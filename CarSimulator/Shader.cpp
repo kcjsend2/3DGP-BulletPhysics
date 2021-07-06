@@ -392,9 +392,9 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	float fTerrainWidth = pTerrain->GetWidth(), fTerrainLength = pTerrain->GetLength();
-	float fxPitch = 300.0f * 3.5f;
+	float fxPitch = 1000.0f * 3.5f;
 	float fyPitch = 100.0f * 3.5f;
-	float fzPitch = 300.0f * 3.5f;
+	float fzPitch = 1000.0f * 3.5f;
 	//직육면체를 지형 표면에 그리고 지형보다 높은 위치에 일정한 간격으로 배치한다.
 	int xObjects = int(fTerrainWidth / fxPitch), yObjects = 1, zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = xObjects * yObjects * zObjects;
@@ -460,9 +460,13 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 			}
 		}
 	}
+	
+	
 	//인스턴싱을 사용하여 렌더링하기 위하여 하나의 게임 객체만 메쉬를 가진다.
 	CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, fLength, fHeight, fDepth);
 	m_ppObjects[0]->SetMesh(0, pCubeMesh);
+
+
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
