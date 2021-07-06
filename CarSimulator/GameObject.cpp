@@ -320,7 +320,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	 
 	btTransform btTerrainTransform;
 	btTerrainTransform.setIdentity();
-	btTerrainTransform.setOrigin(btVector3(nWidth * xmf3Scale.x / 2, fMaxHeight * xmf3Scale.y / 2, nLength * xmf3Scale.z / 2));
+	btTerrainTransform.setOrigin(btVector3(nWidth * xmf3Scale.x / 2, (fMaxHeight + fMinHeight) * xmf3Scale.y / 2, nLength * xmf3Scale.z / 2));
 
 	btScalar mass(0.0f);
 

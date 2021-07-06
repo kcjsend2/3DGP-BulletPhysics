@@ -276,10 +276,10 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 			XMFLOAT3 xmf3Normal = OnGetNormal(x, z, pContext);
 			pVertices[i] = CNormalVertex(xmf3Position, xmf3Normal);
 
-			if (fHeight < fMinHeight)
+			if (fHeight / m_xmf3Scale.y < fMinHeight)
 				fMinHeight = fHeight / m_xmf3Scale.y;
 
-			if (fHeight > fMaxHeight)
+			if (fHeight / m_xmf3Scale.y > fMaxHeight)
 				fMaxHeight = fHeight / m_xmf3Scale.y;
 
 			pHeightmapData[z * nLength + x] = fHeight / m_xmf3Scale.y;
