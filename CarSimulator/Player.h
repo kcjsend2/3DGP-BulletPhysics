@@ -1,12 +1,4 @@
 #pragma once
-#define PITCH_UP 0x01
-#define PITCH_DOWN 0x02
-#define ROLL_LEFT 0x04
-#define ROLL_RIGHT 0x08
-#define YAW_LEFT 0x10
-#define YAW_RIGHT 0x20
-#define AIR_BREAK 0x30
-#define FIRE_BULLET 0x40
 
 #define DIR_FORWARD 0x01
 #define DIR_BACKWARD 0x02
@@ -135,7 +127,7 @@ public:
 	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
-	virtual void ReleaseUploadBuffers();
+	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 
 private:
 	btRigidBody* m_pbtWheel[4];
@@ -152,6 +144,4 @@ private:
 	float m_steeringClamp = 0.3f;
 	float m_wheelRadius = 0.5f;
 	float m_wheelWidth = 0.4f;
-
-	CMeshFileRead** m_ppMeshes = NULL;
 };

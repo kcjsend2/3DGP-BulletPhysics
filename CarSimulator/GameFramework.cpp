@@ -381,16 +381,6 @@ void CGameFramework::ProcessInput()
 
 	if (::GetKeyboardState(pKeyBuffer))
 	{
-		// WASD
-		if (pKeyBuffer[0x57] & 0xF0) dwBehave |= PITCH_UP;
-		if (pKeyBuffer[0x53] & 0xF0) dwBehave |= PITCH_DOWN;
-		if (pKeyBuffer[0x41] & 0xF0) dwBehave |= ROLL_LEFT;
-		if (pKeyBuffer[0x44] & 0xF0) dwBehave |= ROLL_RIGHT;
-		if (pKeyBuffer[0x51] & 0xF0) dwBehave |= YAW_LEFT;
-		if (pKeyBuffer[0x45] & 0xF0) dwBehave |= YAW_RIGHT;
-		if (pKeyBuffer[VK_SPACE] & 0xF0) dwBehave |= FIRE_BULLET;
-		if (pKeyBuffer[VK_SHIFT] & 0xF0) dwBehave |= AIR_BREAK;
-
 		if (pKeyBuffer[VK_UP] & 0xF0) dwBehave |= DIR_FORWARD;
 		if (pKeyBuffer[VK_DOWN] & 0xF0) dwBehave |= DIR_BACKWARD;
 		if (pKeyBuffer[VK_LEFT] & 0xF0) dwBehave |= DIR_LEFT;
@@ -399,29 +389,10 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= DIR_DOWN;
 	}
 
-	m_pPlayer->Behave(dwBehave, m_GameTimer.GetTimeElapsed());
-
-
-	//에어브레이크를 밟은 상태이고, 플레이어 기준 z축 속도가 0 이상이라면 감속한다.
-	m_pPlayer->m_xmf3PlayerSpaceVelocity = Vector3::Projection(m_pPlayer->GetVelocity(), m_pPlayer->GetLookVector());
-
-	//Look 벡터의 z값에 따라서 플레이어 기준 z축 속도의 부호가 변화하므로, 분기하여 적용한다.
-	if (dwBehave == AIR_BREAK)
-		if(m_pPlayer->m_xmf3PlayerSpaceVelocity.z > 0 && m_pPlayer->GetLookVector().z > 0.0f)
-			m_pPlayer->Move(Vector3::ScalarProduct(m_pPlayer->GetLookVector(), m_pPlayer->GetDecceleration()/*감속력*/), true);
-		else if(m_pPlayer->m_xmf3PlayerSpaceVelocity.z < 0 && m_pPlayer->GetLookVector().z < 0.0f)
-			m_pPlayer->Move(Vector3::ScalarProduct(m_pPlayer->GetLookVector(), m_pPlayer->GetDecceleration()/*감속력*/), true);
-
-	m_pPlayer->Move(Vector3::ScalarProduct(m_pPlayer->GetLookVector(), m_pPlayer->GetAcceleration()/*가속력*/), true);
-
-	if (dwBehave == FIRE_BULLET)
-	{
-		m_pPlayer->Fire();
-	}
-
+	
 
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed(), m_pScene->GetTerrain());
+	m_pPlayer->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld);
 }
 
 void CGameFramework::Update()
@@ -456,7 +427,7 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
-	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed(), 2);
+	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed(), 1);
 
 	Update();
 
@@ -492,8 +463,8 @@ void CGameFramework::FrameAdvance()
 	#endif
 
 	//3인칭 카메라일 때 플레이어를 렌더링한다.
-	/*if (m_pPlayer)
-		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);*/
+	if (m_pPlayer)
+		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
