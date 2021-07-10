@@ -324,462 +324,127 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	}
 }
 
-CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nMeshes) : CPlayer(nMeshes)
+CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes) : CPlayer(nMeshes)
 {
-	m_vBullet.reserve(100);
-	CAirplanePlayer::m_ppMeshes = NULL;
-	CMeshFileRead* pAirplaneMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/FlyerPlayership.bin", false);
-	SetMesh(0, pAirplaneMesh);
-	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
+	m_nMeshes = nMeshes;
 
-	m_pBulletMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Sphere.bin", false);
+	if (m_nMeshes > 0)
+	{
+		m_ppMeshes = new CMeshFileRead* [m_nMeshes];
+		for (int i = 0; i < m_nMeshes; i++)
+			m_ppMeshes[i] = NULL;
+	}
+
+	CMeshFileRead* pVehicleMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Car.bin", false);
+	SetMesh(0, pVehicleMesh);
+
+	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
 
 	m_pCamera = ChangeCamera(SPACESHIP_CAMERA/*THIRD_PERSON_CAMERA*/, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetPosition(XMFLOAT3(2000.0f, 100.0f, 2000.0f));
+
+	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(extents.x * 2, extents.y * 2, extents.z * 2));
+	btCollisionShapes.push_back(chassisShape);
+
+	btTransform btCarTransform;
+	btCarTransform.setIdentity();
+	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
+
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(100.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+
+	btTransform FH_tr;
+	const btScalar FALLHEIGHT = 5;
+	FH_tr.setOrigin(btVector3(0, FALLHEIGHT, 0));
+	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(0.5f, 0.4f, 0.4f));
+
+	btVector3 wheelPos[4] = {
+		btVector3(btScalar(-1.), btScalar(FALLHEIGHT - 0.25), btScalar(1.25)),
+		btVector3(btScalar(1.), btScalar(FALLHEIGHT - 0.25), btScalar(1.25)),
+		btVector3(btScalar(1.), btScalar(FALLHEIGHT - 0.25), btScalar(-1.25)),
+		btVector3(btScalar(-1.), btScalar(FALLHEIGHT - 0.25), btScalar(-1.25)) };
+
+	for (int i = 0; i < 4; i++)
+	{
+		btRigidBody* pBodyA = m_pbtRigidBody;
+		pBodyA->setActivationState(DISABLE_DEACTIVATION);
+
+		btTransform tr;
+		tr.setIdentity();
+		tr.setOrigin(wheelPos[i]);
+
+		btRigidBody* pBodyB = BulletHelper::CreateRigidBody(1.0f, tr, wheelShape, pbtDynamicsWorld);
+		pBodyB->setFriction(1110);
+		pBodyB->setActivationState(DISABLE_DEACTIVATION);
+
+		btVector3 parentAxis(0.f, 1.f, 0.f);
+		btVector3 childAxis(1.f, 0.f, 0.f);
+		btVector3 anchor = tr.getOrigin();
+		btHinge2Constraint* pHinge2 = new btHinge2Constraint(*pBodyA, *pBodyB, anchor, parentAxis, childAxis);
+
+		// add constraint to world
+		pbtDynamicsWorld->addConstraint(pHinge2, true);
+
+		// Drive engine.
+		pHinge2->enableMotor(3, true);
+		pHinge2->setMaxMotorForce(3, 1000);
+		pHinge2->setTargetVelocity(3, 0);
+
+		// Steering engine.
+		pHinge2->enableMotor(5, true);
+		pHinge2->setMaxMotorForce(5, 1000);
+		pHinge2->setTargetVelocity(5, 0);
+
+		pHinge2->setParam(BT_CONSTRAINT_CFM, 0.15f, 2);
+		pHinge2->setParam(BT_CONSTRAINT_ERP, 0.35f, 2);
+
+		pHinge2->setDamping(2, 2.0);
+		pHinge2->setStiffness(2, 40.0);
+	}
+
 	CPlayerShader* pShader = new CPlayerShader();
 	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	SetShader(pShader);
 }
 
-void CAirplanePlayer::SetMesh(int nIndex, CMeshFileRead* pMesh)
+CVehiclePlayer::~CVehiclePlayer()
 {
-	if (m_pMesh)
-		m_pMesh->Release();
-
-	m_pMesh = pMesh;
-
-	if (pMesh)
-		pMesh->AddRef();
-
+	ReleaseShaderVariables();
+	if (m_pCamera) delete m_pCamera;
 }
 
-void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+{
+	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
+	btScalar* m = new btScalar[16];
+	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
+	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
+}
+
+void CVehiclePlayer::SetMesh(int nIndex, CMeshFileRead* pMesh)
+{
+	if (m_ppMeshes)
+	{
+		if (m_ppMeshes[nIndex])
+			m_ppMeshes[nIndex]->Release();
+
+		m_ppMeshes[nIndex] = pMesh;
+
+		if (pMesh)
+			pMesh->AddRef();
+	}
+}
+
+void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
 	UpdateShaderVariables(pd3dCommandList);
 	if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
 
-	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
-	if (m_pMesh)
-	{
-		m_pMesh->Render(pd3dCommandList);
-	}
-
-	for (CBullet& b : m_vBullet)
-	{
-		b.Render(pd3dCommandList);
-	}
+	CGameObject::Render(pd3dCommandList, pCamera);
 }
 
-void CAirplanePlayer::ReleaseUploadBuffers()
+void CVehiclePlayer::ReleaseUploadBuffers()
 {
-	if (m_pMesh)
-	{
-		m_pMesh->ReleaseUploadBuffers();
-	}
-}
-
-CAirplanePlayer::~CAirplanePlayer()
-{
-}
-
-
-/*3인칭 카메라일 때 플레이어 메쉬를 로컬 x-축을 중심으로 +90도 회전하고 렌더링한다. 왜냐하면 비행기 모델 메쉬
-는 다음 그림과 같이 y-축 방향이 비행기의 앞쪽이 되도록 모델링이 되었기 때문이다. 그리고 이 메쉬를 카메라의 z- 축 방향으로 향하도록 그릴 것이기 때문이다.*/
-void CAirplanePlayer::OnPrepareRender()
-{
-	CPlayer::OnPrepareRender();
-}
-
-bool CAirplanePlayer::TerrainCollision(CHeightMapTerrain* pTerrain)
-{
-	float fheight = pTerrain->GetHeight(m_xmf3Position.x, m_xmf3Position.z);
-
-	if (fheight > m_xmf3Position.y)
-	{
-		return true;
-	}
-
-	return false;
-
-}
-
-void CAirplanePlayer::Update(float fTimeElapsed, CHeightMapTerrain* pTerrain)
-{
-	if (m_fFireElapsed < m_fFireInterval)
-	{
-		m_fFireElapsed += fTimeElapsed;
-	}
-
-	/*플레이어의 속도 벡터를 중력 벡터와 더한다. 중력 벡터에 fTimeElapsed를 곱하는 것은 중력을 시간에 비례하도록
-	적용한다는 의미이다.*/
-
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
-	/*플레이어의 속도 벡터의 XZ-성분의 크기를 구한다. 이것이 XZ-평면의 최대 속력보다 크면 속도 벡터의 x와 z-방향
-	성분을 조정한다.*/
-
-	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
-	float fMaxVelocityXZ = m_fMaxVelocityXZ * fTimeElapsed;
-
-	if (fLength > m_fMaxVelocityXZ)
-	{
-		m_fAcceleration = 0.0f;
-	}
-	else
-	{
-		m_fAcceleration = 0.0f;
-	}
-
-	/*플레이어의 속도 벡터의 y-성분의 크기를 구한다. 이것이 y-축 방향의 최대 속력보다 크면 속도 벡터의 y-방향 성분을 조정한다.*/
-	float fMaxVelocityY = m_fMaxVelocityY * fTimeElapsed;
-	fLength = sqrtf(m_xmf3Velocity.y * m_xmf3Velocity.y);
-	if (fLength > m_fMaxVelocityY)
-		m_xmf3Velocity.y *= (fMaxVelocityY / fLength);
-
-	//플레이어를 속도 벡터 만큼 실제로 이동한다(카메라도 이동될 것이다). 
-	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	Move(xmf3Velocity, false);
-
-	/*플레이어의 위치가 변경될 때 추가로 수행할 작업을 수행한다. 플레이어의 새로운 위치가 유효한 위치가 아닐 수도
-	있고 또는 플레이어의 충돌 검사 등을 수행할 필요가 있다. 이러한 상황에서 플레이어의 위치를 유효한 위치로 다시
-	변경할 수 있다.*/
-	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
-	DWORD nCameraMode = m_pCamera->GetMode();
-
-	//플레이어의 위치가 변경되었으므로 3인칭 카메라를 갱신한다.
-	if (nCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-
-	//카메라의 위치가 변경될 때 추가로 수행할 작업을 수행한다.
-	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
-
-	//카메라가 3인칭 카메라이면 카메라가 변경된 플레이어 위치를 바라보도록 한다.
-	if (nCameraMode == THIRD_PERSON_CAMERA)
-		m_pCamera->SetLookAt(m_xmf3Position);
-
-	//카메라의 카메라 변환 행렬을 다시 생성한다.
-	m_pCamera->RegenerateViewMatrix();
-
-	/*플레이어의 속도 벡터가 마찰력 때문에 감속이 되어야 한다면 감속 벡터를 생성한다. 속도 벡터의 반대 방향 벡터를
-	구하고 단위 벡터로 만든다. 마찰 계수를 시간에 비례하도록 하여 마찰력을 구한다. 단위 벡터에 마찰력을 곱하여 감
-	속 벡터를 구한다. 속도 벡터에 감속 벡터를 더하여 속도 벡터를 줄인다. 마찰력이 속력보다 크면 속력은 0이 될 것이
-	다.*/
-
-	fLength = Vector3::Length(m_xmf3Velocity);
-	float fDeceleration = (m_fFriction * fTimeElapsed);
-
-	if (fDeceleration > fLength)
-		fDeceleration = fLength;
-
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
-
-	if (m_xmf3Position.y < 0.0f || m_xmf3Position.y > 5000.0f || m_xmf3Position.z < 0.0f || m_xmf3Position.z > 8224.0f || m_xmf3Position.x < 0.0f || m_xmf3Position.x > 8224.0f)
-	{
-		Move(XMFLOAT3{ -m_xmf3Position.x + 4000.0f, -m_xmf3Position.y + 2000.0f, -m_xmf3Position.z + 4000.0f });
-	}
-	/*if (pTerrain)
-	{
-		if (TerrainCollision(pTerrain))
-		{
-			Move(XMFLOAT3{ -m_xmf3Position.x + 4000.0f, -m_xmf3Position.y + 2000.0f, -m_xmf3Position.z + 4000.0f });
-		}
-	}*/
-
-	for (auto i = m_vBullet.begin(); i != m_vBullet.end();)
-	{
-		i->Move(m_xmf3PlayerSpaceVelocity, fTimeElapsed);
-		auto xmf3Traveled = i->GetTraveled();
-		XMFLOAT3 xmf3Position = i->GetPosition();
-		if (xmf3Position.y < 0.0f || xmf3Position.y > 5000.0f || xmf3Position.z < 0.0f || xmf3Position.z > 8224.0f || xmf3Position.x < 0.0f || xmf3Position.x > 8224.0f || xmf3Traveled.x > 1000.0f || xmf3Traveled.y > 1000.0f || xmf3Traveled.z > 1000.0f)
-		{
-			i = m_vBullet.erase(i);
-		}
-		else
-		{
-			if (pTerrain)
-			{
-				if (i->TerrainCollision(pTerrain))
-				{
-					i = m_vBullet.erase(i);
-				}
-				else
-				{
-					++i;
-				}
-			}
-		}
-	}
-}
-
-void CAirplanePlayer::Behave(DWORD dwDirection, float fTimeElapsed)
-{
-	if (dwDirection)
-	{
-		//W를 누르면 플레이어의 X축 기준으로 회전한다. S를 누르면 반대 방향으로 회전한다.
-		if (dwDirection & PITCH_UP)
-			CPlayer::Rotate(fTimeElapsed * m_fPitchSpeed, 0.0f, 0.0f);
-
-		if (dwDirection & PITCH_DOWN)
-			CPlayer::Rotate(fTimeElapsed * -m_fPitchSpeed, 0.0f, 0.0f);
-
-		//D를 누르면 플레이어의 Z축 기준으로 회전한다. A를 누르면 반대 방향으로 회전한다.
-		if (dwDirection & ROLL_LEFT)
-			CPlayer::Rotate(0.0f, 0.0f, fTimeElapsed * m_fRollSpeed);
-		if (dwDirection & ROLL_RIGHT)
-			CPlayer::Rotate(0.0f, 0.0f, fTimeElapsed * -m_fRollSpeed);
-
-		//Q를 누르면 플레이어의 Y축 기준으로 회전한다. E를 누르면 반대 방향으로 회전한다.
-		if (dwDirection & YAW_LEFT)
-			CPlayer::Rotate(0.0f, fTimeElapsed * -m_fYawSpeed, 0.0f);
-		if (dwDirection & YAW_RIGHT)
-			CPlayer::Rotate(0.0f, fTimeElapsed * m_fYawSpeed, 0.0f);
-	}
-}
-
-void CAirplanePlayer::Fire()
-{
-	if (m_vBullet.size() < 100 && m_fFireElapsed > m_fFireInterval)
-	{
-		m_fFireElapsed = 0.0f;
-		m_vBullet.emplace_back(m_xmf3Position, GetLookVector(), m_pBulletMesh);
-	}
-}
-
-//카메라를 변경할 때 호출되는 함수이다. nNewCameraMode는 새로 설정할 카메라 모드이다.
-CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
-{
-	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
-
-	if (nCurrentCameraMode == nNewCameraMode)
-		return(m_pCamera);
-
-	switch (nNewCameraMode)
-	{
-	case FIRST_PERSON_CAMERA:
-		//플레이어의 특성을 1인칭 카메라 모드에 맞게 변경한다. 중력은 적용하지 않는다.
-		SetFriction(200.0f);
-		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		SetMaxVelocityXZ(125.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
-		m_pCamera->SetTimeLag(0.0f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-		break;
-	case SPACESHIP_CAMERA:
-		//플레이어의 특성을 스페이스-쉽 카메라 모드에 맞게 변경한다. 중력은 적용하지 않는다.
-		SetFriction(125.0f);
-		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		SetMaxVelocityXZ(400.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(SPACESHIP_CAMERA, nCurrentCameraMode);
-		m_pCamera->SetTimeLag(0.0f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 5.0f, -13.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-		break;
-	case THIRD_PERSON_CAMERA:
-
-		//플레이어의 특성을 3인칭 카메라 모드에 맞게 변경한다. 지연 효과와 카메라 오프셋을 설정한다.
-		SetFriction(250.0f);
-		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		SetMaxVelocityXZ(125.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
-
-		//3인칭 카메라의 지연 효과를 설정한다. 값을 0.25f 대신에 0.0f와 1.0f로 설정한 결과를 비교하기 바란다.
-		m_pCamera->SetTimeLag(0.25f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-		break;
-	default:
-		break;
-	}
-	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
-
-	//플레이어를 시간의 경과에 따라 갱신(위치와 방향을 변경: 속도, 마찰력, 중력 등을 처리)한다.
-	Update(fTimeElapsed, NULL);
-	return(m_pCamera);
-}
-
-
-CTerrainPlayer::CTerrainPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext, int nMeshes) : CPlayer(nMeshes)
-{
-	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-	//플레이어의 위치를 지형의 가운데(y-축 좌표는 지형의 높이보다 1500 높게)로 설정한다. 플레이어 위치 벡터의 y좌표가 지형의 높이보다 크고 중력이 작용하도록 플레이어를 설정하였으므로 플레이어는 점차적으로 하강하게 된다.*/ 
-	float fHeight = pTerrain->GetHeight(pTerrain->GetWidth() * 0.5f, pTerrain->GetLength() * 0.5f);
-	SetPosition(XMFLOAT3(pTerrain->GetWidth() * 0.5f, fHeight + 1500.0f, pTerrain->GetLength() * 0.5f));
-	//플레이어의 위치가 변경될 때 지형의 정보에 따라 플레이어의 위치를 변경할 수 있도록 설정한다.
-	SetPlayerUpdatedContext(pTerrain);
-	//카메라의 위치가 변경될 때 지형의 정보에 따라 카메라의 위치를 변경할 수 있도록 설정한다.
-	SetCameraUpdatedContext(pTerrain);
-	CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 4.0f, 12.0f, 4.0f);
-	SetMesh(0, pCubeMesh);//플레이어를 렌더링할 셰이더를 생성한다.
-	CPlayerShader *pShader = new CPlayerShader();
-	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
-	SetShader(pShader);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-}
-
-CTerrainPlayer::~CTerrainPlayer()
-{
-}
-
-CCamera* CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
-{
-	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
-	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
-	switch (nNewCameraMode)
-	{
-	case FIRST_PERSON_CAMERA:
-		SetFriction(250.0f);
-		//1인칭 카메라일 때 플레이어에 y-축 방향으로 중력이 작용한다.
-		SetGravity(XMFLOAT3(0.0f, -250.0f, 0.0f));
-		SetMaxVelocityXZ(300.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
-		m_pCamera->SetTimeLag(0.0f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 50000.0f, ASPECT_RATIO, 60.0f);
-		break;
-	case SPACESHIP_CAMERA:
-		SetFriction(125.0f);
-		//스페이스 쉽 카메라일 때 플레이어에 중력이 작용하지 않는다.
-		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		SetMaxVelocityXZ(300.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(SPACESHIP_CAMERA, nCurrentCameraMode);
-		m_pCamera->SetTimeLag(0.0f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 50000.0f, ASPECT_RATIO, 60.0f);
-		break;
-	case THIRD_PERSON_CAMERA:
-		SetFriction(250.0f);
-		//3인칭 카메라일 때 플레이어에 y-축 방향으로 중력이 작용한다.
-		SetGravity(XMFLOAT3(0.0f, -250.0f, 0.0f));
-		SetMaxVelocityXZ(300.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
-		m_pCamera->SetTimeLag(0.25f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 50000.0f, ASPECT_RATIO, 60.0f);
-		break;
-
-	default:
-		break;
-	}
-	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
-
-	Update(fTimeElapsed);
-	return(m_pCamera);
-}
-void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
-{
-	XMFLOAT3 xmf3PlayerPosition = GetPosition();
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pPlayerUpdatedContext;
-
-	/*지형에서 플레이어의 현재 위치 (x, z)의 지형 높이(y)를 구한다. 그리고 플레이어 메쉬의 높이가 12이고 플레이어의
-	중심이 직육면체의 가운데이므로 y 값에 메쉬의 높이의 절반을 더하면 플레이어의 위치가 된다.*/
-
-	float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z) + 6.0f;
-
-	/*플레이어의 위치 벡터의 y-값이 음수이면(예를 들어, 중력이 적용되는 경우) 플레이어의 위치 벡터의 y-값이 점점
-	작아지게 된다. 이때 플레이어의 현재 위치 벡터의 y 값이 지형의 높이(실제로 지형의 높이 + 6)보다 작으면 플레이어
-	의 일부가 지형 아래에 있게 된다. 이러한 경우를 방지하려면 플레이어의 속도 벡터의 y 값을 0으로 만들고 플레이어
-	의 위치 벡터의 y-값을 지형의 높이(실제로 지형의 높이 + 6)로 설정한다. 그러면 플레이어는 항상 지형 위에 있게 된
-	다.*/
-
-	if (xmf3PlayerPosition.y < fHeight)
-	{
-		XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
-		xmf3PlayerVelocity.y = 0.0f;
-		SetVelocity(xmf3PlayerVelocity);
-		xmf3PlayerPosition.y = fHeight;
-		SetPosition(xmf3PlayerPosition);
-	}
-}
-
-void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
-{
-	XMFLOAT3 xmf3CameraPosition = m_pCamera->GetPosition();
-	/*높이 맵에서 카메라의 현재 위치 (x, z)에 대한 지형의 높이(y 값)를 구한다. 이 값이 카메라의 위치 벡터의 y-값 보
-	다 크면 카메라가 지형의 아래에 있게 된다. 이렇게 되면 다음 그림의 왼쪽과 같이 지형이 그려지지 않는 경우가 발생
-	한다(카메라가 지형 안에 있으므로 삼각형의 와인딩 순서가 바뀐다). 이러한 경우가 발생하지 않도록 카메라의 위치 벡
-	터의 y-값의 최소값은 (지형의 높이 + 5)로 설정한다. 카메라의 위치 벡터의 y-값의 최소값은 지형의 모든 위치에서
-	카메라가 지형 아래에 위치하지 않도록 설정해야 한다.*/
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pCameraUpdatedContext;
-	float fHeight = pTerrain->GetHeight(xmf3CameraPosition.x, xmf3CameraPosition.z) + 5.0f;
-	if (xmf3CameraPosition.y <= fHeight)
-	{
-		xmf3CameraPosition.y = fHeight;
-		m_pCamera->SetPosition(xmf3CameraPosition);
-		if (m_pCamera->GetMode() == THIRD_PERSON_CAMERA)
-		{
-			//3인칭 카메라의 경우 카메라 위치(y-좌표)가 변경되었으므로 카메라가 플레이어를 바라보도록 한다.
-			CThirdPersonCamera *p3rdPersonCamera = (CThirdPersonCamera *)m_pCamera;
-			p3rdPersonCamera->SetLookAt(GetPosition());
-		}
-	}
-}
-
-CBullet::CBullet(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Direction, CMeshFileRead* pBulletMesh)
-{
-	m_nMeshes = 0;
-	SetMesh(0, pBulletMesh);
-	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
-	SetPosition(xmf3Position);
-	m_xmf3Direction = xmf3Direction;
-}
-
-CBullet::~CBullet()
-{
-	m_ppMeshes = NULL;
-}
-
-bool CBullet::TerrainCollision(void* pContext)
-{
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-	XMFLOAT3 xfm3BulletPosition = GetPosition();
-	float fheight = pTerrain->GetHeight(xfm3BulletPosition.x, xfm3BulletPosition.z);
-
-	if (fheight > xfm3BulletPosition.y)
-	{
-		return true;
-	}
-
-	return false;
-
-}
-
-void CBullet::SetMesh(int nIndex, CMeshFileRead* pMesh)
-{
-	if (m_pMesh)
-		m_pMesh->Release();
-
-	m_pMesh = pMesh;
-
-	if (pMesh)
-		pMesh->AddRef();
-}
-
-void CBullet::Move(XMFLOAT3 xmf3PlayerSpaceVelocity, float fTimeElapsed)
-{
-	//플레이어를 현재 위치 벡터에서 xmf3Shift 벡터만큼 이동한다.
-	XMFLOAT3 xmf3Shift = Vector3::Add(Vector3::ScalarProduct(m_xmf3Direction, m_fVelocity * fTimeElapsed), Vector3::ScalarProduct(xmf3PlayerSpaceVelocity, fTimeElapsed));
-	SetPosition(Vector3::Add(GetPosition(), xmf3Shift));
-
-	m_xmf3Traveled = Vector3::Add(m_xmf3Traveled, Vector3::abs(xmf3Shift));
-}
-
-void CBullet::Render(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	UpdateShaderVariables(pd3dCommandList);
-	if(m_pMesh)
-		m_pMesh->Render(pd3dCommandList);
 }

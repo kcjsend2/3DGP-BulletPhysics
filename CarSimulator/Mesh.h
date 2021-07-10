@@ -72,7 +72,7 @@ private:
 public:
 	void AddRef() { m_nReferences++; }
 	void Release() { if (--m_nReferences <= 0) delete this; }
-	void ReleaseUploadBuffers();
+	virtual void ReleaseUploadBuffers();
 	BoundingOrientedBox GetBoundingBox() { return(m_xmBoundingBox); }
 
 protected:
@@ -178,25 +178,14 @@ public:
 	virtual XMFLOAT4 OnGetColor(int x, int z, void *pContext);
 };
 
-class CMeshFileRead
+class CMeshFileRead : public CMesh
 {
 public:
 	CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName = NULL, bool bTextFile = true);
 	virtual ~CMeshFileRead();
-
-private:
-	int								m_nReferences = 0;
-
-public:
-	void AddRef() { m_nReferences++; }
-	void Release() { if (--m_nReferences <= 0) delete this; }
-	BoundingOrientedBox GetBoundingBox() { return(m_xmBoundingBox); }
-	void ReleaseUploadBuffers();
+	virtual void ReleaseUploadBuffers();
 
 protected:
-	BoundingOrientedBox				m_xmBoundingBox;
-
-	UINT							m_nVertices = 0;
 	XMFLOAT3* m_pxmf3Positions = NULL;
 	ID3D12Resource* m_pd3dPositionBuffer = NULL;
 	ID3D12Resource* m_pd3dPositionUploadBuffer = NULL;
@@ -209,26 +198,24 @@ protected:
 	ID3D12Resource* m_pd3dTextureCoordBuffer = NULL;
 	ID3D12Resource* m_pd3dTextureCoordUploadBuffer = NULL;
 
-	UINT							m_nIndices = 0;
+	UINT m_nIndices = 0;
 	UINT* m_pnIndices = NULL;
 	ID3D12Resource* m_pd3dIndexBuffer = NULL;
 	ID3D12Resource* m_pd3dIndexUploadBuffer = NULL;
 
-	UINT							m_nVertexBufferViews = 0;
+	UINT m_nVertexBufferViews = 0;
 	D3D12_VERTEX_BUFFER_VIEW* m_pd3dVertexBufferViews = NULL;
 
-	D3D12_INDEX_BUFFER_VIEW			m_d3dIndexBufferView;
+	D3D12_INDEX_BUFFER_VIEW	m_d3dIndexBufferView;
 
-	D3D12_PRIMITIVE_TOPOLOGY		m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	UINT							m_nSlot = 0;
-	UINT							m_nStride = 0;
-	UINT							m_nOffset = 0;
+	UINT m_nStartIndex = 0;
+	int	m_nBaseVertex = 0;
 
-	UINT							m_nStartIndex = 0;
-	int								m_nBaseVertex = 0;
+protected:
+	BoundingOrientedBox m_xmBoundingBox;
 
 public:
-	void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile);
 };

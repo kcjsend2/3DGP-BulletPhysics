@@ -282,3 +282,25 @@ namespace Matrix4x4
 	}
 }
 
+namespace BulletHelper
+{
+	inline btRigidBody* CreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+	{
+		btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
+
+		bool isDynamic = (mass != 0.f);
+
+		btVector3 localInertia(0, 0, 0);
+		if (isDynamic)
+			shape->calculateLocalInertia(mass, localInertia);
+
+		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+
+		btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
+
+		btRigidBody* body = new btRigidBody(cInfo);
+
+		pbtDynamicsWorld->addRigidBody(body);
+		return body;
+	}
+}

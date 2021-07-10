@@ -126,66 +126,32 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 };
 
-class CBullet : public CGameObject
+class CVehiclePlayer : public CPlayer
 {
 public:
-	CBullet(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Direction, CMeshFileRead* pBulletMesh);
-	~CBullet();
-	bool TerrainCollision(void* pContext);
-	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
-	void Move(XMFLOAT3 xmf3PlayerSpaceVelocity, float fTimeElapsed);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-	XMFLOAT3 GetTraveled() { return m_xmf3Traveled; }
+	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes = 5);
+	virtual ~CVehiclePlayer();
 
-private:
-	XMFLOAT3 m_xmf3Traveled = {0.0f, 0.0f, 0.0f};
-	XMFLOAT3 m_xmf3Direction;
-	float m_fVelocity = 2000.0f;
-	CMeshFileRead* m_pMesh = NULL;
-};
-
-class CAirplanePlayer : virtual public CPlayer
-{
-public:
-	CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nMeshes = 1);
-	virtual ~CAirplanePlayer();
-	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
-	virtual void OnPrepareRender();
-	bool TerrainCollision(CHeightMapTerrain* pTerrain);
-	virtual void Update(float fTimeElapsed, CHeightMapTerrain* pTerrain);
+	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual void ReleaseUploadBuffers();
-	void Behave(DWORD dwDirection, float fTimeElapsed);
-	void Fire();
-	float GetAcceleration() { return m_fAcceleration; }
-	float GetDecceleration() { return m_fDecceleration; }
 
 private:
-	CMeshFileRead* m_pMesh = NULL;
-	float m_fRollSpeed = 100.0f;
-	float m_fYawSpeed = 100.0f;
-	float m_fPitchSpeed = 100.0f;
-	float m_fAcceleration = 0.0f;
-	float m_fDecceleration = 0.0f;
+	btRigidBody* m_pbtWheel[4];
 
-	const float m_fFireInterval = 0.5f;
-	float m_fFireElapsed = 0.0f;
+	float m_gEngineForce = 0.f;
 
-	CMeshFileRead* m_pBulletMesh = NULL;
-	std::vector<CBullet> m_vBullet;
+	float m_defaultBreakingForce = 10.f;
+	float m_gBreakingForce = 100.f;
 
-public:
-	XMFLOAT3 m_xmf3PlayerSpaceVelocity;
+	float m_maxEngineForce = 1000.f;
+
+	float m_gVehicleSteering = 0.f;
+	float m_steeringIncrement = 0.04f;
+	float m_steeringClamp = 0.3f;
+	float m_wheelRadius = 0.5f;
+	float m_wheelWidth = 0.4f;
+
+	CMeshFileRead** m_ppMeshes = NULL;
 };
-
-class CTerrainPlayer : public CPlayer
-{
-public:
-	CTerrainPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext, int nMeshes = 1);
-	virtual ~CTerrainPlayer();
-	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
-	virtual void OnPlayerUpdateCallback(float fTimeElapsed);
-	virtual void OnCameraUpdateCallback(float fTimeElapsed);
-};
-

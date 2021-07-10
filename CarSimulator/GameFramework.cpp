@@ -290,7 +290,7 @@ void CGameFramework::BuildObjects()
 	if (m_pScene)
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_btCollisionShapes, m_pbtDynamicsWorld);
 
-	m_pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), 1);
+	m_pPlayer = new CVehiclePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_btCollisionShapes, m_pbtDynamicsWorld, 1);
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -456,7 +456,7 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
-	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed());
+	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed(), 2);
 
 	Update();
 
