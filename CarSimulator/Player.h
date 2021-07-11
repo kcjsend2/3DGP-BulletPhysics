@@ -120,6 +120,16 @@ public:
 
 class CVehiclePlayer : public CPlayer
 {
+private:
+	class CWheel : public CGameObject
+	{
+	public:
+		CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh);
+		~CWheel();
+		virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+		virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	};
+
 public:
 	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes = 5);
 	virtual ~CVehiclePlayer();
@@ -130,7 +140,7 @@ public:
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 
 private:
-	btRigidBody* m_pbtWheel[4];
+	CWheel* m_pWheel[4];
 
 	float m_gEngineForce = 0.f;
 

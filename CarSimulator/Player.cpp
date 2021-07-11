@@ -327,34 +327,35 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes) : CPlayer(nMeshes)
 {
 	CMeshFileRead* pVehicleMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/FlyerPlayership.bin", false);
+	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Sphere.bin", false);
 	SetMesh(0, pVehicleMesh);
 
 	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 100.0f, 100.0f));
+	SetPosition(XMFLOAT3(100.0f, 50.0f, 100.0f));
 
-	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(extents.x * 2, extents.y * 2, extents.z * 2));
+	/*auto extents = pVehicleMesh[0].GetBoundingBox().Extents;*/
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.0f, 0.2f, 1.0f));
 	btCollisionShapes.push_back(chassisShape);
 
 	btTransform btCarTransform;
 	btCarTransform.setIdentity();
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
-	m_pbtRigidBody = BulletHelper::CreateRigidBody(100.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(1.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
 	btTransform FH_tr;
 	const btScalar FALLHEIGHT = 5;
 	FH_tr.setOrigin(btVector3(0, FALLHEIGHT, 0));
-	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(0.5f, 0.4f, 0.4f));
+	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(0.4f, 0.5f, 0.5f));
 
 	btVector3 wheelPos[4] = {
-		btVector3(btScalar(-1.), btScalar(FALLHEIGHT - 0.25), btScalar(1.25)),
-		btVector3(btScalar(1.), btScalar(FALLHEIGHT - 0.25), btScalar(1.25)),
-		btVector3(btScalar(1.), btScalar(FALLHEIGHT - 0.25), btScalar(-1.25)),
-		btVector3(btScalar(-1.), btScalar(FALLHEIGHT - 0.25), btScalar(-1.25)) };
+		btVector3(btScalar(m_xmf3Position.x - 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + 1.25)),
+		btVector3(btScalar(m_xmf3Position.x + 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + 1.25)),
+		btVector3(btScalar(m_xmf3Position.x + 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - 1.25)),
+		btVector3(btScalar(m_xmf3Position.x - 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - 1.25)) };
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -392,11 +393,22 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 		pHinge2->setDamping(2, 2.0);
 		pHinge2->setStiffness(2, 40.0);
+
+		btScalar m[16];
+		pBodyB->getWorldTransform().getOpenGLMatrix(m);
+
+		m_pWheel[i] = new CWheel(Matrix4x4::glMatrixToD3DMatrix(m), pWheelMesh);
+		m_pWheel[i]->SetRigidBody(pBodyB);
 	}
 
 	CPlayerShader* pShader = new CPlayerShader();
 	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	SetShader(pShader);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		m_pWheel[i]->SetShader(pShader);
+	}
 }
 
 CVehiclePlayer::~CVehiclePlayer()
@@ -418,6 +430,11 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	m_xmf3Right = XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13);
 
 	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		m_pWheel[i]->Update(fTimeElapsed, pbtDynamicsWorld);
+	}
 
 	//카메라의 카메라 변환 행렬을 다시 생성한다.
 	m_pCamera->RegenerateViewMatrix();
@@ -444,6 +461,11 @@ void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
 
 	CGameObject::Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		m_pWheel[i]->Render(pd3dCommandList);
+	}
 }
 
 CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
@@ -503,4 +525,40 @@ CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
 
 	return(m_pCamera);
+}
+
+CVehiclePlayer::CWheel::CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh)
+{
+	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
+}
+
+CVehiclePlayer::CWheel::~CWheel()
+{
+}
+
+void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender();
+	UpdateShaderVariables(pd3dCommandList);
+
+	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i])
+				m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
+}
+
+void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+{
+	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
+	btScalar* m = new btScalar[16];
+	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
+
+	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
+
+	auto p = GetPosition();
 }
