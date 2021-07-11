@@ -334,7 +334,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 10.0f, 100.0f));
+	SetPosition(XMFLOAT3(100.0f, 100.0f, 100.0f));
 
 	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
 
@@ -345,18 +345,18 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btCarTransform.setIdentity();
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
-	m_pbtRigidBody = BulletHelper::CreateRigidBody(1.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(2.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
 	btTransform FH_tr;
-	const btScalar FALLHEIGHT = 5;
+	const btScalar FALLHEIGHT = -3;
 	FH_tr.setOrigin(btVector3(0, FALLHEIGHT, 0));
 	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(0.4f, 0.5f, 0.5f));
 
 	btVector3 wheelPos[4] = {
-		btVector3(btScalar(m_xmf3Position.x - 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + 1.25)),
-		btVector3(btScalar(m_xmf3Position.x + 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + 1.25)),
-		btVector3(btScalar(m_xmf3Position.x + 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - 1.25)),
-		btVector3(btScalar(m_xmf3Position.x - 1.), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - 1.25)) };
+		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + (extents.z / 2))),
+		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + (extents.z / 2))),
+		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - (extents.z / 2))),
+		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - (extents.z / 2))) };
 
 	for (int i = 0; i < 4; i++)
 	{
