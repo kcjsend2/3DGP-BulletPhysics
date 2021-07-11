@@ -211,9 +211,6 @@ protected:
 	UINT m_nStartIndex = 0;
 	int	m_nBaseVertex = 0;
 
-protected:
-	BoundingOrientedBox m_xmBoundingBox;
-
 public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 

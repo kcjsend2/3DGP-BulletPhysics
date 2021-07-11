@@ -334,10 +334,11 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 50.0f, 100.0f));
+	SetPosition(XMFLOAT3(100.0f, 10.0f, 100.0f));
 
-	/*auto extents = pVehicleMesh[0].GetBoundingBox().Extents;*/
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.0f, 0.2f, 1.0f));
+	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
+
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(extents.x, extents.y, extents.z));
 	btCollisionShapes.push_back(chassisShape);
 
 	btTransform btCarTransform;
@@ -530,6 +531,7 @@ CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 CVehiclePlayer::CWheel::CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh)
 {
 	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
+	SetMesh(0, pWheelMesh);
 }
 
 CVehiclePlayer::CWheel::~CWheel()
