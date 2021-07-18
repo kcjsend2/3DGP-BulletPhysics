@@ -384,7 +384,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld)
 {
-	float fHeight = 12.0f, fLength = 12.0f, fDepth = 12.0f;
+	float fHeight = 1.0f, fLength = 1.0f, fDepth = 1.0f;
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength), btScalar(fHeight), btScalar(fDepth)));
 

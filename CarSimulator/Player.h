@@ -128,13 +128,18 @@ private:
 		~CWheel();
 		virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 		virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+		void setHinge(btHinge2Constraint* pbtHinge) { m_pbtHinge = pbtHinge; }
+		btHinge2Constraint* getHinge() { return m_pbtHinge; }
+
+	private:
+		btHinge2Constraint* m_pbtHinge;
 	};
 
 public:
 	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes = 5);
 	virtual ~CVehiclePlayer();
 
-	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);
 	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);

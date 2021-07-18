@@ -389,10 +389,8 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= DIR_DOWN;
 	}
 
-	
-
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld);
+	m_pPlayer->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld, dwBehave);
 }
 
 void CGameFramework::Update()

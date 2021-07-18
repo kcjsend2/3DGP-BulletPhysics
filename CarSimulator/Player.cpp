@@ -334,7 +334,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 100.0f, 100.0f));
+	SetPosition(XMFLOAT3(100.0f, 300.0f, 100.0f));
 
 	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
 
@@ -400,6 +400,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 		m_pWheel[i] = new CWheel(Matrix4x4::glMatrixToD3DMatrix(m), pWheelMesh);
 		m_pWheel[i]->SetRigidBody(pBodyB);
+		m_pWheel[i]->setHinge(pHinge2);
 	}
 
 	CPlayerShader* pShader = new CPlayerShader();
@@ -418,8 +419,61 @@ CVehiclePlayer::~CVehiclePlayer()
 	if (m_pCamera) delete m_pCamera;
 }
 
-void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
+	switch (dwBehave)
+	{
+		case DIR_LEFT:
+		{
+			m_gVehicleSteering += m_steeringIncrement;
+			if (m_gVehicleSteering > m_steeringClamp)
+				m_gVehicleSteering = m_steeringClamp;
+			for (int i = 0; i < 2; ++i)
+			{
+				m_pWheel[i]->getHinge()->setTargetVelocity(5, m_gVehicleSteering);
+			}
+
+			break;
+		}
+		case DIR_RIGHT:
+		{
+			m_gVehicleSteering -= m_steeringIncrement;
+			if (m_gVehicleSteering < -m_steeringClamp)
+				m_gVehicleSteering = -m_steeringClamp;
+			for (int i = 0; i < 2; ++i)
+			{
+				m_pWheel[i]->getHinge()->setTargetVelocity(5, m_gVehicleSteering);
+			}
+			break;
+		}
+		case DIR_FORWARD:
+		{
+			m_gEngineForce = m_maxEngineForce;
+			m_gBreakingForce = 0.f;
+
+			for (int i = 0; i < 2; ++i)
+			{
+				m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
+			}
+
+			break;
+		}
+		case DIR_BACKWARD:
+		{
+			m_gEngineForce = -m_maxEngineForce;
+			m_gBreakingForce = 0.f;
+
+			for (int i = 0; i < 2; ++i)
+			{
+				m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
+			}
+
+			break;
+		}
+	}
+
+	
+
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
 	btScalar* m = new btScalar[16];
 	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
