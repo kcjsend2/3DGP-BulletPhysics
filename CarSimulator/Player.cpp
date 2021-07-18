@@ -334,7 +334,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 300.0f, 100.0f));
+	SetPosition(XMFLOAT3(100.0f, 50.0f, 100.0f));
 
 	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
 
@@ -349,14 +349,14 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	btTransform FH_tr;
 	const btScalar FALLHEIGHT = -3;
-	FH_tr.setOrigin(btVector3(0, FALLHEIGHT, 0));
-	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(0.4f, 0.5f, 0.5f));
+	FH_tr.setOrigin(btVector3(0, 0, 0));
+	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(pWheelMesh->GetBoundingBox().Extents.x, pWheelMesh->GetBoundingBox().Extents.y, pWheelMesh->GetBoundingBox().Extents.y));
 
 	btVector3 wheelPos[4] = {
-		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + (extents.z / 2))),
-		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z + (extents.z / 2))),
-		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - (extents.z / 2))),
-		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT - 0.25), btScalar(m_xmf3Position.z - (extents.z / 2))) };
+		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2) - 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z + (extents.z / 2)) + 3),
+		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2) + 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z + (extents.z / 2)) + 3),
+		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2) + 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z - (extents.z / 2)) - 3),
+		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2) - 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z - (extents.z / 2)) - 3) };
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -381,7 +381,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 		// Drive engine.
 		pHinge2->enableMotor(3, true);
-		pHinge2->setMaxMotorForce(3, 1000);
+		pHinge2->setMaxMotorForce(3, 100);
 		pHinge2->setTargetVelocity(3, 0);
 
 		// Steering engine.
@@ -425,7 +425,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	{
 		case DIR_LEFT:
 		{
-			m_gVehicleSteering += m_steeringIncrement;
+			m_gVehicleSteering += m_steeringIncrement * fTimeElapsed;
 			if (m_gVehicleSteering > m_steeringClamp)
 				m_gVehicleSteering = m_steeringClamp;
 			for (int i = 0; i < 2; ++i)
@@ -437,7 +437,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		}
 		case DIR_RIGHT:
 		{
-			m_gVehicleSteering -= m_steeringIncrement;
+			m_gVehicleSteering -= m_steeringIncrement * fTimeElapsed;
 			if (m_gVehicleSteering < -m_steeringClamp)
 				m_gVehicleSteering = -m_steeringClamp;
 			for (int i = 0; i < 2; ++i)
@@ -448,7 +448,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		}
 		case DIR_FORWARD:
 		{
-			m_gEngineForce = m_maxEngineForce;
+			m_gEngineForce += m_EngineForceIncrement * fTimeElapsed;
 			m_gBreakingForce = 0.f;
 
 			for (int i = 0; i < 2; ++i)
@@ -460,7 +460,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		}
 		case DIR_BACKWARD:
 		{
-			m_gEngineForce = -m_maxEngineForce;
+			m_gEngineForce -= m_EngineForceIncrement * fTimeElapsed;
 			m_gBreakingForce = 0.f;
 
 			for (int i = 0; i < 2; ++i)
