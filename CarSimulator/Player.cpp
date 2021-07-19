@@ -327,14 +327,15 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes) : CPlayer(nMeshes)
 {
 	CMeshFileRead* pVehicleMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/FlyerPlayership.bin", false);
-	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Sphere.bin", false);
+	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Tire.bin", false, {10.0f, 10.0f, 10.0f});
+
 	SetMesh(0, pVehicleMesh);
 
 	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 50.0f, 100.0f));
+	SetPosition(XMFLOAT3(1000.0f, 20.0f, 1000.0f));
 
 	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
 
@@ -345,7 +346,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btCarTransform.setIdentity();
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
-	m_pbtRigidBody = BulletHelper::CreateRigidBody(2.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(10.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
 	btTransform FH_tr;
 	const btScalar FALLHEIGHT = -3;
@@ -353,10 +354,10 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(pWheelMesh->GetBoundingBox().Extents.x, pWheelMesh->GetBoundingBox().Extents.y, pWheelMesh->GetBoundingBox().Extents.y));
 
 	btVector3 wheelPos[4] = {
-		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2) - 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z + (extents.z / 2)) + 3),
-		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2) + 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z + (extents.z / 2)) + 3),
-		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2) + 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z - (extents.z / 2)) - 3),
-		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2) - 3), btScalar(m_xmf3Position.y), btScalar(m_xmf3Position.z - (extents.z / 2)) - 3) };
+		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z - (extents.z / 2))),
+		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z - (extents.z / 2))),
+		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z + (extents.z / 2))),
+		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z + (extents.z / 2))) };
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -366,6 +367,12 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		btTransform tr;
 		tr.setIdentity();
 		tr.setOrigin(wheelPos[i]);
+		
+
+		if(i < 2)
+			tr.setRotation(btQuaternion(0.f, 0.f, BulletHelper::RadianToEuler(90.0f)));
+		else
+			tr.setRotation(btQuaternion(0.f, 0.f, BulletHelper::RadianToEuler(-90.0f)));
 
 		btRigidBody* pBodyB = BulletHelper::CreateRigidBody(1.0f, tr, wheelShape, pbtDynamicsWorld);
 		pBodyB->setFriction(1110);
@@ -453,7 +460,8 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 			for (int i = 0; i < 2; ++i)
 			{
-				m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
+				if(m_gEngineForce < m_maxEngineForce)
+					m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
 			}
 
 			break;
@@ -465,14 +473,13 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 			for (int i = 0; i < 2; ++i)
 			{
-				m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
+				if (m_gEngineForce < m_maxEngineForce)
+					m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
 			}
 
 			break;
 		}
 	}
-
-	
 
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
 	btScalar* m = new btScalar[16];
@@ -584,6 +591,9 @@ CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 
 CVehiclePlayer::CWheel::CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh)
 {
+	XMMATRIX xmf4x4Scale = XMMatrixScaling(10.0f, 10.0f, 10.0f);
+	m_xmf4x4World = Matrix4x4::Multiply(xmf4x4WorldMatrix, xmf4x4Scale);
+
 	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
 	SetMesh(0, pWheelMesh);
 }
@@ -615,6 +625,4 @@ void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btDiscreteDynamicsWorld*
 	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
 
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
-
-	auto p = GetPosition();
 }

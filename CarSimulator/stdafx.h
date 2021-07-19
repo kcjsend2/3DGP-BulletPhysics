@@ -46,6 +46,7 @@ using Microsoft::WRL::ComPtr;
 
 #define FRAME_BUFFER_WIDTH 640
 #define FRAME_BUFFER_HEIGHT 480
+#define PI 3.1415926535
 
 /*정점의 색상을 무작위로(Random) 설정하기 위해 사용한다. 각 정점의 색상은 난수(Random Number)를 생성하여
 지정한다.*/
@@ -214,8 +215,7 @@ namespace Matrix4x4
 	inline XMFLOAT4X4 Multiply(XMFLOAT4X4& xmmtx4x4Matrix1, XMFLOAT4X4& xmmtx4x4Matrix2)
 	{
 		XMFLOAT4X4 xmmtx4x4Result;
-		XMStoreFloat4x4(&xmmtx4x4Result, XMLoadFloat4x4(&xmmtx4x4Matrix1) *
-			XMLoadFloat4x4(&xmmtx4x4Matrix2));
+		XMStoreFloat4x4(&xmmtx4x4Result, XMLoadFloat4x4(&xmmtx4x4Matrix1) * XMLoadFloat4x4(&xmmtx4x4Matrix2));
 		return(xmmtx4x4Result);
 	}
 	inline XMFLOAT4X4 Multiply(XMFLOAT4X4& xmmtx4x4Matrix1, XMMATRIX& xmmtxMatrix2)
@@ -302,5 +302,10 @@ namespace BulletHelper
 
 		pbtDynamicsWorld->addRigidBody(body);
 		return body;
+	}
+
+	inline float RadianToEuler(float fRadian)
+	{
+		return fRadian / 360 * (2 * PI);
 	}
 }

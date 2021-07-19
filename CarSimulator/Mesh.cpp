@@ -377,9 +377,9 @@ XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void* pContext)
 }
 
 
-CMeshFileRead::CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile) : CMesh(pd3dDevice, pd3dCommandList)
+CMeshFileRead::CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile, XMFLOAT3 xmf3Scale, XMFLOAT3 xmf3Rotation) : CMesh(pd3dDevice, pd3dCommandList)
 {
-	if (pstrFileName) LoadMeshFromFile(pd3dDevice, pd3dCommandList, pstrFileName, bTextFile);
+	if (pstrFileName) LoadMeshFromFile(pd3dDevice, pd3dCommandList, pstrFileName, bTextFile, xmf3Scale, xmf3Rotation);
 }
 
 CMeshFileRead::~CMeshFileRead()
@@ -426,7 +426,7 @@ void CMeshFileRead::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
-void CMeshFileRead::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile)
+void CMeshFileRead::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile, XMFLOAT3 xmf3Scale, XMFLOAT3 xmf3Rotation)
 {
 	char pstrToken[64] = { '\0' };
 
@@ -507,6 +507,17 @@ void CMeshFileRead::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 		::fclose(pFile);
 	}
+
+	for (int i = 0; i < m_nVertices; ++i)
+	{
+		m_pxmf3Positions[i].x *= xmf3Scale.x;
+		m_pxmf3Positions[i].y *= xmf3Scale.y;
+		m_pxmf3Positions[i].z *= xmf3Scale.z;
+	}
+
+	m_xmBoundingBox.Extents.x *= xmf3Scale.x;
+	m_xmBoundingBox.Extents.y *= xmf3Scale.y;
+	m_xmBoundingBox.Extents.z *= xmf3Scale.z;
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);

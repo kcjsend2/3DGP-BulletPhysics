@@ -181,7 +181,7 @@ public:
 class CMeshFileRead : public CMesh
 {
 public:
-	CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName = NULL, bool bTextFile = true);
+	CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName = NULL, bool bTextFile = true, XMFLOAT3 xmf3Scale = { 1.0f, 1.0f, 1.0f }, XMFLOAT3 xmf3Rotation = { 1.0f, 1.0f, 1.0f });
 	virtual ~CMeshFileRead();
 	virtual void ReleaseUploadBuffers();
 
@@ -214,5 +214,5 @@ protected:
 public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 
-	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile);
+	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile, XMFLOAT3 xmf3Scale, XMFLOAT3 xmf3Rotation);
 };
