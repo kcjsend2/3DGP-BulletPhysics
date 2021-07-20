@@ -368,7 +368,8 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	float gVehicleSteering = 0.f;
 	float steeringIncrement = 0.04f;
 	float steeringClamp = 0.3f;
-	float wheelWidth = 0.4f;
+	float wheelWidth = wheelExtents.z;
+	float wheelRadius = wheelExtents.x;
 	float wheelFriction = 1000;  //BT_LARGE_FLOAT;
 	float suspensionStiffness = 20.f;
 	float suspensionDamping = 2.3f;
@@ -376,16 +377,16 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	float rollInfluence = 0.1f;  //1.0f;
 
 	// ¾Õ¹ÙÄû
-	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3 * wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
-	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3 * wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
+	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, 2 * vehicleExtents.x - wheelRadius);
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
+	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x + wheelRadius);
 
 	// µÞ¹ÙÄû
 	isFrontWheel = false;
-	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(CUBE_HALF_EXTENTS - (0.3 * wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
-	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
+	connectionPointCS0 = btVector3(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x + wheelRadius);
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
 	{
@@ -396,7 +397,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		wheel.m_frictionSlip = wheelFriction;
 		wheel.m_rollInfluence = rollInfluence;
 	}
-
 
 	CPlayerShader* pShader = new CPlayerShader();
 	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
@@ -416,61 +416,6 @@ CVehiclePlayer::~CVehiclePlayer()
 
 void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
-	int SteeringIndex = 5;
-	switch (dwBehave)
-	{
-		case DIR_LEFT:
-		{
-			m_gVehicleSteering += m_steeringIncrement * fTimeElapsed;
-			if (m_gVehicleSteering > m_steeringClamp)
-				m_gVehicleSteering = m_steeringClamp;
-
-			for (int i = 0; i < 2; ++i)
-			{
-				m_pWheel[i]->getHinge()->setTargetVelocity(SteeringIndex, m_gVehicleSteering);
-			}
-
-			break;
-		}
-		case DIR_RIGHT:
-		{
-			m_gVehicleSteering -= m_steeringIncrement * fTimeElapsed;
-			if (m_gVehicleSteering < -m_steeringClamp)
-				m_gVehicleSteering = -m_steeringClamp;
-			for (int i = 0; i < 2; ++i)
-			{
-				m_pWheel[i]->getHinge()->setTargetVelocity(SteeringIndex, m_gVehicleSteering);
-			}
-			break;
-		}
-		case DIR_FORWARD:
-		{
-			m_gEngineForce += m_EngineForceIncrement * fTimeElapsed;
-			m_gBreakingForce = 0.f;
-
-			for (int i = 0; i < 2; ++i)
-			{
-				if(m_gEngineForce < m_maxEngineForce)
-					m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
-			}
-
-			break;
-		}
-		case DIR_BACKWARD:
-		{
-			m_gEngineForce -= m_EngineForceIncrement * fTimeElapsed;
-			m_gBreakingForce = 0.f;
-
-			for (int i = 0; i < 2; ++i)
-			{
-				if (m_gEngineForce < m_maxEngineForce)
-					m_pWheel[i]->getHinge()->setTargetVelocity(3, m_gEngineForce);
-			}
-
-			break;
-		}
-	}
-
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
 	btScalar* m = new btScalar[16];
 	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
@@ -581,9 +526,6 @@ CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 
 CVehiclePlayer::CWheel::CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh)
 {
-	XMMATRIX xmf4x4Scale = XMMatrixScaling(10.0f, 10.0f, 10.0f);
-	m_xmf4x4World = Matrix4x4::Multiply(xmf4x4WorldMatrix, xmf4x4Scale);
-
 	SetMaterial(XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.0f, 0.0f));
 	SetMesh(0, pWheelMesh);
 }

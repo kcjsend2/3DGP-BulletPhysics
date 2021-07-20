@@ -128,11 +128,6 @@ private:
 		~CWheel();
 		virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 		virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
-		void setHinge(btHinge2Constraint* pbtHinge) { m_pbtHinge = pbtHinge; }
-		btHinge2Constraint* getHinge() { return m_pbtHinge; }
-
-	private:
-		btHinge2Constraint* m_pbtHinge;
 	};
 
 public:
@@ -146,6 +141,10 @@ public:
 
 private:
 	CWheel* m_pWheel[4];
+
+	btRaycastVehicle::btVehicleTuning m_tuning;
+	btVehicleRaycaster* m_vehicleRayCaster;
+	btRaycastVehicle* m_vehicle;
 
 	float m_gEngineForce = 0.f;
 
