@@ -357,18 +357,31 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	pbtDynamicsWorld->addVehicle(m_vehicle);
 
 	float connectionHeight = 1.2f;
-
 	bool isFrontWheel = true;
 
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
-	btVector3 connectionPointCS0(CUBE_HALF_EXTENTS - (0.3 * wheelExtents.x), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelExtents.y);
+	btVector3 connectionPointCS0(1 - (0.3 * wheelExtents.x), connectionHeight, 2 * 1 - wheelExtents.y);
+	btVector3 wheelDirectionCS0(0, -1, 0);
+	btVector3 wheelAxleCS(-1, 0, 0);
 
+	float gVehicleSteering = 0.f;
+	float steeringIncrement = 0.04f;
+	float steeringClamp = 0.3f;
+	float wheelWidth = 0.4f;
+	float wheelFriction = 1000;  //BT_LARGE_FLOAT;
+	float suspensionStiffness = 20.f;
+	float suspensionDamping = 2.3f;
+	float suspensionCompression = 4.4f;
+	float rollInfluence = 0.1f;  //1.0f;
+
+	// ¾Õ¹ÙÄû
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
 	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3 * wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
-
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
 	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3 * wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+
+	// µÞ¹ÙÄû
 	isFrontWheel = false;
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
 	connectionPointCS0 = btVector3(CUBE_HALF_EXTENTS - (0.3 * wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
