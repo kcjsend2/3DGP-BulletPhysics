@@ -416,6 +416,38 @@ CVehiclePlayer::~CVehiclePlayer()
 
 void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
+	switch (dwBehave)
+	{
+		case DIR_LEFT:
+		{
+			m_gVehicleSteering += m_steeringIncrement;
+			if (m_gVehicleSteering > m_steeringClamp)
+				m_gVehicleSteering = m_steeringClamp;
+
+			break;
+		}
+		case DIR_RIGHT:
+		{
+			m_gVehicleSteering -= m_steeringIncrement;
+			if (m_gVehicleSteering < -m_steeringClamp)
+				m_gVehicleSteering = -m_steeringClamp;
+
+			break;
+		}
+		case DIR_FORWARD:
+		{
+			m_gEngineForce = m_maxEngineForce;
+			m_gBreakingForce = 0.f;
+			break;
+		}
+		case DIR_BACKWARD:
+		{
+			m_gEngineForce = -m_maxEngineForce;
+			m_gBreakingForce = 0.f;
+			break;
+		}
+	}
+
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
 	btScalar* m = new btScalar[16];
 	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
@@ -428,9 +460,10 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 
+
 	for (int i = 0; i < 4; ++i)
 	{
-		m_pWheel[i]->Update(fTimeElapsed, pbtDynamicsWorld);
+		m_pWheel[i]->Update(fTimeElapsed, m_vehicle, i);
 	}
 
 	//카메라의 카메라 변환 행렬을 다시 생성한다.
@@ -550,11 +583,11 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
-void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btRaycastVehicle* pbtVehicle, int index)
 {
-	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
-	btScalar* m = new btScalar[16];
-	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
+	btTransform wheelTransform = pbtVehicle->getWheelTransformWS(index);
 
+	btScalar m[16];
+	wheelTransform.getOpenGLMatrix(m);
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
 }

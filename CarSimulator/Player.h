@@ -127,7 +127,7 @@ private:
 		CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh);
 		~CWheel();
 		virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-		virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+		virtual void Update(float fTimeElapsed, btRaycastVehicle* pbtVehicle, int index);
 	};
 
 public:
