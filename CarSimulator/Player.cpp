@@ -326,6 +326,7 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 
 CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes) : CPlayer(nMeshes)
 {
+	int SteeringIndex = 5;
 	CMeshFileRead* pVehicleMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/FlyerPlayership.bin", false);
 	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Tire.bin", false, {10.0f, 10.0f, 10.0f});
 
@@ -337,78 +338,52 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetPosition(XMFLOAT3(1000.0f, 20.0f, 1000.0f));
 
-	auto extents = pVehicleMesh[0].GetBoundingBox().Extents;
+	auto vehicleExtents = pVehicleMesh[0].GetBoundingBox().Extents;
+	auto wheelExtents = pWheelMesh[0].GetBoundingBox().Extents;
 
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(extents.x, extents.y, extents.z));
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(vehicleExtents.x, vehicleExtents.y, vehicleExtents.z));
 	btCollisionShapes.push_back(chassisShape);
 
 	btTransform btCarTransform;
 	btCarTransform.setIdentity();
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
-	m_pbtRigidBody = BulletHelper::CreateRigidBody(10.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(2.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
-	btTransform FH_tr;
-	const btScalar FALLHEIGHT = -3;
-	FH_tr.setOrigin(btVector3(0, 0, 0));
-	btCollisionShape* wheelShape = new btCylinderShapeX(btVector3(pWheelMesh->GetBoundingBox().Extents.x, pWheelMesh->GetBoundingBox().Extents.y, pWheelMesh->GetBoundingBox().Extents.y));
+	m_vehicleRayCaster = new btDefaultVehicleRaycaster(pbtDynamicsWorld);
+	m_vehicle = new btRaycastVehicle(m_tuning, m_pbtRigidBody, m_vehicleRayCaster);
 
-	btVector3 wheelPos[4] = {
-		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z - (extents.z / 2))),
-		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z - (extents.z / 2))),
-		btVector3(btScalar(m_xmf3Position.x + (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z + (extents.z / 2))),
-		btVector3(btScalar(m_xmf3Position.x - (extents.x / 2)), btScalar(m_xmf3Position.y + FALLHEIGHT), btScalar(m_xmf3Position.z + (extents.z / 2))) };
+	m_pbtRigidBody->setActivationState(DISABLE_DEACTIVATION);
+	pbtDynamicsWorld->addVehicle(m_vehicle);
 
-	for (int i = 0; i < 4; i++)
+	float connectionHeight = 1.2f;
+
+	bool isFrontWheel = true;
+
+	m_vehicle->setCoordinateSystem(0, 1, 2);
+
+	btVector3 connectionPointCS0(CUBE_HALF_EXTENTS - (0.3 * wheelExtents.x), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelExtents.y);
+
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3 * wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
+
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3 * wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	isFrontWheel = false;
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+	connectionPointCS0 = btVector3(CUBE_HALF_EXTENTS - (0.3 * wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+
+	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
 	{
-		btRigidBody* pBodyA = m_pbtRigidBody;
-		pBodyA->setActivationState(DISABLE_DEACTIVATION);
-
-		btTransform tr;
-		tr.setIdentity();
-		tr.setOrigin(wheelPos[i]);
-		
-
-		if(i < 2)
-			tr.setRotation(btQuaternion(0.f, 0.f, BulletHelper::RadianToEuler(90.0f)));
-		else
-			tr.setRotation(btQuaternion(0.f, 0.f, BulletHelper::RadianToEuler(-90.0f)));
-
-		btRigidBody* pBodyB = BulletHelper::CreateRigidBody(1.0f, tr, wheelShape, pbtDynamicsWorld);
-		pBodyB->setFriction(1110);
-		pBodyB->setActivationState(DISABLE_DEACTIVATION);
-
-		btVector3 parentAxis(0.f, 1.f, 0.f);
-		btVector3 childAxis(1.f, 0.f, 0.f);
-		btVector3 anchor = tr.getOrigin();
-		btHinge2Constraint* pHinge2 = new btHinge2Constraint(*pBodyA, *pBodyB, anchor, parentAxis, childAxis);
-
-		// add constraint to world
-		pbtDynamicsWorld->addConstraint(pHinge2, true);
-
-		// Drive engine.
-		pHinge2->enableMotor(3, true);
-		pHinge2->setMaxMotorForce(3, 100);
-		pHinge2->setTargetVelocity(3, 0);
-
-		// Steering engine.
-		pHinge2->enableMotor(5, true);
-		pHinge2->setMaxMotorForce(5, 1000);
-		pHinge2->setTargetVelocity(5, 0);
-
-		pHinge2->setParam(BT_CONSTRAINT_CFM, 0.15f, 2);
-		pHinge2->setParam(BT_CONSTRAINT_ERP, 0.35f, 2);
-
-		pHinge2->setDamping(2, 2.0);
-		pHinge2->setStiffness(2, 40.0);
-
-		btScalar m[16];
-		pBodyB->getWorldTransform().getOpenGLMatrix(m);
-
-		m_pWheel[i] = new CWheel(Matrix4x4::glMatrixToD3DMatrix(m), pWheelMesh);
-		m_pWheel[i]->SetRigidBody(pBodyB);
-		m_pWheel[i]->setHinge(pHinge2);
+		btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
+		wheel.m_suspensionStiffness = suspensionStiffness;
+		wheel.m_wheelsDampingRelaxation = suspensionDamping;
+		wheel.m_wheelsDampingCompression = suspensionCompression;
+		wheel.m_frictionSlip = wheelFriction;
+		wheel.m_rollInfluence = rollInfluence;
 	}
+
 
 	CPlayerShader* pShader = new CPlayerShader();
 	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
@@ -428,6 +403,7 @@ CVehiclePlayer::~CVehiclePlayer()
 
 void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
+	int SteeringIndex = 5;
 	switch (dwBehave)
 	{
 		case DIR_LEFT:
@@ -435,9 +411,10 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 			m_gVehicleSteering += m_steeringIncrement * fTimeElapsed;
 			if (m_gVehicleSteering > m_steeringClamp)
 				m_gVehicleSteering = m_steeringClamp;
+
 			for (int i = 0; i < 2; ++i)
 			{
-				m_pWheel[i]->getHinge()->setTargetVelocity(5, m_gVehicleSteering);
+				m_pWheel[i]->getHinge()->setTargetVelocity(SteeringIndex, m_gVehicleSteering);
 			}
 
 			break;
@@ -449,7 +426,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 				m_gVehicleSteering = -m_steeringClamp;
 			for (int i = 0; i < 2; ++i)
 			{
-				m_pWheel[i]->getHinge()->setTargetVelocity(5, m_gVehicleSteering);
+				m_pWheel[i]->getHinge()->setTargetVelocity(SteeringIndex, m_gVehicleSteering);
 			}
 			break;
 		}
@@ -594,7 +571,7 @@ CVehiclePlayer::CWheel::CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWhe
 	XMMATRIX xmf4x4Scale = XMMatrixScaling(10.0f, 10.0f, 10.0f);
 	m_xmf4x4World = Matrix4x4::Multiply(xmf4x4WorldMatrix, xmf4x4Scale);
 
-	SetMaterial(XMFLOAT4{ 0.0f, 0.25f, 0.875f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.25f, 0.875f));
+	SetMaterial(XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.0f, 0.0f));
 	SetMesh(0, pWheelMesh);
 }
 

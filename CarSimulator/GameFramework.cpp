@@ -47,7 +47,7 @@ void CGameFramework::BulletInit()
 
 	m_pbtDynamicsWorld = new btDiscreteDynamicsWorld(m_pbtDispatcher, m_pbtOverlappingPairCache, m_pbtSolver, m_pbtCollisionConfiguration);
 
-	m_pbtDynamicsWorld->setGravity(btVector3(0, -10, 0));
+	m_pbtDynamicsWorld->setGravity(btVector3(0, -10	, 0));
 }
 
 //다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라.
