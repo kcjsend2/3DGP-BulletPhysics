@@ -362,7 +362,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
 	btVector3 wheelDirectionCS0(0, -1, 0);
-	btVector3 wheelAxleCS(-1, 0, 0);
+	btVector3 wheelAxleCS(1, 0, 0);
 
 	float gVehicleSteering = 0.f;
 	float steeringIncrement = 0.04f;
