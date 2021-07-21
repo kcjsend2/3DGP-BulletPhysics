@@ -263,19 +263,19 @@ namespace Matrix4x4
 
 		xmf4x4Result._21 = btMat[4];
 		xmf4x4Result._12 = btMat[1];
-		xmf4x4Result._13 = -btMat[2];
+		xmf4x4Result._13 = btMat[2];
 		xmf4x4Result._31 = btMat[8];
 		xmf4x4Result._14 = btMat[3];
 		xmf4x4Result._41 = btMat[12];
-		xmf4x4Result._23 = -btMat[6];
+		xmf4x4Result._23 = btMat[6];
 		xmf4x4Result._32 = btMat[9];
 		xmf4x4Result._24 = btMat[7];
 		xmf4x4Result._42 = btMat[13];
-		xmf4x4Result._34 = -btMat[11];
+		xmf4x4Result._34 = btMat[11];
 		xmf4x4Result._43 = btMat[14];
 		xmf4x4Result._11 = btMat[0];
 		xmf4x4Result._22 = btMat[5];
-		xmf4x4Result._33 = -btMat[10];
+		xmf4x4Result._33 = btMat[10];
 		xmf4x4Result._44 = btMat[15];
 
 		return xmf4x4Result;

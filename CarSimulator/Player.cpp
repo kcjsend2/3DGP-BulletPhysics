@@ -364,9 +364,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btVector3 wheelDirectionCS0(0, -1, 0);
 	btVector3 wheelAxleCS(1, 0, 0);
 
-	float gVehicleSteering = 0.f;
-	float steeringIncrement = 0.04f;
-	float steeringClamp = 0.3f;
 	float wheelWidth = wheelExtents.z;
 	float wheelRadius = wheelExtents.x;
 	float wheelFriction = 1000;  //BT_LARGE_FLOAT;
@@ -395,6 +392,8 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	connectionPointCS0 = btVector3(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
+	
+
 	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
 	{
 		btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
@@ -403,6 +402,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		wheel.m_wheelsDampingCompression = suspensionCompression;
 		wheel.m_frictionSlip = wheelFriction;
 		wheel.m_rollInfluence = rollInfluence;
+		
 	}
 
 	CPlayerShader* pShader = new CPlayerShader();
@@ -428,29 +428,29 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	{
 		case DIR_LEFT:
 		{
-			m_gVehicleSteering += m_steeringIncrement;
-			if (m_gVehicleSteering > m_steeringClamp)
-				m_gVehicleSteering = m_steeringClamp;
-
-			break;
-		}
-		case DIR_RIGHT:
-		{
 			m_gVehicleSteering -= m_steeringIncrement;
 			if (m_gVehicleSteering < -m_steeringClamp)
 				m_gVehicleSteering = -m_steeringClamp;
 
 			break;
 		}
+		case DIR_RIGHT:
+		{
+			m_gVehicleSteering += m_steeringIncrement;
+			if (m_gVehicleSteering > m_steeringClamp)
+				m_gVehicleSteering = m_steeringClamp;
+
+			break;
+		}
 		case DIR_FORWARD:
 		{
-			m_gEngineForce = -m_maxEngineForce;
+			m_gEngineForce = m_maxEngineForce;
 			m_gBreakingForce = 0.f;
 			break;
 		}
 		case DIR_BACKWARD:
 		{
-			m_gEngineForce = m_maxEngineForce;
+			m_gEngineForce = -m_maxEngineForce;
 			m_gBreakingForce = 0.f;
 			break;
 		}
