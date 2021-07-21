@@ -357,7 +357,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	pbtDynamicsWorld->addVehicle(m_vehicle);
 
 	float connectionHeight = 1.2f;
-	bool isFrontWheel = true;
 
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
@@ -376,6 +375,8 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	float rollInfluence = 0.1f;  //1.0f;
 
 	// ¾Õ¹ÙÄû
+	bool isFrontWheel = true;
+
 	btVector3 connectionPointCS0(vehicleExtents.x - (0.3 * wheelExtents.x), connectionHeight, -2 * vehicleExtents.x - wheelExtents.y);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x - wheelRadius);
@@ -422,44 +423,44 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	{
 		case DIR_LEFT:
 		{
-			m_gVehicleSteering += m_steeringIncrement;
-			if (m_gVehicleSteering > m_steeringClamp)
-				m_gVehicleSteering = m_steeringClamp;
+			m_gVehicleSteering -= m_steeringIncrement;
+			if (m_gVehicleSteering < m_steeringClamp)
+				m_gVehicleSteering = -m_steeringClamp;
 
 			break;
 		}
 		case DIR_RIGHT:
 		{
-			m_gVehicleSteering -= m_steeringIncrement;
-			if (m_gVehicleSteering < -m_steeringClamp)
-				m_gVehicleSteering = -m_steeringClamp;
+			m_gVehicleSteering += m_steeringIncrement;
+			if (m_gVehicleSteering > -m_steeringClamp)
+				m_gVehicleSteering = m_steeringClamp;
 
 			break;
 		}
 		case DIR_FORWARD:
 		{
-			m_gEngineForce = m_maxEngineForce;
+			m_gEngineForce = -m_maxEngineForce;
 			m_gBreakingForce = 0.f;
 			break;
 		}
 		case DIR_BACKWARD:
 		{
-			m_gEngineForce = -m_maxEngineForce;
+			m_gEngineForce = m_maxEngineForce;
 			m_gBreakingForce = 0.f;
 			break;
 		}
 	}
 
-	int wheelIndex = 0;
+	int wheelIndex = 2;
 	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
 	m_vehicle->setBrake(m_gBreakingForce, wheelIndex);
-	wheelIndex = 1;
+	wheelIndex = 3;
 	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
 	m_vehicle->setBrake(m_gBreakingForce, wheelIndex);
 
-	wheelIndex = 2;
+	wheelIndex = 0;
 	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
-	wheelIndex = 3;
+	wheelIndex = 1;
 	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
 
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
