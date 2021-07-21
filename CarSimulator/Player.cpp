@@ -362,7 +362,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
 	btVector3 wheelDirectionCS0(0, -1, 0);
-	btVector3 wheelAxleCS(1, 0, 0);
+	btVector3 wheelAxleCS(-1, 0, 0);
 
 	float wheelWidth = wheelExtents.z;
 	float wheelRadius = wheelExtents.x;
@@ -377,19 +377,19 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	// ¾Õ¹ÙÄû
 	bool isFrontWheel = true;
 
-	btVector3 connectionPointCS0(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents - wheelRadius);
+	btVector3 connectionPointCS0(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
-	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents - wheelRadius);
+	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	// µÞ¹ÙÄû
 	isFrontWheel = false;
 
-	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
+	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
-	connectionPointCS0 = btVector3(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
+	connectionPointCS0 = btVector3(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	
