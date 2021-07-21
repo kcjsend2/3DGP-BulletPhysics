@@ -348,7 +348,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btCarTransform.setIdentity();
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
-	m_pbtRigidBody = BulletHelper::CreateRigidBody(2.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(800.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
 	m_vehicleRayCaster = new btDefaultVehicleRaycaster(pbtDynamicsWorld);
 	m_vehicle = new btRaycastVehicle(m_tuning, m_pbtRigidBody, m_vehicleRayCaster);
@@ -361,7 +361,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
-	btVector3 connectionPointCS0(vehicleExtents.x - (0.3 * wheelExtents.x), connectionHeight, 2 * vehicleExtents.x - wheelExtents.y);
 	btVector3 wheelDirectionCS0(0, -1, 0);
 	btVector3 wheelAxleCS(-1, 0, 0);
 
@@ -377,15 +376,17 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	float rollInfluence = 0.1f;  //1.0f;
 
 	// ¾Õ¹ÙÄû
+	btVector3 connectionPointCS0(vehicleExtents.x - (0.3 * wheelExtents.x), connectionHeight, -2 * vehicleExtents.x - wheelExtents.y);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, 2 * vehicleExtents.x - wheelRadius);
+	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x + wheelRadius);
 
 	// µÞ¹ÙÄû
 	isFrontWheel = false;
+
+	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, 2 * vehicleExtents.x + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x + wheelRadius);
+	connectionPointCS0 = btVector3(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, 2 * vehicleExtents.x + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
@@ -449,16 +450,16 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		}
 	}
 
-	int wheelIndex = 2;
+	int wheelIndex = 0;
 	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
 	m_vehicle->setBrake(m_gBreakingForce, wheelIndex);
-	wheelIndex = 3;
+	wheelIndex = 1;
 	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
 	m_vehicle->setBrake(m_gBreakingForce, wheelIndex);
 
-	wheelIndex = 0;
+	wheelIndex = 2;
 	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
-	wheelIndex = 1;
+	wheelIndex = 3;
 	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
 
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
