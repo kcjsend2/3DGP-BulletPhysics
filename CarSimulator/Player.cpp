@@ -424,36 +424,29 @@ CVehiclePlayer::~CVehiclePlayer()
 
 void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
-	switch (dwBehave)
+	if (dwBehave & DIR_LEFT)
 	{
-		case DIR_LEFT:
-		{
-			m_gVehicleSteering -= m_steeringIncrement;
-			if (m_gVehicleSteering < -m_steeringClamp)
-				m_gVehicleSteering = -m_steeringClamp;
+		m_gVehicleSteering -= m_steeringIncrement;
+		if (m_gVehicleSteering < -m_steeringClamp)
+			m_gVehicleSteering = -m_steeringClamp;
+	}
 
-			break;
-		}
-		case DIR_RIGHT:
-		{
-			m_gVehicleSteering += m_steeringIncrement;
-			if (m_gVehicleSteering > m_steeringClamp)
-				m_gVehicleSteering = m_steeringClamp;
+	if (dwBehave & DIR_RIGHT)
+	{
+		m_gVehicleSteering += m_steeringIncrement;
+		if (m_gVehicleSteering > m_steeringClamp)
+			m_gVehicleSteering = m_steeringClamp;
+	}
 
-			break;
-		}
-		case DIR_FORWARD:
-		{
-			m_gEngineForce = m_maxEngineForce;
-			m_gBreakingForce = 0.f;
-			break;
-		}
-		case DIR_BACKWARD:
-		{
-			m_gEngineForce = -m_maxEngineForce;
-			m_gBreakingForce = 0.f;
-			break;
-		}
+	if (dwBehave & DIR_FORWARD)
+	{
+		m_gEngineForce = m_maxEngineForce;
+		m_gBreakingForce = 0.f;
+	}
+	if (dwBehave & DIR_BACKWARD)
+	{
+		m_gEngineForce = -m_maxEngineForce;
+		m_gBreakingForce = 0.f;
 	}
 
 	if (dwBehave == DIR_FORWARD || dwBehave == DIR_BACKWARD || dwBehave == NULL)

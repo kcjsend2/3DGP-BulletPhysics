@@ -384,7 +384,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld)
 {
-	float fHeight = 1.0f, fLength = 1.0f, fDepth = 1.0f;
+	float fHeight = 10.0f, fLength = 10.0f, fDepth = 10.0f;
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength), btScalar(fHeight), btScalar(fDepth)));
 
@@ -392,9 +392,9 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	float fTerrainWidth = pTerrain->GetWidth(), fTerrainLength = pTerrain->GetLength();
-	float fxPitch = 1000.0f * 3.5f;
-	float fyPitch = 100.0f * 3.5f;
-	float fzPitch = 1000.0f * 3.5f;
+	float fxPitch = 500.0f * 3.5f;
+	float fyPitch = 500.0f * 3.5f;
+	float fzPitch = 500.0f * 3.5f;
 	//직육면체를 지형 표면에 그리고 지형보다 높은 위치에 일정한 간격으로 배치한다.
 	int xObjects = int(fTerrainWidth / fxPitch), yObjects = 1, zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = xObjects * yObjects * zObjects;
