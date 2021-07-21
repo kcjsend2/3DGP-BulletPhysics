@@ -155,7 +155,7 @@ private:
 	float m_EngineForceIncrement = 5.0f;
 
 	float m_gVehicleSteering = 0.f;
-	float m_steeringIncrement = 0.4f;
+	float m_steeringIncrement = 0.01f;
 	float m_steeringClamp = 0.3f;
 	float m_wheelRadius = 0.5f;
 	float m_wheelWidth = 0.4f;

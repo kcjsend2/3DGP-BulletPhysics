@@ -6,7 +6,8 @@ CPlayer::CPlayer(int nMeshes) : CGameObject(nMeshes)
 {
 	m_pCamera = NULL;
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f); m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -424,7 +425,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		case DIR_LEFT:
 		{
 			m_gVehicleSteering -= m_steeringIncrement;
-			if (m_gVehicleSteering < m_steeringClamp)
+			if (m_gVehicleSteering < -m_steeringClamp)
 				m_gVehicleSteering = -m_steeringClamp;
 
 			break;
@@ -432,7 +433,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		case DIR_RIGHT:
 		{
 			m_gVehicleSteering += m_steeringIncrement;
-			if (m_gVehicleSteering > -m_steeringClamp)
+			if (m_gVehicleSteering > m_steeringClamp)
 				m_gVehicleSteering = m_steeringClamp;
 
 			break;
@@ -463,15 +464,15 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	wheelIndex = 1;
 	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
 
-	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
-	btScalar* m = new btScalar[16];
-	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
+	btScalar m[16];
+	m_vehicle->getChassisWorldTransform().getOpenGLMatrix(m);
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
 	
 	m_xmf3Position = XMFLOAT3(m_xmf4x4World._41, m_xmf4x4World._42, m_xmf4x4World._43);
 	m_xmf3Look = XMFLOAT3(m_xmf4x4World._31, m_xmf4x4World._32, m_xmf4x4World._33);
 	m_xmf3Up = XMFLOAT3(m_xmf4x4World._21, m_xmf4x4World._22, m_xmf4x4World._23);
 	m_xmf3Right = XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13);
+
 
 	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 
