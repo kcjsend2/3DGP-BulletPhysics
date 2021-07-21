@@ -428,17 +428,17 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	{
 		case DIR_LEFT:
 		{
-			m_gVehicleSteering -= m_steeringIncrement;
-			if (m_gVehicleSteering < -m_steeringClamp)
-				m_gVehicleSteering = -m_steeringClamp;
+			m_gVehicleSteering += m_steeringIncrement;
+			if (m_gVehicleSteering > m_steeringClamp)
+				m_gVehicleSteering = m_steeringClamp;
 
 			break;
 		}
 		case DIR_RIGHT:
 		{
-			m_gVehicleSteering += m_steeringIncrement;
-			if (m_gVehicleSteering > m_steeringClamp)
-				m_gVehicleSteering = m_steeringClamp;
+			m_gVehicleSteering -= m_steeringIncrement;
+			if (m_gVehicleSteering < -m_steeringClamp)
+				m_gVehicleSteering = -m_steeringClamp;
 
 			break;
 		}
@@ -455,6 +455,21 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 			break;
 		}
 	}
+
+	if (dwBehave == DIR_FORWARD || dwBehave == DIR_BACKWARD || dwBehave == NULL)
+	{
+		if(m_gVehicleSteering > 0)
+			m_gVehicleSteering -= m_steeringIncrement;
+
+		else if (m_gVehicleSteering < 0)
+			m_gVehicleSteering += m_steeringIncrement;
+	}
+
+	if (dwBehave == DIR_LEFT || dwBehave == DIR_RIGHT || dwBehave == NULL)
+	{
+		m_gEngineForce = 0;
+	}
+
 
 	int wheelIndex = 2;
 	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
@@ -480,7 +495,6 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	m_xmf3Look = XMFLOAT3(m_xmf4x4World._31, m_xmf4x4World._32, m_xmf4x4World._33);
 	m_xmf3Up = XMFLOAT3(m_xmf4x4World._21, m_xmf4x4World._22, m_xmf4x4World._23);
 	m_xmf3Right = XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13);
-
 
 
 	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
