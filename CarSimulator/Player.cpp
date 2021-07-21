@@ -361,7 +361,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
-	btVector3 connectionPointCS0(1 - (0.3 * wheelExtents.x), connectionHeight, 2 * 1 - wheelExtents.y);
+	btVector3 connectionPointCS0(vehicleExtents.x - (0.3 * wheelExtents.x), connectionHeight, 2 * vehicleExtents.x - wheelExtents.y);
 	btVector3 wheelDirectionCS0(0, -1, 0);
 	btVector3 wheelAxleCS(-1, 0, 0);
 
@@ -404,6 +404,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	for (int i = 0; i < 4; ++i)
 	{
+		m_pWheel[i] = new CWheel(pWheelMesh);
 		m_pWheel[i]->SetShader(pShader);
 	}
 }
@@ -447,6 +448,18 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 			break;
 		}
 	}
+
+	int wheelIndex = 2;
+	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
+	m_vehicle->setBrake(m_gBreakingForce, wheelIndex);
+	wheelIndex = 3;
+	m_vehicle->applyEngineForce(m_gEngineForce, wheelIndex);
+	m_vehicle->setBrake(m_gBreakingForce, wheelIndex);
+
+	wheelIndex = 0;
+	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
+	wheelIndex = 1;
+	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
 
 	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
 	btScalar* m = new btScalar[16];
@@ -557,7 +570,7 @@ CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	return(m_pCamera);
 }
 
-CVehiclePlayer::CWheel::CWheel(XMFLOAT4X4 xmf4x4WorldMatrix, CMeshFileRead* pWheelMesh)
+CVehiclePlayer::CWheel::CWheel(CMeshFileRead* pWheelMesh)
 {
 	SetMaterial(XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, 100, XMFLOAT3(0.0f, 0.0f, 0.0f));
 	SetMesh(0, pWheelMesh);
