@@ -103,7 +103,7 @@ void CPlayer::Rotate(float x, float y, float z)
 	DWORD nCameraMode = m_pCamera->GetMode();
 
 	//1인칭 카메라 또는 3인칭 카메라의 경우 플레이어의 회전은 약간의 제약이 따른다.
-	if ((nCameraMode == FIRST_PERSON_CAMERA) || (nCameraMode == THIRD_PERSON_CAMERA))
+	if ((nCameraMode == FIRST_PERSON_CAMERA))
 	{
 		/*로컬 x-축을 중심으로 회전하는 것은 고개를 앞뒤로 숙이는 동작에 해당한다. 그러므로 x-축을 중심으로 회전하는
 		각도는 -89.0~+89.0도 사이로 제한한다. x는 현재의 m_fPitch에서 실제 회전하는 각도이므로 x만큼 회전한 다음
@@ -142,7 +142,7 @@ void CPlayer::Rotate(float x, float y, float z)
 			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 		}
 	}
-	else if (nCameraMode == SPACESHIP_CAMERA)
+	else if (nCameraMode == SPACESHIP_CAMERA || nCameraMode == THIRD_PERSON_CAMERA)
 	{
 		/*스페이스-쉽 카메라에서 플레이어의 회전은 회전 각도의 제한이 없다. 그리고 모든 축을 중심으로 회전을 할 수 있
 		다.*/
@@ -375,20 +375,24 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	float suspensionCompression = 4.4f;
 	float rollInfluence = 0.1f;  //1.0f;
 
+	float chassisHalfExtents = vehicleExtents.x / 2;
+
 	// 앞바퀴
 	bool isFrontWheel = true;
 
-	btVector3 connectionPointCS0(vehicleExtents.x - (0.3 * wheelExtents.x), connectionHeight, -2 * vehicleExtents.x - wheelExtents.y);
+	btVector3 connectionPointCS0(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -2 * vehicleExtents.x - wheelRadius);
+
+	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	// 뒷바퀴
 	isFrontWheel = false;
 
-	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, 2 * vehicleExtents.x + wheelRadius);
+	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
-	connectionPointCS0 = btVector3(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, 2 * vehicleExtents.x + wheelRadius);
+
+	connectionPointCS0 = btVector3(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
@@ -464,14 +468,19 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	wheelIndex = 1;
 	m_vehicle->setSteeringValue(m_gVehicleSteering, wheelIndex);
 
+
 	btScalar m[16];
-	m_vehicle->getChassisWorldTransform().getOpenGLMatrix(m);
+	btTransform btMat;
+	m_vehicle->getRigidBody()->getMotionState()->getWorldTransform(btMat);
+	btMat.getOpenGLMatrix(m);
+
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
-	
+
 	m_xmf3Position = XMFLOAT3(m_xmf4x4World._41, m_xmf4x4World._42, m_xmf4x4World._43);
 	m_xmf3Look = XMFLOAT3(m_xmf4x4World._31, m_xmf4x4World._32, m_xmf4x4World._33);
 	m_xmf3Up = XMFLOAT3(m_xmf4x4World._21, m_xmf4x4World._22, m_xmf4x4World._23);
 	m_xmf3Right = XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13);
+
 
 
 	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
