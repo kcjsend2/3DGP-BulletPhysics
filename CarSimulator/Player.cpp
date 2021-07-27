@@ -329,7 +329,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 {
 	int SteeringIndex = 5;
 	CMeshFileRead* pVehicleMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/FlyerPlayership.bin", false);
-	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Tire.bin", false, {10.0f, 10.0f, 10.0f});
+	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Tire.bin", false, { 10.0f, 10.0f, 10.0f }, {0.0f, 0.0f, 90.0f});
 
 	SetMesh(0, pVehicleMesh);
 
@@ -357,39 +357,37 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_pbtRigidBody->setActivationState(DISABLE_DEACTIVATION);
 	pbtDynamicsWorld->addVehicle(m_vehicle);
 
-	float connectionHeight = 1.2f;
+	float connectionHeight = 0.0f;
 
 	m_vehicle->setCoordinateSystem(0, 1, 2);
 
 	btVector3 wheelDirectionCS0(0, -1, 0);
 	btVector3 wheelAxleCS(-1, 0, 0);
 
-	float wheelWidth = wheelExtents.z;
-	float wheelRadius = wheelExtents.x;
+	float wheelWidth = wheelExtents.x;
+	float wheelRadius = wheelExtents.z;
 	float wheelFriction = 1000;  //BT_LARGE_FLOAT;
 	float suspensionStiffness = 20.f;
 	float suspensionDamping = 2.3f;
 	float suspensionCompression = 4.4f;
 	float rollInfluence = 0.1f;  //1.0f;
 
-	float chassisHalfExtents = vehicleExtents.x / 2;
-
 	// ¾Õ¹ÙÄû
 	bool isFrontWheel = true;
 
-	btVector3 connectionPointCS0(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
+	btVector3 connectionPointCS0(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, vehicleExtents.z - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
-	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, 2 * chassisHalfExtents + wheelRadius);
+	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, vehicleExtents.z - wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	// µÞ¹ÙÄû
 	isFrontWheel = false;
 
-	connectionPointCS0 = btVector3(-chassisHalfExtents + (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents - wheelRadius);
+	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -vehicleExtents.z + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
-	connectionPointCS0 = btVector3(chassisHalfExtents - (0.3 * wheelWidth), connectionHeight, -2 * chassisHalfExtents - wheelRadius);
+	connectionPointCS0 = btVector3(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, -vehicleExtents.z + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
 	

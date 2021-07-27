@@ -4,6 +4,7 @@
 
 #pragma once
 #define BT_NO_SIMD_OPERATOR_OVERLOADS
+#define NOMINMAX
 
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
@@ -22,6 +23,7 @@
 #include <shellapi.h>
 #include <fstream>
 #include <vector>
+#include <limits>
 
 #include <d3d12.h>
 #include <dxgi1_4.h>
@@ -80,13 +82,11 @@ namespace Vector3
 		XMStoreFloat3(&xmf3Result, xmvVector);
 		return(xmf3Result);
 	}
-	inline XMFLOAT3 ScalarProduct(XMFLOAT3& xmf3Vector, float fScalar, bool bNormalize =
-		true)
+	inline XMFLOAT3 ScalarProduct(XMFLOAT3& xmf3Vector, float fScalar, bool bNormalize = true)
 	{
 		XMFLOAT3 xmf3Result;
 		if (bNormalize)
-			XMStoreFloat3(&xmf3Result, XMVector3Normalize(XMLoadFloat3(&xmf3Vector)) *
-				fScalar);
+			XMStoreFloat3(&xmf3Result, XMVector3Normalize(XMLoadFloat3(&xmf3Vector)) * fScalar);
 		else
 			XMStoreFloat3(&xmf3Result, XMLoadFloat3(&xmf3Vector) * fScalar);
 		return(xmf3Result);
@@ -154,15 +154,13 @@ namespace Vector3
 	inline XMFLOAT3 TransformNormal(XMFLOAT3& xmf3Vector, XMMATRIX& xmmtxTransform)
 	{
 		XMFLOAT3 xmf3Result;
-		XMStoreFloat3(&xmf3Result, XMVector3TransformNormal(XMLoadFloat3(&xmf3Vector),
-			xmmtxTransform));
+		XMStoreFloat3(&xmf3Result, XMVector3TransformNormal(XMLoadFloat3(&xmf3Vector), xmmtxTransform));
 		return(xmf3Result);
 	}
 	inline XMFLOAT3 TransformCoord(XMFLOAT3& xmf3Vector, XMMATRIX& xmmtxTransform)
 	{
 		XMFLOAT3 xmf3Result;
-		XMStoreFloat3(&xmf3Result, XMVector3TransformCoord(XMLoadFloat3(&xmf3Vector),
-			xmmtxTransform));
+		XMStoreFloat3(&xmf3Result, XMVector3TransformCoord(XMLoadFloat3(&xmf3Vector), xmmtxTransform));
 		return(xmf3Result);
 	}
 	inline XMFLOAT3 TransformCoord(XMFLOAT3& xmf3Vector, XMFLOAT4X4& xmmtx4x4Matrix)
@@ -176,6 +174,12 @@ namespace Vector3
 	inline XMFLOAT3 abs(XMFLOAT3 xmf3Vector)
 	{
 		return XMFLOAT3(std::abs(xmf3Vector.x), std::abs(xmf3Vector.y), std::abs(xmf3Vector.z));
+	}
+	inline XMFLOAT3 Rotate(XMFLOAT3 xmf3Vector,	XMFLOAT3 xmf3Roatate)
+	{
+		XMMATRIX xmmatrixRoation = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&xmf3Roatate));
+
+		return TransformCoord(xmf3Vector, xmmatrixRoation);
 	}
 }
 

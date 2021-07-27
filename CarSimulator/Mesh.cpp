@@ -508,16 +508,55 @@ void CMeshFileRead::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 		::fclose(pFile);
 	}
 
+	float xmin = std::numeric_limits<float>::max();
+	float xmax = std::numeric_limits<float>::min();
+
+	float ymin = std::numeric_limits<float>::max();
+	float ymax = std::numeric_limits<float>::min();
+
+	float zmin = std::numeric_limits<float>::max();
+	float zmax = std::numeric_limits<float>::min();
+
+	xmf3Rotation.x = BulletHelper::RadianToEuler(xmf3Rotation.x);
+	xmf3Rotation.y = BulletHelper::RadianToEuler(xmf3Rotation.y);
+	xmf3Rotation.z = BulletHelper::RadianToEuler(xmf3Rotation.z);
+
 	for (int i = 0; i < m_nVertices; ++i)
 	{
+		m_pxmf3Positions[i] = Vector3::Rotate(m_pxmf3Positions[i], xmf3Rotation);
+
 		m_pxmf3Positions[i].x *= xmf3Scale.x;
 		m_pxmf3Positions[i].y *= xmf3Scale.y;
 		m_pxmf3Positions[i].z *= xmf3Scale.z;
+
+		if (m_pxmf3Positions[i].x > xmax)
+		{
+			xmax = m_pxmf3Positions[i].x;
+		}
+		if (m_pxmf3Positions[i].y > ymax)
+		{
+			ymax = m_pxmf3Positions[i].y;
+		}
+		if (m_pxmf3Positions[i].z > zmax)
+		{
+			zmax = m_pxmf3Positions[i].z;
+		}
+
+		if (m_pxmf3Positions[i].x < xmin)
+		{
+			xmin = m_pxmf3Positions[i].x;
+		}
+		if (m_pxmf3Positions[i].y < ymin)
+		{
+			ymin = m_pxmf3Positions[i].y;
+		}
+		if (m_pxmf3Positions[i].z < zmin)
+		{
+			zmin = m_pxmf3Positions[i].z;
+		}
 	}
 
-	m_xmBoundingBox.Extents.x *= xmf3Scale.x;
-	m_xmBoundingBox.Extents.y *= xmf3Scale.y;
-	m_xmBoundingBox.Extents.z *= xmf3Scale.z;
+	m_xmBoundingBox.Extents = { (xmax - xmin) / 2, (ymax - ymin) / 2, (zmax - zmin) / 2 };
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);

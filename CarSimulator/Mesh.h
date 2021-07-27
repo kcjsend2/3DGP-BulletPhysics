@@ -181,7 +181,7 @@ public:
 class CMeshFileRead : public CMesh
 {
 public:
-	CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName = NULL, bool bTextFile = true, XMFLOAT3 xmf3Scale = { 1.0f, 1.0f, 1.0f }, XMFLOAT3 xmf3Rotation = { 1.0f, 1.0f, 1.0f });
+	CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName = NULL, bool bTextFile = true, XMFLOAT3 xmf3Scale = { 1.0f, 1.0f, 1.0f }, XMFLOAT3 xmf3Rotation = { 0.0f, 0.0f, 0.0f });
 	virtual ~CMeshFileRead();
 	virtual void ReleaseUploadBuffers();
 

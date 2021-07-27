@@ -31,7 +31,6 @@ private:
 	UINT m_nSwapChainBufferIndex;
 	//현재 스왑 체인의 후면 버퍼 인덱스이다.
 
-
 	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
 	ID3D12DescriptorHeap* m_pd3dRtvDescriptorHeap;
 	UINT m_nRtvDescriptorIncrementSize;
