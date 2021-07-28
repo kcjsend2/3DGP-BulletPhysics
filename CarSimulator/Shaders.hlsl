@@ -48,27 +48,14 @@ StructuredBuffer<LIGHT_INFO> light : register(t1);
 
 
 //정점 셰이더의 입력을 위한 구조체를 선언한다.
-struct VS_PLAYER_INPUT
+struct VS_DEFAULT_INPUT
 {
     float3 position : POSITION;
     float3 normal : NORMAL;
 };
 
 //정점 셰이더의 출력(픽셀 셰이더의 입력)을 위한 구조체를 선언한다.
-struct VS_PLAYER_OUTPUT
-{
-    float4 position : SV_POSITION;
-    float3 position_w : POSITION;
-    float3 normal : NORMAL;
-};
-
-struct VS_TERRAIN_INPUT
-{
-    float3 position : POSITION;
-    float3 normal : NORMAL;
-};
-
-struct VS_TERRAIN_OUTPUT
+struct VS_DEFAULT_OUTPUT
 {
     float4 position : SV_POSITION;
     float3 position_w : POSITION;
@@ -171,9 +158,9 @@ float4 ComputeLight(LIGHT_INFO li, float3 pos, float3 nor, float3 toCamera)
 
 
 
-VS_PLAYER_OUTPUT VSPlayer(VS_PLAYER_INPUT input)
+VS_DEFAULT_OUTPUT VS_Default(VS_DEFAULT_INPUT input)
 {
-    VS_PLAYER_OUTPUT output;
+    VS_DEFAULT_OUTPUT output;
     output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
     output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
@@ -181,7 +168,7 @@ VS_PLAYER_OUTPUT VSPlayer(VS_PLAYER_INPUT input)
     return (output);
 }
 
-float4 PSPlayer(VS_PLAYER_OUTPUT input) : SV_TARGET
+float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
 {
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     
@@ -193,29 +180,7 @@ float4 PSPlayer(VS_PLAYER_OUTPUT input) : SV_TARGET
     return (cColor);
 }
 
-VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
-{
-    VS_TERRAIN_OUTPUT output;
-    output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
-    output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
-    output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
-    
-    return (output);
-}
-
-float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
-{
-    float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    
-    for (int i = 0; i < nLights; i++)
-    {
-        cColor += ComputeLight(light[i], input.position_w, input.normal, normalize(cameraPos - input.position_w));
-    }
-    
-    return (cColor);
-}
-
-VS_INSTANCING_OUTPUT VSInstancing(VS_INSTANCING_INPUT input, uint InstanceID : SV_InstanceID)
+VS_INSTANCING_OUTPUT VS_Instancing(VS_INSTANCING_INPUT input, uint InstanceID : SV_InstanceID)
 {
     VS_INSTANCING_OUTPUT output;
     output.position = mul(mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject), gmtxViewProj);    
@@ -225,7 +190,7 @@ VS_INSTANCING_OUTPUT VSInstancing(VS_INSTANCING_INPUT input, uint InstanceID : S
     return (output);
 }
 
-float4 PSInstancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
+float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
 {
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     
