@@ -57,8 +57,12 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_hWnd = hMainWnd;
 
 	CreateDirect3DDevice();
+
+	m_ShadowMap = new CShadowMap(m_pd3dDevice, 2048, 2048);
+
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
+	BuildDescriptorHeaps();
 	CreateSwapChain();
 	CreateDepthStencilView();
 	BulletInit();
@@ -234,6 +238,32 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 
 	m_nDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	//깊이-스텐실 서술자 힙의 원소의 크기를 저장한다.
+}
+
+void CGameFramework::BuildDescriptorHeaps()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 14;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
+
+	D3D12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	auto srvCpuStart = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	auto srvGpuStart = m_pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	auto dsvCpuStart = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE hCpuSrv;
+	hCpuSrv.ptr = srvCpuStart.ptr;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE hGpuSrv;
+	hGpuSrv.ptr = srvGpuStart.ptr;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE hCpuDsv;
+	hCpuDsv.ptr = dsvCpuStart.ptr + m_nDsvDescriptorIncrementSize;
+
+	m_ShadowMap->BuildDescriptors(hCpuSrv, hGpuSrv, hCpuDsv);
 }
 
 //스왑체인의 각 후면 버퍼에 대한 렌더 타겟 뷰를 생성한다.

@@ -84,6 +84,8 @@ void CScene::ReleaseUploadBuffers()
 		m_pLightShaders[i].ReleaseUploadBuffers();
 }
 
+
+
 bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 {
 	return(false);

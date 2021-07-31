@@ -42,6 +42,11 @@ private:
 	UINT m_nDsvDescriptorIncrementSize;
 	//깊이-스텐실 버퍼, 서술자 힙 인터페이스 포인터, 깊이-스텐실 서술자 원소의 크기이다.
 
+	ID3D12Resource* m_pd3dShaderResourceBuffer;
+	ID3D12DescriptorHeap* m_pd3dSrvDescriptorHeap;
+	UINT m_nSrvDescriptorIncrementSize;
+	//쉐이더 리소스 버퍼, 서술자 힙 인터페이스 포인터, 쉐이더 리소스 서술자 원소의 크기이다.
+
 	ID3D12CommandQueue *m_pd3dCommandQueue;
 	ID3D12CommandAllocator* m_pd3dCommandAllocator;
 	ID3D12GraphicsCommandList* m_pd3dCommandList;
@@ -93,6 +98,7 @@ public:
 	void OnDestroy();
 	void CreateSwapChain();
 	void CreateRtvAndDsvDescriptorHeaps();
+	void BuildDescriptorHeaps();
 	void CreateDirect3DDevice();
 	void CreateCommandQueueAndList();
 	//스왑 체인, 디바이스, 서술자 힙, 명령 큐/할당자/리스트를 생성하는 함수이다.
