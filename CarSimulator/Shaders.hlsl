@@ -27,11 +27,13 @@ cbuffer cbLightInfo : register(b2)
     int nLights : packoffset(c0);
 }
 
+Texture2D gShadowMap : register(t0);
+
 struct INSTANCED_GAMEOBJECT_INFO
 {
     matrix m_mtxGameObject;
 };
-StructuredBuffer<INSTANCED_GAMEOBJECT_INFO> gGameObjectInfos : register(t0);
+StructuredBuffer<INSTANCED_GAMEOBJECT_INFO> gGameObjectInfos : register(t0, space1);
 
 struct LIGHT_INFO
 {
@@ -44,7 +46,7 @@ struct LIGHT_INFO
     float range;
     float3 direction;
 };
-StructuredBuffer<LIGHT_INFO> light : register(t1);
+StructuredBuffer<LIGHT_INFO> light : register(t1, space1);
 
 
 //정점 셰이더의 입력을 위한 구조체를 선언한다.
