@@ -9,6 +9,8 @@ CShadowMap::CShadowMap(ID3D12Device* pd3dDevice, UINT width, UINT height)
 
 	m_Viewport = { 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
 	m_ScissorRect = { 0, 0, (int)width, (int)height };
+
+	BuildResource();
 }
 
 void CShadowMap::BuildDescriptors(D3D12_CPU_DESCRIPTOR_HANDLE hCpuSrv, D3D12_GPU_DESCRIPTOR_HANDLE hGpuSrv, D3D12_CPU_DESCRIPTOR_HANDLE hCpuDsv)

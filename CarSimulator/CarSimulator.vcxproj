@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CarSimulator.h" />
+    <ClInclude Include="d3dx12.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="GameObject.h" />
