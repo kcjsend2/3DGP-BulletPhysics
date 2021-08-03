@@ -26,7 +26,6 @@
 #include <limits>
 
 #include <d3d12.h>
-#include <d3dx12.h>
 #include <dxgi1_4.h>
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
@@ -36,6 +35,7 @@
 #include <DirectXCollision.h>
 #include <DXGIDebug.h>
 
+#include "d3dx12.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -233,6 +233,7 @@ namespace Matrix4x4
 	{
 		XMFLOAT4X4 xmmtx4x4Result;
 		XMStoreFloat4x4(&xmmtx4x4Result, xmmtxMatrix1 * XMLoadFloat4x4(&xmmtx4x4Matrix2));
+
 		return(xmmtx4x4Result);
 	}
 	inline XMFLOAT4X4 Inverse(XMFLOAT4X4& xmmtx4x4Matrix)
