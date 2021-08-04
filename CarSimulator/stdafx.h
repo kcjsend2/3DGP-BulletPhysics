@@ -23,6 +23,7 @@
 #include <shellapi.h>
 #include <fstream>
 #include <vector>
+#include <array>
 #include <limits>
 
 #include <d3d12.h>

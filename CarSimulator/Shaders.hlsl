@@ -48,6 +48,13 @@ struct LIGHT_INFO
 };
 StructuredBuffer<LIGHT_INFO> light : register(t1, space1);
 
+SamplerState gsamPointWrap : register(s0);
+SamplerState gsamPointClamp : register(s1);
+SamplerState gsamLinearWrap : register(s2);
+SamplerState gsamLinearClamp : register(s3);
+SamplerState gsamAnisotropicWrap : register(s4);
+SamplerState gsamAnisotropicClamp : register(s5);
+SamplerComparisonState gsamShadow : register(s6);
 
 //정점 셰이더의 입력을 위한 구조체를 선언한다.
 struct VS_DEFAULT_INPUT

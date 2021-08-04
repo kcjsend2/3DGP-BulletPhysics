@@ -15,6 +15,7 @@ public:
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 	void ReleaseUploadBuffers();
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice);
