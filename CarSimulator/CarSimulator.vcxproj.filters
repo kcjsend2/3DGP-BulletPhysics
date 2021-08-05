@@ -113,7 +113,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders.hlsl" />
+    <FxCompile Include="Default.hlsl" />
+    <FxCompile Include="Instancing.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

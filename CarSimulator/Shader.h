@@ -65,6 +65,18 @@ protected:
 	int m_nPipelineStates = 0;
 };
 
+class CShadowShader : public CShader
+{
+public:
+	CShadowShader();
+	virtual ~CShadowShader();
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+protected:
+	std::vector<CGameObject*> m_vpGameObjects;
+};
+
 class CPlayerShader : public CShader
 {
 public:
@@ -73,7 +85,6 @@ public:
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
-	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void Update(float fTimeElapsed);
 };
 

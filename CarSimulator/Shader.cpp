@@ -222,16 +222,11 @@ D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CPlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 D3D12_SHADER_BYTECODE CPlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
-}
-
-void CPlayerShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
-{
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CPlayerShader::Update(float fTimeElapsed)
@@ -260,12 +255,12 @@ D3D12_INPUT_LAYOUT_DESC CObjectsShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_Instancing", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_Instancing", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -343,12 +338,12 @@ D3D12_INPUT_LAYOUT_DESC CInstancingShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CInstancingShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_Instancing", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Instancing.hlsl", "VS_Instancing", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CInstancingShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_Instancing", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Instancing.hlsl", "PS_Instancing", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CInstancingShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -514,12 +509,12 @@ D3D12_INPUT_LAYOUT_DESC CTerrainShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CTerrainShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -586,12 +581,12 @@ D3D12_INPUT_LAYOUT_DESC CLightsShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CLightsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CLightsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CLightsShader::ReleaseUploadBuffers()
@@ -628,4 +623,27 @@ void CLightsShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	int vSize = m_vLight.size();
 	pd3dCommandList->SetGraphicsRootShaderResourceView(4, m_pd3dcbLight->GetGPUVirtualAddress());
 	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &vSize, 0);
+}
+
+CShadowShader::CShadowShader()
+{
+}
+
+CShadowShader::~CShadowShader()
+{
+}
+
+D3D12_INPUT_LAYOUT_DESC CShadowShader::CreateInputLayout()
+{
+	return D3D12_INPUT_LAYOUT_DESC();
+}
+
+D3D12_SHADER_BYTECODE CShadowShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return D3D12_SHADER_BYTECODE();
+}
+
+D3D12_SHADER_BYTECODE CShadowShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return D3D12_SHADER_BYTECODE();
 }
