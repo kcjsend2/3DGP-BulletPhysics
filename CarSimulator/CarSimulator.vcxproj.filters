@@ -115,4 +115,8 @@
   <ItemGroup>
     <FxCompile Include="Shaders.hlsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LightUtil.hlsli" />
+    <None Include="Common.hlsli" />
+  </ItemGroup>
 </Project>

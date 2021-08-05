@@ -1,9 +1,9 @@
 #pragma once
 #include "GameObject.h"
 
-#define SPOT_LIGHT 0x00
-#define DIRECTIONAL_LIGHT 0x01
-#define POINT_LIGHT 0x02
+#define SPOT_LIGHT 1
+#define DIRECTIONAL_LIGHT 2
+#define POINT_LIGHT 3
 
 class CLight : public CGameObject
 {
