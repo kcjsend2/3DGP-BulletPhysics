@@ -56,7 +56,6 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pLightShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pLightShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
 
-
 	//지형을 확대할 스케일 벡터이다. x-축과 z-축은 32배, y-축은 8배 확대한다.
 	XMFLOAT3 xmf3Scale(4.0f, 8.0f, 4.0f);
 

@@ -115,6 +115,7 @@
   <ItemGroup>
     <FxCompile Include="Default.hlsl" />
     <FxCompile Include="Instancing.hlsl" />
+    <FxCompile Include="Shadow.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

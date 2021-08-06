@@ -207,11 +207,12 @@ CPlayerShader::~CPlayerShader()
 
 D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 2;
+	UINT nInputElementDescs = 3;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
@@ -324,11 +325,13 @@ CInstancingShader::~CInstancingShader()
 
 D3D12_INPUT_LAYOUT_DESC CInstancingShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 2;
+	UINT nInputElementDescs = 3;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 	//정점 정보를 위한 입력 원소이다.
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
@@ -496,10 +499,12 @@ CTerrainShader::~CTerrainShader()
 
 D3D12_INPUT_LAYOUT_DESC CTerrainShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 2;
+	UINT nInputElementDescs = 3;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
@@ -568,10 +573,12 @@ void CLightsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 
 D3D12_INPUT_LAYOUT_DESC CLightsShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 2;
+	UINT nInputElementDescs = 3;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;

@@ -26,10 +26,11 @@ VS_INSTANCING_OUTPUT VS_Instancing(VS_INSTANCING_INPUT input, uint InstanceID : 
 float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
 {
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
     
     for (int i = 0; i < nLights; i++)
     {
-        cColor += ComputeLight(light[i], input.position_w, input.normal, normalize(cameraPos - input.position_w));
+        cColor += ComputeLighting(light[i], input.position_w, input.normal, normalize(cameraPos - input.position_w), shadowFactor);
     }
     
     return (cColor);
