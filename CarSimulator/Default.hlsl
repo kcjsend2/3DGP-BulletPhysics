@@ -30,6 +30,8 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
 {
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     
+    cColor += material.AmbientLight * material.DiffuseAlbedo;
+    
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
     for (int i = 0; i < nLights; i++)
     {

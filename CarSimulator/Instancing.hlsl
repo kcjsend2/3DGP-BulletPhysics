@@ -28,6 +28,8 @@ float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
     
+    cColor += material.AmbientLight * material.DiffuseAlbedo;
+    
     for (int i = 0; i < nLights; i++)
     {
         cColor += ComputeLighting(light[i], input.position_w, input.normal, normalize(cameraPos - input.position_w), shadowFactor);

@@ -1,6 +1,6 @@
 struct MATERIAL //머티리얼 정보
 {
-    float4 gAmbientLight;
+    float4 AmbientLight;
     float4 DiffuseAlbedo;
     float3 FresnelR0;
     float Shininess;
