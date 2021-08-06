@@ -175,14 +175,12 @@ void CGameObject::SetPosition(XMFLOAT3 xmf3Position)
 	SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
-void CGameObject::SetMaterial(XMFLOAT4 xmf4Ambient, XMFLOAT4 xmf4Diffuse, XMFLOAT4 xmf4Specular, XMFLOAT4 xmf4Emmesive, float SpecularPower, XMFLOAT3 xmf3Color)
+void CGameObject::SetMaterial(XMFLOAT4 xmf4Ambient, XMFLOAT4 xmf4DiffuseAlbedo, XMFLOAT3 xmf3FresneIR, float fShininess)
 {
-	m_material.ambient = xmf4Ambient;
-	m_material.diffuse = xmf4Diffuse;
-	m_material.specular = xmf4Specular;
-	m_material.emmesive = xmf4Emmesive;
-	m_material.specularPower = SpecularPower;
-	m_material.cColor = xmf3Color;
+	m_material.AmbientLight = xmf4Ambient;
+	m_material.DiffuseAlbedo = xmf4DiffuseAlbedo;
+	m_material.FresnelR0 = xmf3FresneIR;
+	m_material.Shininess = fShininess;
 }
 
 XMFLOAT3 CGameObject::GetPosition()
@@ -267,7 +265,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_nWidth = nWidth;
 	m_nLength = nLength;
 
-	SetMaterial(XMFLOAT4{ 0.3f, 0.3f, 0.1f, 1.0f }, XMFLOAT4{ 0.3f, 0.3f, 0.1f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f }, 1000000, XMFLOAT3(0.3f, 0.3f, 0.1f));
+	SetMaterial(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	/*지형 객체는 격자 메쉬들의 배열로 만들 것이다. nBlockWidth, nBlockLength는 격자 메쉬 하나의 가로, 세로 크
 	기이다. cxQuadsPerBlock, czQuadsPerBlock은 격자 메쉬의 가로 방향과 세로 방향 사각형의 개수이다.*/

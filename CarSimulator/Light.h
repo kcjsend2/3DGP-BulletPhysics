@@ -9,17 +9,18 @@ class CLight : public CGameObject
 {
 public:
     int m_itype;
-    XMFLOAT4 m_xmf4Ambient;
-    XMFLOAT4 m_xmf4Diffuse;
-    XMFLOAT4 m_xmf4Specular;
-    XMFLOAT3 m_xmf3Attenuation;
-    float m_fRange;
+    XMFLOAT3 m_xmf3Strength;
+    float m_fFalloffStart;
     XMFLOAT3 m_xmf3Direction;
+    float m_fFalloffEnd;
+    XMFLOAT4 m_xmf4Ambient;
+    float m_fSpotPower;
+   
     CMeshFileRead* m_pMesh = NULL;
 
 public:
     CLight() = default;
-    CLight(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Ambient, XMFLOAT4 xmf4Diffuse, XMFLOAT4 xmf4Specular, XMFLOAT3 xmf3Attenuation, float fRange, XMFLOAT3 xmf3Direction);
+    CLight(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Ambient, float fSpotPower);
     ~CLight();
     virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
     virtual void ReleaseUploadBuffers();

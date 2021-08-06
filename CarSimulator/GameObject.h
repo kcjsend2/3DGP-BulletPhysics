@@ -6,12 +6,10 @@ class CShader;
 
 struct MATERIAL //머티리얼 정보
 {
-	XMFLOAT4 ambient;
-	XMFLOAT4 diffuse;
-	XMFLOAT4 specular;
-	XMFLOAT4 emmesive;
-	float specularPower;
-	XMFLOAT3 cColor;
+	XMFLOAT4 AmbientLight;
+	XMFLOAT4 DiffuseAlbedo;
+	XMFLOAT3 FresnelR0;
+	float Shininess;
 };
 
 class CGameObject
@@ -23,7 +21,7 @@ public:
 	int m_nReferences = 0;
 	CMesh** m_ppMeshes = NULL;
 	int m_nMeshes = 0;
-	MATERIAL m_material = { XMFLOAT4{}, XMFLOAT4{}, XMFLOAT4{}, XMFLOAT4{}, 0, XMFLOAT3(0.0f, 0.25f, 0.875f) };
+	MATERIAL m_material = { XMFLOAT4{}, XMFLOAT4{}, XMFLOAT3{}, 0};
 
 public:
 	void AddRef() { m_nReferences++; }
@@ -68,7 +66,7 @@ public:
 	//게임 객체의 위치를 설정한다.
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
-	void SetMaterial(XMFLOAT4 xmf4Ambient, XMFLOAT4 xmf4Diffuse, XMFLOAT4 xmf4Specualr, XMFLOAT4 xmf4Emmesive, float SpecularPower, XMFLOAT3 xmf3Color);
+	void SetMaterial(XMFLOAT4 xmf4Ambient, XMFLOAT4 xmf4DiffuseAlbedo, XMFLOAT3 xmf3FresneIR, float fShininess);
 
 	//게임 객체를 로컬 x-축, y-축, z-축 방향으로 이동한다.
 	void MoveStrafe(float fDistance = 1.0f);

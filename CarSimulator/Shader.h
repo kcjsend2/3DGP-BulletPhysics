@@ -12,24 +12,24 @@ struct VS_VB_INSTANCE
 struct VS_VB_LIGHT_INFO
 {
 	int type;
-	XMFLOAT3 position;
-	XMFLOAT4 ambient;
-	XMFLOAT4 diffuse;
-	XMFLOAT4 specular;
-	XMFLOAT3 attenuation;
-	float range;
-	XMFLOAT3 direction;
+	XMFLOAT3 Strength;
+	float FalloffStart; // point/spot light only
+	XMFLOAT3 Direction; // directional/spot light only
+	float FalloffEnd; // point/spot light only
+	XMFLOAT3 Position; // point light only
+	XMFLOAT4 Ambient;
+	float SpotPower; // spot light only
 
 	VS_VB_LIGHT_INFO(CLight& li)
 	{
 		type = li.m_itype;
-		position = li.GetPosition();
-		ambient = li.m_xmf4Ambient;
-		diffuse = li.m_xmf4Diffuse;
-		specular = li.m_xmf4Specular;
-		attenuation = li.m_xmf3Attenuation;
-		range = li.m_fRange;
-		direction = li.m_xmf3Direction;
+		Position = li.GetPosition();
+		Ambient = li.m_xmf4Ambient;
+		Direction = li.m_xmf3Direction;
+		Strength = li.m_xmf3Strength;
+		FalloffStart = li.m_fFalloffStart;
+		FalloffEnd = li.m_fFalloffEnd;
+		SpotPower = li.m_fSpotPower;
 	}
 };
 

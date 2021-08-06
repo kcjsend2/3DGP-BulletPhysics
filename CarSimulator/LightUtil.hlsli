@@ -156,6 +156,7 @@ float4 ComputeLighting(LIGHT_INFO gLights, float3 pos, float3 normal, float3 toE
         
         case SPOT_LIGHT:
             result += ComputeSpotLight(gLights, pos, normal, toEye);
+            break;
     }
 
     return float4(result, 0.0f);
