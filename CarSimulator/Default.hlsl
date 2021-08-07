@@ -32,7 +32,7 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     
     cColor += material.AmbientLight * material.DiffuseAlbedo;
     
-    float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
+    float3 shadowFactor = 1.0f;
     for (int i = 0; i < nLights; i++)
     {
         cColor += ComputeLighting(light[i], input.position_w, input.normal, normalize(cameraPos - input.position_w), shadowFactor);

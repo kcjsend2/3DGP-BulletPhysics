@@ -17,14 +17,12 @@ struct VS_VB_LIGHT_INFO
 	XMFLOAT3 Direction; // directional/spot light only
 	float FalloffEnd; // point/spot light only
 	XMFLOAT3 Position; // point light only
-	XMFLOAT4 Ambient;
 	float SpotPower; // spot light only
 
 	VS_VB_LIGHT_INFO(CLight& li)
 	{
 		type = li.m_itype;
 		Position = li.GetPosition();
-		Ambient = li.m_xmf4Ambient;
 		Direction = li.m_xmf3Direction;
 		Strength = li.m_xmf3Strength;
 		FalloffStart = li.m_fFalloffStart;

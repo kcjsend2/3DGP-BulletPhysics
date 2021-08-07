@@ -13,14 +13,13 @@ public:
     float m_fFalloffStart;
     XMFLOAT3 m_xmf3Direction;
     float m_fFalloffEnd;
-    XMFLOAT4 m_xmf4Ambient;
     float m_fSpotPower;
    
     CMeshFileRead* m_pMesh = NULL;
 
 public:
     CLight() = default;
-    CLight(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Ambient, float fSpotPower);
+    CLight(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower);
     ~CLight();
     virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
     virtual void ReleaseUploadBuffers();
