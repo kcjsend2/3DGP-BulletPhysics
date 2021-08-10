@@ -82,6 +82,21 @@ void CGameObject::OnPrepareRender()
 
 }
 
+void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender();
+	UpdateShaderVariables(pd3dCommandList);
+
+	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
+}
+
 void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
@@ -265,7 +280,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_nWidth = nWidth;
 	m_nLength = nLength;
 
-	SetMaterial(XMFLOAT4(0.0f, 0.8f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.8f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
+	SetMaterial(XMFLOAT4(0.6f, 0.6f, 0.2f, 1.0f), XMFLOAT4(0.6f, 0.6f, 0.2f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 1.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	/*지형 객체는 격자 메쉬들의 배열로 만들 것이다. nBlockWidth, nBlockLength는 격자 메쉬 하나의 가로, 세로 크
 	기이다. cxQuadsPerBlock, czQuadsPerBlock은 격자 메쉬의 가로 방향과 세로 방향 사각형의 개수이다.*/

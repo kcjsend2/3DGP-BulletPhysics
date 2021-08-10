@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Camera.h"
+#include "Player.h"
 #include "Light.h"
 
 //게임 객체의 정보를 셰이더에게 넘겨주기 위한 구조체(상수 버퍼)이다.
@@ -69,9 +70,15 @@ public:
 	CShadowShader();
 	virtual ~CShadowShader();
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos);
+	void SetLight(CLight* pLight) { m_pLight = pLight; }
+	std::vector<CGameObject*> GetObjectVector() { return m_vpGameObjects; }
 protected:
+	CLight* m_pLight = NULL;
 	std::vector<CGameObject*> m_vpGameObjects;
 };
 
@@ -102,6 +109,9 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual CGameObject** GetObjects() { return m_ppObjects; }
+	virtual int GetObjectsNumber() { return m_nObjects; }
+
 protected:
 	CGameObject** m_ppObjects = NULL;
 	int m_nObjects = 0;
@@ -154,6 +164,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	CLight* GetDirectionalLight() { return &m_vLight[0]; }
 protected:
 	ID3D12Resource* m_pd3dcbLight = NULL;
 	std::vector<CLight> m_vLight;

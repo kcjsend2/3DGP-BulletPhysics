@@ -115,6 +115,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		m_pShaders[i].Render(pd3dCommandList, pCamera);
 	}
+
+	
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
@@ -190,18 +192,19 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[6];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[7];
 
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[2].InitAsConstants(1, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[3].InitAsConstants(16, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
 
-	pd3dRootParameters[3].InitAsShaderResourceView(0, 1);
-	pd3dRootParameters[4].InitAsShaderResourceView(1, 1);
+	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
+	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);
 
 
 	CD3DX12_DESCRIPTOR_RANGE texTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
-	pd3dRootParameters[5].InitAsDescriptorTable(1, &texTable);
+	pd3dRootParameters[6].InitAsDescriptorTable(1, &texTable);
 
 	auto staticSamplers = GetStaticSamplers();
 

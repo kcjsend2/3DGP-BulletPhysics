@@ -383,7 +383,7 @@ void CInstancingShader::ReleaseUploadBuffers()
 //인스턴싱 정보(객체의 월드 변환 행렬과 색상)를 정점 버퍼에 복사한다.
 void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->SetGraphicsRootShaderResourceView(3, m_pd3dcbGameObjects->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRootShaderResourceView(4, m_pd3dcbGameObjects->GetGPUVirtualAddress());
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->GetWorldTransformMatrix())));
@@ -545,7 +545,7 @@ void CLightsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	//ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower
 
-	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 1.0f, 1.0f, 1.0f }, NULL, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 4000.0f, 10000.0f, 4000.0f }, NULL);
+	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 1.0f, 1.0f, 1.0f }, NULL, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 4000.0f, 1000.0f, 4000.0f }, NULL);
 	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -629,7 +629,7 @@ void CLightsShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	}
 	
 	int vSize = m_vLight.size();
-	pd3dCommandList->SetGraphicsRootShaderResourceView(4, m_pd3dcbLight->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRootShaderResourceView(5, m_pd3dcbLight->GetGPUVirtualAddress());
 	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &vSize, 0);
 }
 
@@ -643,15 +643,105 @@ CShadowShader::~CShadowShader()
 
 D3D12_INPUT_LAYOUT_DESC CShadowShader::CreateInputLayout()
 {
-	return D3D12_INPUT_LAYOUT_DESC();
+	UINT nInputElementDescs = 3;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
+	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
+	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+
+	d3dPipelineStateDesc.RasterizerState.DepthBias = 10000.0f;
+	d3dPipelineStateDesc.RasterizerState.DepthBiasClamp = 0.0f;
+	d3dPipelineStateDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
+
+	d3dPipelineStateDesc.BlendState = CreateBlendState();
+	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
+	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
+	d3dPipelineStateDesc.SampleMask = UINT_MAX;
+	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	d3dPipelineStateDesc.NumRenderTargets = 0;
+	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dPipelineStateDesc.SampleDesc.Count = 1;
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+
+	if (pd3dVertexShaderBlob)
+		pd3dVertexShaderBlob->Release();
+
+	if (pd3dPixelShaderBlob)
+		pd3dPixelShaderBlob->Release();
+
+	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
+		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
 D3D12_SHADER_BYTECODE CShadowShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return D3D12_SHADER_BYTECODE();
+	return(CShader::CompileShaderFromFile(L"Shadow.hlsl", "VS", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CShadowShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return D3D12_SHADER_BYTECODE();
+	return(CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", ppd3dShaderBlob));
+}
+
+void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer)
+{
+	UpdateShaderVariables(pd3dCommandList, pPlayer->GetPosition());
+
+	for (CGameObject* o : m_vpGameObjects)
+	{
+		o->UpdateShaderVariables(pd3dCommandList);
+		o->Render(pd3dCommandList);
+	}
+}
+
+void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos)
+{
+	XMMATRIX lightView = XMMatrixLookAtLH(XMLoadFloat3(&m_pLight->GetPosition()), XMLoadFloat3(&xmf3TargetPos), XMLoadFloat3(&m_pLight->GetUp()));
+
+	// Transform bounding sphere to light space.
+	XMFLOAT3 xmf3CenterLS;
+	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&xmf3TargetPos), lightView));
+
+	// Ortho frustum in light space encloses scene.
+
+	float l = xmf3CenterLS.x - 3000;
+	float b = xmf3CenterLS.y - 3000;
+	float n = xmf3CenterLS.z - 3000;
+	float r = xmf3CenterLS.x + 3000;
+	float t = xmf3CenterLS.y + 3000;
+	float f = xmf3CenterLS.z + 3000;
+
+	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
+
+	// Transform NDC space [-1,+1]^2 to texture space [0,1]^2
+	XMMATRIX T(
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f);
+
+	XMMATRIX S = lightView * lightProj * T;
+
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &S, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 3, &m_pLight->GetPosition(), 16);
 }

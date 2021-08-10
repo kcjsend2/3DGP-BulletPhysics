@@ -1,11 +1,15 @@
 #pragma once
 #include "stdafx.h"
+#include "Shader.h"
 
 class CShadowMap
 {
 public:
 	CShadowMap(ID3D12Device* device, UINT width, UINT height);
 	~CShadowMap() = default;
+
+	void SetShader(CShadowShader* pShader) { m_pShader = pShader; }
+	CShadowShader* GetShader() { return m_pShader; }
 
 	UINT GetWidth()const { return  m_Width; }
 	UINT GetHeight()const {	return m_Height; }
@@ -40,5 +44,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE m_hCpuDsv;
 
 	ID3D12Resource* m_ShadowMap = NULL;
+
+	CShadowShader* m_pShader;
 };
 

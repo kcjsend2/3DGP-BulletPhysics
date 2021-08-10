@@ -29,9 +29,6 @@ protected:
 	CLightsShader* m_pLightShaders = NULL;
 	int m_nLightShaders = 0;
 
-	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
-	CGameObject **m_ppObjects = NULL;
-	int m_nObjects = 0;
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 
 
@@ -40,5 +37,9 @@ protected:
 
 public:
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain); }
+	CInstancingShader* GetInstancingShader() { return m_pShaders; }
+	int GetInstancingShaderNumber() { return m_nShaders; }
 
+	CLightsShader* GetLightShader() { return m_pLightShaders; }
+	int GetLightShaderNumber() { return m_nLightShaders; }
 };

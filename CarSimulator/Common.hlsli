@@ -12,6 +12,11 @@ cbuffer cbLightInfo : register(b2)
     int nLights : packoffset(c0);
 }
 
+cbuffer cbShadowInfo : register(b3)
+{
+    matrix gmtxShadowTransform : packoffset(c0);
+}
+
 Texture2D gShadowMap : register(t0);
 
 struct INSTANCED_GAMEOBJECT_INFO

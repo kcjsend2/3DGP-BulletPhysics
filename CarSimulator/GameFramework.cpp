@@ -56,9 +56,10 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
 
+
 	CreateDirect3DDevice();
 
-	m_ShadowMap = new CShadowMap(m_pd3dDevice, 2048, 2048);
+	m_pShadowMap = new CShadowMap(m_pd3dDevice, 2048, 2048);
 
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
@@ -263,7 +264,7 @@ void CGameFramework::BuildDescriptorHeaps()
 	D3D12_CPU_DESCRIPTOR_HANDLE hCpuDsv;
 	hCpuDsv.ptr = dsvCpuStart.ptr + m_nDsvDescriptorIncrementSize;
 
-	m_ShadowMap->BuildDescriptors(hCpuSrv, hGpuSrv, hCpuDsv);
+	m_pShadowMap->BuildDescriptors(hCpuSrv, hGpuSrv, hCpuDsv);
 }
 
 //스왑체인의 각 후면 버퍼에 대한 렌더 타겟 뷰를 생성한다.
@@ -323,6 +324,11 @@ void CGameFramework::BuildObjects()
 
 	if (m_pScene)
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_btCollisionShapes, m_pbtDynamicsWorld);
+	
+	CShadowShader* pShadowShader = new CShadowShader();
+	pShadowShader->CreateShader(m_pd3dDevice, m_pScene->GetGraphicsRootSignature());
+	m_pShadowMap->SetShader(pShadowShader);
+	m_pShadowMap->GetShader()->SetLight(m_pScene->GetLightShader()[0].GetDirectionalLight());
 
 	m_pPlayer = new CVehiclePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_btCollisionShapes, m_pbtDynamicsWorld, 1);
 	m_pCamera = m_pPlayer->GetCamera();
@@ -335,6 +341,24 @@ void CGameFramework::BuildObjects()
 		m_pScene->ReleaseUploadBuffers();
 
 	Update();
+
+	// 쉐도우맵은 모든 오브젝트를 그려야한다.
+	{
+		auto vpGameObjects = m_pShadowMap->GetShader()->GetObjectVector();
+		vpGameObjects.push_back(m_pPlayer);
+		vpGameObjects.push_back(m_pScene->GetTerrain());
+
+		auto pInstancingShader = m_pScene->GetInstancingShader();
+		for (int i = 0; i < m_pScene->GetInstancingShaderNumber(); ++i)
+		{
+			auto ppObjects = pInstancingShader->GetObjects();
+			for (int j = 0; j < pInstancingShader->GetObjectsNumber(); ++j)
+			{
+				vpGameObjects.push_back(ppObjects[i]);
+			}
+		}
+	}
+
 	m_GameTimer.Reset();
 }
 
@@ -463,6 +487,29 @@ void CGameFramework::FrameAdvance()
 
 	Update();
 
+	m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap->GetViewport());
+	m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap->GetScissorRect());
+
+	// Change to DEPTH_WRITE.
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(),
+		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+
+	// Clear the back buffer and depth buffer.
+	m_pd3dCommandList->ClearDepthStencilView(m_pShadowMap->GetDsv(),
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	// Set null render target because we are only going to draw to
+	// depth buffer.  Setting a null render target will disable color writes.
+	// Note the active PSO also must specify a render target count of 0.
+	m_pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &m_pShadowMap->GetDsv());
+
+	m_pShadowMap->GetShader()->Render(m_pd3dCommandList, m_pPlayer);
+
+	// Change back to GENERIC_READ so we can read the texture in a shader.
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(),
+		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
+
+
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
@@ -484,6 +531,7 @@ void CGameFramework::FrameAdvance()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
+
 
 	if (m_pScene)
 		m_pScene->Render(m_pd3dCommandList, m_pCamera);

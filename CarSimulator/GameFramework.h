@@ -76,7 +76,7 @@ private:
 	UINT64 m_nFenceValues[m_nSwapChainBuffers];
 	CScene* m_pScene;
 
-	CShadowMap* m_ShadowMap;
+	CShadowMap* m_pShadowMap;
 
 public:
 	CCamera* m_pCamera = NULL;

@@ -9,6 +9,7 @@ struct VS_INSTANCING_INPUT
 struct VS_INSTANCING_OUTPUT
 {
     float4 position : SV_POSITION;
+
     float3 position_w : POSITION;
     float3 normal : NORMAL;
 };
