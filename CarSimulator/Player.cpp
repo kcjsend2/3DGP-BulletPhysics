@@ -320,8 +320,8 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	//카메라 모드가 3인칭이면 플레이어 객체를 렌더링한다.
 	if (nCameraMode == THIRD_PERSON_CAMERA || nCameraMode == SPACESHIP_CAMERA)
 	{
-		if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
-		CGameObject::Render(pd3dCommandList, pCamera);
+		if (m_pShader) m_pShader->Render(pd3dCommandList);
+		CGameObject::Render(pd3dCommandList);
 	}
 }
 
@@ -518,9 +518,9 @@ void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 {
 	OnPrepareRender();
 	UpdateShaderVariables(pd3dCommandList);
-	if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
+	if (m_pShader) m_pShader->Render(pd3dCommandList);
 
-	CGameObject::Render(pd3dCommandList, pCamera);
+	CGameObject::Render(pd3dCommandList);
 
 	for (int i = 0; i < 4; ++i)
 	{

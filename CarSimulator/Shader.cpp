@@ -188,7 +188,7 @@ void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
 }
 
-void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender(pd3dCommandList);
 }
@@ -301,13 +301,15 @@ void CObjectsShader::ReleaseUploadBuffers()
 	}
 }
 
-void CObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList, pCamera); for (int j = 0; j < m_nObjects; j++)
+	CShader::Render(pd3dCommandList);
+
+	for (int j = 0; j < m_nObjects; j++)
 	{
 		if (m_ppObjects[j])
 		{
-			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+			m_ppObjects[j]->Render(pd3dCommandList);
 		}
 	}
 	UpdateShaderVariables(pd3dCommandList);
@@ -479,14 +481,14 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
-void CInstancingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CInstancingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList);
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
-	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects);
+	m_ppObjects[0]->Render(pd3dCommandList, m_nObjects);
 }
 
 CTerrainShader::CTerrainShader()
@@ -559,16 +561,16 @@ void CLightsShader::ReleaseObjects()
 	}
 }
 
-void CLightsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CLightsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList);
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
 	for (auto i = m_vLight.begin(); i != m_vLight.end(); ++i)
 	{
-		i->Render(pd3dCommandList, pCamera);
+		i->Render(pd3dCommandList);
 	}
 }
 
@@ -705,6 +707,7 @@ D3D12_SHADER_BYTECODE CShadowShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlo
 
 void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer)
 {
+	CShader::Render(pd3dCommandList);
 	UpdateShaderVariables(pd3dCommandList, pPlayer->GetPosition());
 
 	for (CGameObject* o : m_vpGameObjects)
@@ -742,6 +745,15 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	XMMATRIX S = lightView * lightProj * T;
 
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &S, 0);
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 3, &m_pLight->GetPosition(), 16);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 16, &S, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 3, &m_pLight->GetPosition(), 16);
+
+	XMFLOAT3X4 xmf3x4Dummy(
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f);
+
+	float fDummy = NULL;
+	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 12, &xmf3x4Dummy, 19);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 1, &fDummy, 31);
 }

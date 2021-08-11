@@ -21,6 +21,10 @@ cbuffer cbGameObjectInfo : register(b0)
 {
     matrix gmtxWorld : packoffset(c0);
     MATERIAL material : packoffset(c4);
+    
+    //16의 배수로 채우기 위한 오프셋
+    float3x4 dummy1 : packoffset(c8);
+    float dummy2 : packoffset(c12);
 };
 
 
@@ -81,7 +85,7 @@ float3 ComputePointLight(LIGHT_INFO L, float3 pos, float3 normal, float3 toEye)
 {
     // The vector from the surface to the light.
     float3 lightVec = L.Position - pos;
-
+    
     // The distance from surface to light.
     float d = length(lightVec);
 

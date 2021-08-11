@@ -43,11 +43,11 @@ void CLight::ReleaseUploadBuffers()
 }
 
 
-void CLight::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CLight::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender();
 	UpdateShaderVariables(pd3dCommandList);
-	if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
+	if (m_pShader) m_pShader->Render(pd3dCommandList);
 
 	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
 	if (m_pMesh)

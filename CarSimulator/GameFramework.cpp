@@ -343,19 +343,16 @@ void CGameFramework::BuildObjects()
 	Update();
 
 	// 쉐도우맵은 모든 오브젝트를 그려야한다.
-	{
-		auto vpGameObjects = m_pShadowMap->GetShader()->GetObjectVector();
-		vpGameObjects.push_back(m_pPlayer);
-		vpGameObjects.push_back(m_pScene->GetTerrain());
+	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer);
+	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
 
-		auto pInstancingShader = m_pScene->GetInstancingShader();
-		for (int i = 0; i < m_pScene->GetInstancingShaderNumber(); ++i)
+	auto pInstancingShader = m_pScene->GetInstancingShader();
+	for (int i = 0; i < m_pScene->GetInstancingShaderNumber(); ++i)
+	{
+		auto ppObjects = pInstancingShader->GetObjects();
+		for (int j = 0; j < pInstancingShader->GetObjectsNumber(); ++j)
 		{
-			auto ppObjects = pInstancingShader->GetObjects();
-			for (int j = 0; j < pInstancingShader->GetObjectsNumber(); ++j)
-			{
-				vpGameObjects.push_back(ppObjects[i]);
-			}
+			m_pShadowMap->GetShader()->GetObjectVector()->push_back(ppObjects[i]);
 		}
 	}
 
@@ -506,8 +503,7 @@ void CGameFramework::FrameAdvance()
 	m_pShadowMap->GetShader()->Render(m_pd3dCommandList, m_pPlayer);
 
 	// Change back to GENERIC_READ so we can read the texture in a shader.
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(),
-		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
 
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();

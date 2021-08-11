@@ -103,17 +103,17 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	for (int i = 0; i < m_nLightShaders; ++i)
 	{
-		m_pLightShaders[i].Render(pd3dCommandList, pCamera);
+		m_pLightShaders[i].Render(pd3dCommandList);
 	}
 
 	if (m_pTerrain)
 	{
-		m_pTerrain->Render(pd3dCommandList, pCamera);
+		m_pTerrain->Render(pd3dCommandList);
 	}
 
 	for (int i = 0; i < m_nShaders; i++)
 	{
-		m_pShaders[i].Render(pd3dCommandList, pCamera);
+		m_pShaders[i].Render(pd3dCommandList);
 	}
 
 	
@@ -197,7 +197,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[2].InitAsConstants(1, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[3].InitAsConstants(16, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[3].InitAsConstants(19, 3, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
 	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);

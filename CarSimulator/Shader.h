@@ -56,7 +56,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Update(float fTimeElapsed);
 
 protected:
@@ -76,7 +76,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos);
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
-	std::vector<CGameObject*> GetObjectVector() { return m_vpGameObjects; }
+	std::vector<CGameObject*>* GetObjectVector() { return &m_vpGameObjects; }
 protected:
 	CLight* m_pLight = NULL;
 	std::vector<CGameObject*> m_vpGameObjects;
@@ -108,7 +108,7 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void ReleaseUploadBuffers();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual CGameObject** GetObjects() { return m_ppObjects; }
 	virtual int GetObjectsNumber() { return m_nObjects; }
 
@@ -131,7 +131,7 @@ public:
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	virtual void ReleaseShaderVariables();
 	virtual void ReleaseUploadBuffers();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 protected:
 	//인스턴스 데이터를 포함하는 버퍼와 포인터이다.
 	ID3D12Resource* m_pd3dcbGameObjects = NULL;
@@ -156,7 +156,7 @@ public:
 	virtual ~CLightsShader();
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReleaseObjects();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
