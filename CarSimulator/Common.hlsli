@@ -5,18 +5,22 @@ cbuffer cbCameraInfo : register(b1)
 {
     matrix gmtxViewProj : packoffset(c0);
     float3 cameraPos : packoffset(c4);
+    
+    //size : 19
 };
 
 cbuffer cbLightInfo : register(b2)
 {
     int nLights : packoffset(c0);
+    //size : 1
 }
 
-cbuffer cbShadowInfo : register(b3)
+cbuffer cbLightInfo : register(b3)
 {
-    matrix gmtxShadowTransform : packoffset(c0);
-    float3 ShadowCameraPos : packoffset(c4);
+    matrix gmtxShadowTransform : register(b3);
+    float3 ShadowCameraPos : register(b4);
 }
+
 
 Texture2D gShadowMap : register(t0);
 

@@ -752,8 +752,4 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 		0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 0.0f);
-
-	float fDummy = NULL;
-	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 12, &xmf3x4Dummy, 19);
-	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 1, &fDummy, 31);
 }

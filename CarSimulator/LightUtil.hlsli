@@ -19,12 +19,8 @@ struct LIGHT_INFO
 
 cbuffer cbGameObjectInfo : register(b0)
 {
-    matrix gmtxWorld : packoffset(c0);
+    matrix gmtxWorld : packoffset(c0); 
     MATERIAL material : packoffset(c4);
-    
-    //16의 배수로 채우기 위한 오프셋
-    float3x4 dummy1 : packoffset(c8);
-    float dummy2 : packoffset(c12);
 };
 
 

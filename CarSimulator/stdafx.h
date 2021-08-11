@@ -37,6 +37,7 @@
 #include <DXGIDebug.h>
 
 #include "d3dx12.h"
+#include "UploadBuffer.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
