@@ -337,7 +337,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 20.0f, 100.0f));
+	SetPosition(XMFLOAT3(1000.0f, 20.0f, 1000.0f));
 
 	auto vehicleExtents = pVehicleMesh[0].GetBoundingBox().Extents;
 	auto wheelExtents = pWheelMesh[0].GetBoundingBox().Extents;
