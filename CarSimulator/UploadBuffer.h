@@ -16,7 +16,7 @@ public:
         // UINT   SizeInBytes;   // multiple of 256
         // } D3D12_CONSTANT_BUFFER_VIEW_DESC;
         if (isConstantBuffer)
-            m_nElementByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(T));
+            m_nElementByteSize = CalcConstantBufferByteSize(sizeof(T));
 
         device->CreateCommittedResource(
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -51,6 +51,12 @@ public:
     {
         memcpy(&m_pMappedData[elementIndex * m_nElementByteSize], &data, sizeof(T));
     }
+
+    UINT CalcConstantBufferByteSize(UINT byteSize)
+    {
+        return (byteSize + 255) & ~255;
+    }
+
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Resource> m_pUploadBuffer;

@@ -46,7 +46,7 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     // Add in specular reflections.
     
     float3 r = reflect(-toEyeW, input.normal);
-    float4 reflectionColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+    float4 reflectionColor = { 1.0f, 1.0f, 1.0f, 0.0f };
     
     float3 fresnelFactor = SchlickFresnel(material.FresnelR0, input.normal, r);
     cColor.rgb += material.Shininess * fresnelFactor * reflectionColor.rgb;

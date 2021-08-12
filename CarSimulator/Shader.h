@@ -77,8 +77,16 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos);
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
 	std::vector<CGameObject*>* GetObjectVector() { return &m_vpGameObjects; }
+
+	struct CB_SHADOW
+	{
+		XMFLOAT4X4 m_xmf4x4ShadowTransform;
+		XMFLOAT3 m_xmf3ShadowCamPos;
+	};
+
 protected:
 	CLight* m_pLight = NULL;
+	UploadBuffer<CB_SHADOW>* m_ubShadowCB;
 	std::vector<CGameObject*> m_vpGameObjects;
 };
 

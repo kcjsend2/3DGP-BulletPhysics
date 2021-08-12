@@ -660,6 +660,8 @@ D3D12_INPUT_LAYOUT_DESC CShadowShader::CreateInputLayout()
 
 void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
+	m_ubShadowCB = new UploadBuffer<CB_SHADOW>(pd3dDevice, 1, true);
+
 	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
@@ -745,11 +747,12 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	XMMATRIX S = lightView * lightProj * T;
 
-	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 16, &S, 0);
-	pd3dCommandList->SetGraphicsRoot32BitConstants(3, 3, &m_pLight->GetPosition(), 16);
+	XMFLOAT4X4 m_xmf4x4ShadowTransform;
 
-	XMFLOAT3X4 xmf3x4Dummy(
-		0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f);
+	XMStoreFloat4x4(&m_xmf4x4ShadowTransform, S);
+
+	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, m_pLight->GetPosition() };
+
+	m_ubShadowCB->CopyData(0, cbShadow);
+	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());
 }
