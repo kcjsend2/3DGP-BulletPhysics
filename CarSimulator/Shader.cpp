@@ -715,8 +715,11 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 
 	for (CGameObject* o : m_vpGameObjects)
 	{
-		o->UpdateShaderVariables(pd3dCommandList);
-		o->ShadowPassRender(pd3dCommandList);
+		if (o != NULL)
+		{
+			o->UpdateShaderVariables(pd3dCommandList);
+			o->ShadowPassRender(pd3dCommandList);
+		}
 	}
 }
 

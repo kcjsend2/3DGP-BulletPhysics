@@ -76,14 +76,37 @@ public:
 	BoundingOrientedBox GetBoundingBox() { return(m_xmBoundingBox); }
 
 protected:
-	ID3D12Resource* m_pd3dVertexBuffer = NULL;
-	ID3D12Resource* m_pd3dVertexUploadBuffer = NULL;
-	D3D12_VERTEX_BUFFER_VIEW m_d3dVertexBufferView;
 	D3D12_PRIMITIVE_TOPOLOGY m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
 	UINT m_nSlot = 0;
 	UINT m_nVertices = 0;
 	UINT m_nStride = 0;
 	UINT m_nOffset = 0;
+
+	XMFLOAT3* m_pxmf3Positions = NULL;
+	ID3D12Resource* m_pd3dPositionBuffer = NULL;
+	ID3D12Resource* m_pd3dPositionUploadBuffer = NULL;
+
+	XMFLOAT3* m_pxmf3Normals = NULL;
+	ID3D12Resource* m_pd3dNormalBuffer = NULL;
+	ID3D12Resource* m_pd3dNormalUploadBuffer = NULL;
+
+	XMFLOAT2* m_pxmf2TextureCoords = NULL;
+	ID3D12Resource* m_pd3dTextureCoordBuffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoordUploadBuffer = NULL;
+
+	UINT m_nIndices = 0;
+	UINT* m_pnIndices = NULL;
+	ID3D12Resource* m_pd3dIndexBuffer = NULL;
+	ID3D12Resource* m_pd3dIndexUploadBuffer = NULL;
+
+	UINT m_nVertexBufferViews = 0;
+	D3D12_VERTEX_BUFFER_VIEW* m_pd3dVertexBufferViews = NULL;
+
+	D3D12_INDEX_BUFFER_VIEW	m_d3dIndexBufferView;
+
+	UINT m_nStartIndex = 0;
+	int	m_nBaseVertex = 0;
 
 protected:
 	BoundingOrientedBox m_xmBoundingBox;
@@ -91,21 +114,6 @@ protected:
 public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nInstances);
-
-protected:
-	ID3D12Resource* m_pd3dIndexBuffer = NULL;
-	ID3D12Resource* m_pd3dIndexUploadBuffer = NULL;
-	/*인덱스 버퍼(인덱스의 배열)와 인덱스 버퍼를 위한 업로드 버퍼에 대한 인터페이스 포인터이다. 인덱스 버퍼는 정점 버퍼(배열)에 대한 인덱스를 가진다.*/
-	D3D12_INDEX_BUFFER_VIEW m_d3dIndexBufferView;
-
-	UINT m_nIndices = 0;
-	//인덱스 버퍼에 포함되는 인덱스의 개수이다.
-
-	UINT m_nStartIndex = 0;
-	//인덱스 버퍼에서 메쉬를 그리기 위해 사용되는 시작 인덱스이다.
-
-	int m_nBaseVertex = 0;
-	//인덱스 버퍼의 인덱스에 더해질 인덱스이다. 
 };
 
 class CTriangleMesh : public CMesh
@@ -185,34 +193,6 @@ public:
 	virtual ~CMeshFileRead();
 	virtual void ReleaseUploadBuffers();
 
-protected:
-	XMFLOAT3* m_pxmf3Positions = NULL;
-	ID3D12Resource* m_pd3dPositionBuffer = NULL;
-	ID3D12Resource* m_pd3dPositionUploadBuffer = NULL;
-
-	XMFLOAT3* m_pxmf3Normals = NULL;
-	ID3D12Resource* m_pd3dNormalBuffer = NULL;
-	ID3D12Resource* m_pd3dNormalUploadBuffer = NULL;
-
-	XMFLOAT2* m_pxmf2TextureCoords = NULL;
-	ID3D12Resource* m_pd3dTextureCoordBuffer = NULL;
-	ID3D12Resource* m_pd3dTextureCoordUploadBuffer = NULL;
-
-	UINT m_nIndices = 0;
-	UINT* m_pnIndices = NULL;
-	ID3D12Resource* m_pd3dIndexBuffer = NULL;
-	ID3D12Resource* m_pd3dIndexUploadBuffer = NULL;
-
-	UINT m_nVertexBufferViews = 0;
-	D3D12_VERTEX_BUFFER_VIEW* m_pd3dVertexBufferViews = NULL;
-
-	D3D12_INDEX_BUFFER_VIEW	m_d3dIndexBufferView;
-
-	UINT m_nStartIndex = 0;
-	int	m_nBaseVertex = 0;
-
 public:
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-
 	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile, XMFLOAT3 xmf3Scale, XMFLOAT3 xmf3Rotation);
 };
