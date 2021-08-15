@@ -98,7 +98,6 @@ ID3D12RootSignature* CScene::GetGraphicsRootSignature()
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
-	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < m_nLightShaders; ++i)

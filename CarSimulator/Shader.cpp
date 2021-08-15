@@ -688,6 +688,7 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
 
+
 	if (pd3dVertexShaderBlob)
 		pd3dVertexShaderBlob->Release();
 
@@ -717,7 +718,6 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 	{
 		if (o != NULL)
 		{
-			o->UpdateShaderVariables(pd3dCommandList);
 			o->ShadowPassRender(pd3dCommandList);
 		}
 	}

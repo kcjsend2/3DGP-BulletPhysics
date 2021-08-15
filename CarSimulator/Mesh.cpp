@@ -108,45 +108,44 @@ CCubeMeshDiffused::CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 {
 	//직육면체는 꼭지점(정점)이 8개이다.
 	m_nVertices = 8;
-	m_nStride = sizeof(CVertex);
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
 
 	//정점 버퍼는 직육면체의 꼭지점 8개에 대한 정점 데이터를 가진다.
-	CVertex pVertices[8];
-	pVertices[0] = CVertex(XMFLOAT3(-fx, +fy, -fz));
-	pVertices[1] = CVertex(XMFLOAT3(+fx, +fy, -fz));
-	pVertices[2] = CVertex(XMFLOAT3(+fx, +fy, +fz));
-	pVertices[3] = CVertex(XMFLOAT3(-fx, +fy, +fz));
-	pVertices[4] = CVertex(XMFLOAT3(-fx, -fy, -fz));
-	pVertices[5] = CVertex(XMFLOAT3(+fx, -fy, -fz));
-	pVertices[6] = CVertex(XMFLOAT3(+fx, -fy, +fz));
-	pVertices[7] = CVertex(XMFLOAT3(-fx, -fy, +fz));
+	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
+	m_pxmf3Positions[0] = XMFLOAT3(-fx, +fy, -fz);
+	m_pxmf3Positions[1] = XMFLOAT3(+fx, +fy, -fz);
+	m_pxmf3Positions[2] = XMFLOAT3(+fx, +fy, +fz);
+	m_pxmf3Positions[3] = XMFLOAT3(-fx, +fy, +fz);
+	m_pxmf3Positions[4] = XMFLOAT3(-fx, -fy, -fz);
+	m_pxmf3Positions[5] = XMFLOAT3(+fx, -fy, -fz);
+	m_pxmf3Positions[6] = XMFLOAT3(+fx, -fy, +fz);
+	m_pxmf3Positions[7] = XMFLOAT3(-fx, -fy, +fz);
 
-	XMFLOAT3 pNormals[8];
-	pNormals[0] = Vector3::Normalize(XMFLOAT3(-1.0f, 1.0f, -1.0f));
-	pNormals[1] = Vector3::Normalize(XMFLOAT3(1.0f, 1.0f, -1.0f));
-	pNormals[2] = Vector3::Normalize(XMFLOAT3(1.0f, 1.0f, 1.0f));
-	pNormals[3] = Vector3::Normalize(XMFLOAT3(-1.0f, 1.0f, 1.0f));
-	pNormals[4] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, -1.0f));
-	pNormals[5] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, -1.0f));
-	pNormals[6] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, 1.0f));
-	pNormals[7] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, 1.0f));
+	m_pxmf3Normals = new XMFLOAT3[m_nVertices];
+	m_pxmf3Normals[0] = Vector3::Normalize(XMFLOAT3(-1.0f, 1.0f, -1.0f));
+	m_pxmf3Normals[1] = Vector3::Normalize(XMFLOAT3(1.0f, 1.0f, -1.0f));
+	m_pxmf3Normals[2] = Vector3::Normalize(XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pxmf3Normals[3] = Vector3::Normalize(XMFLOAT3(-1.0f, 1.0f, 1.0f));
+	m_pxmf3Normals[4] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, -1.0f));
+	m_pxmf3Normals[5] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, -1.0f));
+	m_pxmf3Normals[6] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, 1.0f));
+	m_pxmf3Normals[7] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, 1.0f));
 
 
 	m_nVertexBufferViews = 2;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
 
-	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);
+
 	m_pd3dVertexBufferViews[0].BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
-	m_pd3dVertexBufferViews[0].StrideInBytes = m_nStride;
-	m_pd3dVertexBufferViews[0].SizeInBytes = m_nStride * m_nVertices;
+	m_pd3dVertexBufferViews[0].StrideInBytes = sizeof(XMFLOAT3);
+	m_pd3dVertexBufferViews[0].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
 
-	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);
 	m_pd3dVertexBufferViews[1].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
-	m_pd3dVertexBufferViews[1].StrideInBytes = m_nStride;
-	m_pd3dVertexBufferViews[1].SizeInBytes = m_nStride * m_nVertices;
-
+	m_pd3dVertexBufferViews[1].StrideInBytes = sizeof(XMFLOAT3);
+	m_pd3dVertexBufferViews[1].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
 
 
 	/*인덱스 버퍼는 직육면체의 6개의 면(사각형)에 대한 기하 정보를 갖는다. 삼각형 리스트로 직육면체를 표현할 것이
@@ -345,6 +344,7 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	m_pd3dVertexBufferViews[1].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
 	m_pd3dVertexBufferViews[1].StrideInBytes = sizeof(XMFLOAT3);
 	m_pd3dVertexBufferViews[1].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
 
 	m_nIndices = ((nWidth * 2) * (nLength - 1)) + ((nLength - 1) - 1);
 	m_pnIndices = new UINT[m_nIndices];
