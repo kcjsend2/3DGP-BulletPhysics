@@ -14,7 +14,8 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	D3D12_RESOURCE_DESC d3dResourceDesc;
 	::ZeroMemory(&d3dResourceDesc, sizeof(D3D12_RESOURCE_DESC));
 	d3dResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	d3dResourceDesc.Alignment = 0; d3dResourceDesc.Width = nBytes;
+	d3dResourceDesc.Alignment = 0; 
+	d3dResourceDesc.Width = nBytes;
 	d3dResourceDesc.Height = 1;
 	d3dResourceDesc.DepthOrArraySize = 1;
 	d3dResourceDesc.MipLevels = 1;
@@ -41,7 +42,7 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 			{
 				//업로드 버퍼를 생성한다.
 				d3dHeapPropertiesDesc.Type = D3D12_HEAP_TYPE_UPLOAD;
-				pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc,
+				auto tmp = pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc,
 					D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL,
 					__uuidof(ID3D12Resource), (void**)ppd3dUploadBuffer);
 

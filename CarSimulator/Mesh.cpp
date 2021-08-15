@@ -316,10 +316,8 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 			//정점의 높이와 노멀을 높이 맵으로부터 구한다.
 			fHeight = OnGetHeight(x, z, pContext);
 
-			XMFLOAT3 xmf3Position = XMFLOAT3((x * m_xmf3Scale.x), fHeight, (z * m_xmf3Scale.z));
-			XMFLOAT3 xmf3Normal = OnGetNormal(x, z, pContext);
-			m_pxmf3Positions[i] = xmf3Position;
-			m_pxmf3Normals[i] = xmf3Normal;
+			m_pxmf3Positions[i] = XMFLOAT3((x * m_xmf3Scale.x), fHeight, (z * m_xmf3Scale.z));
+			m_pxmf3Normals[i] = OnGetNormal(x, z, pContext);
 
 			if (fHeight / m_xmf3Scale.y < fMinHeight)
 				fMinHeight = fHeight / m_xmf3Scale.y;
