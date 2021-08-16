@@ -41,7 +41,7 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     
     for (int i = 0; i < nLights; i++)
     {
-        cColor += ComputeLighting(light[i], input.position_w, input.normal, toEyeW, 1.0f - shadowFactor[0]);
+        cColor += ComputeLighting(light[i], input.position_w, input.normal, toEyeW, shadowFactor[0]);
     }
     // Add in specular reflections.
     
