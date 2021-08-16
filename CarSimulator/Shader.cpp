@@ -454,7 +454,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 				pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 				pRotatingObject->SetRotationSpeed(0.0f);
 
-				pRotatingObject->SetMaterial(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
+				pRotatingObject->SetMaterial(XMFLOAT4(1.3f, 0.3f, 0.3f, 1.0f), XMFLOAT4(1.0f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
 				pRotatingObject->SetPosition(xPosition, fHeight + (y * 100.0f * fyPitch) + 1000.0f, zPosition);
 
 				XMFLOAT3 xmf3ObjPosition = pRotatingObject->GetPosition();
@@ -547,8 +547,7 @@ void CLightsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	//ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower
 
-	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 1.0f, 1.0f, 1.0f }, NULL, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 4000.0f, 1000.0f, 4000.0f }, NULL);
-	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, POINT_LIGHT, XMFLOAT3{ 1.0f, 1.0f, 1.0f }, 0.0f, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, 1.0f, XMFLOAT3{ 1000.0f, 10.0f, 1000.0f }, 1.0f);
+	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 1000.0f, 10.0f, 1000.0f }, NULL);
 	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
