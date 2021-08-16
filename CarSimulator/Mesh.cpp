@@ -69,7 +69,6 @@ void CMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nInstances)
 	{
 		pd3dCommandList->DrawInstanced(m_nVertices, nInstances, m_nOffset, 0);
 	}
-	
 }
 	
 
