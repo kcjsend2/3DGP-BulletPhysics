@@ -757,6 +757,6 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, m_pLight->GetPosition() };
 
-	m_ubShadowCB->CopyData(0, cbShadow);
+	m_ubShadowCB->CopyData(0, cbShadow); 
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());
 }

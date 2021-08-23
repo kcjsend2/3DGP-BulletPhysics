@@ -214,6 +214,12 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	ID3DBlob* pd3dErrorBlob = NULL;
 	::D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pd3dSignatureBlob, &pd3dErrorBlob);
 	pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&pd3dGraphicsRootSignature);
+	if (pd3dErrorBlob != NULL)
+	{
+		auto tmp = (char*)pd3dErrorBlob->GetBufferPointer();
+		std::string p = tmp;
+		return 0;
+	}
 
 	if (pd3dSignatureBlob)
 		pd3dSignatureBlob->Release();
