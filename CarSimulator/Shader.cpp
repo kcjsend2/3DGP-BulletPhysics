@@ -548,7 +548,7 @@ void CLightsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	//ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower
 
-	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 1000.0f, 10.0f, 1000.0f }, NULL);
+	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 1000.0f, 30.0f, 1000.0f }, NULL);
 	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -725,11 +725,12 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 
 void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos)
 {
-	XMMATRIX lightView = XMMatrixLookAtLH(XMLoadFloat3(&m_pLight->GetPosition()), XMLoadFloat3(&xmf3TargetPos), XMLoadFloat3(&m_pLight->GetUp()));
+	XMFLOAT3 TargetPos = {950, 0, 950};
+	XMMATRIX lightView = XMMatrixLookAtLH(XMLoadFloat3(&m_pLight->GetPosition()), XMLoadFloat3(&TargetPos), XMLoadFloat3(&m_pLight->GetUp()));
 
 	// Transform bounding sphere to light space.
 	XMFLOAT3 xmf3CenterLS;
-	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&xmf3TargetPos), lightView));
+	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&TargetPos), lightView));
 
 	// Ortho frustum in light space encloses scene.
 

@@ -345,8 +345,8 @@ void CGameFramework::BuildObjects()
 	Update();
 
 	// 쉐도우맵은 모든 오브젝트를 그려야한다.
-	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
+	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 
 	auto pInstancingShader = m_pScene->GetInstancingShader();
 	for (int i = 0; i < m_pScene->GetInstancingShaderNumber(); ++i)
