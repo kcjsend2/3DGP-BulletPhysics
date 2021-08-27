@@ -21,7 +21,9 @@ public:
     CLight() = default;
     CLight(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower);
     ~CLight();
+    XMFLOAT3 GetDirection() { return m_xmf3Direction; }
     virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
     virtual void ReleaseUploadBuffers();
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+    
 };

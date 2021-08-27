@@ -13,15 +13,13 @@ struct VertexOut
 VertexOut VS(VertexIn vin)
 {
     VertexOut vout = (VertexOut) 0.0f;
-
-    MATERIAL matData = material;
 	
     // Transform to world space.
     float4 posW = mul(float4(vin.PosL, 1.0f), gmtxWorld);
 
     // Transform to homogeneous clip space.
-    vout.PosH = mul(posW, gmtxShadowTransform);
-	
+    vout.PosH = mul(posW, gmtxLightViewProj);
+    
     return vout;
 }
 

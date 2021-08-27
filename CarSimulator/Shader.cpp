@@ -548,7 +548,7 @@ void CLightsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	//ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower
 
-	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 1000.0f, 30.0f, 1000.0f }, NULL);
+	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 2000.0f, 100.0f, 2000.0f }, NULL);
 	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -725,12 +725,15 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 
 void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos)
 {
-	XMFLOAT3 TargetPos = {950, 0, 950};
-	XMMATRIX lightView = XMMatrixLookAtLH(XMLoadFloat3(&m_pLight->GetPosition()), XMLoadFloat3(&TargetPos), XMLoadFloat3(&m_pLight->GetUp()));
+	XMVECTOR lightPos = XMLoadFloat3(&m_pLight->GetPosition());
+	XMVECTOR TargetPos = XMLoadFloat3(&xmf3TargetPos);
+	XMVECTOR lightUp = XMLoadFloat3(&m_pLight->GetUp());
+
+	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, TargetPos, lightUp);
 
 	// Transform bounding sphere to light space.
 	XMFLOAT3 xmf3CenterLS;
-	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&TargetPos), lightView));
+	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&xmf3TargetPos), lightView));
 
 	// Ortho frustum in light space encloses scene.
 
@@ -750,13 +753,17 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.5f, 0.5f, 0.0f, 1.0f);
 
-	XMMATRIX S = lightView * lightProj * T;
+	XMMATRIX S = lightView * lightProj;
 
-	XMFLOAT4X4 m_xmf4x4ShadowTransform;
+	XMFLOAT4X4 xmf4x4LightViewProj;
+	XMStoreFloat4x4(&xmf4x4LightViewProj, S);
 
-	XMStoreFloat4x4(&m_xmf4x4ShadowTransform, S);
+	S = T * S;
 
-	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, m_pLight->GetPosition() };
+	XMFLOAT4X4 xmf4x4ShadowTransform;
+	XMStoreFloat4x4(&xmf4x4ShadowTransform, S);
+
+	CB_SHADOW cbShadow{ xmf4x4ShadowTransform, xmf4x4LightViewProj, m_pLight->GetPosition() };
 
 	m_ubShadowCB->CopyData(0, cbShadow); 
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());

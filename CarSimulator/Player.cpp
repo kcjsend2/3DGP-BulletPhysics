@@ -337,7 +337,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(1000.0f, 10.0f, 1000.0f));
+	SetPosition(XMFLOAT3(2000.0f, 5.0f, 2000.0f));
 
 	auto vehicleExtents = pVehicleMesh[0].GetBoundingBox().Extents;
 	auto wheelExtents = pWheelMesh[0].GetBoundingBox().Extents;
@@ -449,11 +449,24 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 	if (dwBehave == DIR_FORWARD || dwBehave == DIR_BACKWARD || dwBehave == NULL)
 	{
-		if(m_gVehicleSteering > 0)
+		if (m_gVehicleSteering > 0)
+		{
 			m_gVehicleSteering -= m_steeringIncrement;
+			if (m_gVehicleSteering < 0)
+			{
+				m_gVehicleSteering = 0;
+			}
+		}
 
 		else if (m_gVehicleSteering < 0)
+		{
 			m_gVehicleSteering += m_steeringIncrement;
+			if (m_gVehicleSteering > 0)
+			{
+				m_gVehicleSteering = 0;
+			}
+		}
+
 	}
 
 	if (dwBehave == DIR_LEFT || dwBehave == DIR_RIGHT || dwBehave == NULL)

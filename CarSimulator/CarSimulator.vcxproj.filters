@@ -123,5 +123,6 @@
   <ItemGroup>
     <None Include="LightUtil.hlsli" />
     <None Include="Common.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

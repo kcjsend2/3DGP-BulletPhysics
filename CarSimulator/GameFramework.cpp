@@ -66,7 +66,6 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateRtvAndDsvDescriptorHeaps();
 	BuildDescriptorHeaps();
 	CreateSwapChain();
-	CreateDepthStencilView();
 	BulletInit();
 	BuildObjects();
 
@@ -267,6 +266,7 @@ void CGameFramework::BuildDescriptorHeaps()
 	D3D12_CPU_DESCRIPTOR_HANDLE hCpuDsv;
 	hCpuDsv.ptr = dsvCpuStart.ptr + m_nDsvDescriptorIncrementSize;
 
+	CreateDepthStencilView();
 	m_pShadowMap->BuildDescriptors(hCpuSrv, hGpuSrv, hCpuDsv);
 }
 
@@ -314,8 +314,6 @@ void CGameFramework::CreateDepthStencilView()
 
 	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dDepthStencilBuffer);
 	//깊이-스텐실 버퍼를 생성한다.
-
-
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, d3dDsvCPUDescriptorHandle);
@@ -492,8 +490,6 @@ void CGameFramework::FrameAdvance()
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_pd3dSrvDescriptorHeap };
 	m_pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-	m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap->GetViewport());
-	m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap->GetScissorRect());
 
 	// Change to DEPTH_WRITE.
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(),
@@ -501,7 +497,7 @@ void CGameFramework::FrameAdvance()
 
 	// Clear the back buffer and depth buffer.
 	m_pd3dCommandList->ClearDepthStencilView(m_pShadowMap->GetDsv(),
-		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 
 	// Set null render target because we are only going to draw to
 	// depth buffer.  Setting a null render target will disable color writes.
@@ -509,6 +505,10 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &m_pShadowMap->GetDsv());
 
 	m_pd3dCommandList->SetGraphicsRootSignature(m_pScene->GetGraphicsRootSignature());
+
+	m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap->GetViewport());
+	m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap->GetScissorRect());
+
 	m_pShadowMap->GetShader()->Render(m_pd3dCommandList, m_pPlayer);
 
 	// Change back to GENERIC_READ so we can read the texture in a shader.
@@ -525,7 +525,7 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
 	if (m_pScene)

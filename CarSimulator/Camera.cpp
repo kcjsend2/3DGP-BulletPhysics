@@ -87,7 +87,7 @@ void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMF
 	GenerateViewMatrix();
 }
 
-/*카메라 변환 행렬을 생성한다. 카메라의 위치 벡터, 카메라가 바	라보는 지점, 카메라의 Up 벡터(로컬 y-축 벡터)를
+/*카메라 변환 행렬을 생성한다. 카메라의 위치 벡터, 카메라가 바라보는 지점, 카메라의 Up 벡터(로컬 y-축 벡터)를
 파라메터로 사용하는 XMMatrixLookAtLH() 함수를 사용한다.*/
 void CCamera::GenerateViewMatrix()
 {
@@ -314,7 +314,7 @@ void CThirdPersonCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
 		XMFLOAT3 xmf3Right = m_pPlayer->GetRightVector();
 		XMFLOAT3 xmf3Up = m_pPlayer->GetUpVector();
-		XMFLOAT3 xmf3Look = m_pPlayer->GetLookVector();
+		XMFLOAT3 xmf3Look = m_pPlayer->GetLookVector();	
 
 		//플레이어의 로컬 x-축, y-축, z-축 벡터로부터 회전 행렬(플레이어와 같은 방향을 나타내는 행렬)을 생성한다.
 		xmf4x4Rotate._11 = xmf3Right.x; xmf4x4Rotate._21 = xmf3Up.x; xmf4x4Rotate._31 = xmf3Look.x;

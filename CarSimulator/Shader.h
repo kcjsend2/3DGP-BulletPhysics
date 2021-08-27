@@ -81,6 +81,7 @@ public:
 	struct CB_SHADOW
 	{
 		XMFLOAT4X4 m_xmf4x4ShadowTransform;
+		XMFLOAT4X4 m_xmf4x4LightViewProj;
 		XMFLOAT3 m_xmf3ShadowCamPos;
 	};
 

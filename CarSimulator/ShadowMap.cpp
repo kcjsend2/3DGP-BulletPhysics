@@ -43,6 +43,11 @@ void CShadowMap::BuildDescriptors()
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.Texture2D.MipSlice = 0;
 	m_pd3dDevice->CreateDepthStencilView(m_ShadowMap, &dsvDesc, m_hCpuDsv);
+
+	D3D12_CLEAR_VALUE d3dClearValue;
+	d3dClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dClearValue.DepthStencil.Depth = 1.0f;
+	d3dClearValue.DepthStencil.Stencil = 0;
 }
 
 void CShadowMap::BuildResource()
