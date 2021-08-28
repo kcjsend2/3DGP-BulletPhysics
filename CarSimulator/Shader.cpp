@@ -731,18 +731,20 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, TargetPos, lightUp);
 
+	/*XMVECTOR lightLook = Vector3::Normalize(lightPos - TargetPos);*/
+
 	// Transform bounding sphere to light space.
 	XMFLOAT3 xmf3CenterLS;
 	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&xmf3TargetPos), lightView));
 
 	// Ortho frustum in light space encloses scene.
 
-	float l = xmf3CenterLS.x - 3000;
-	float b = xmf3CenterLS.y - 3000;
-	float n = xmf3CenterLS.z - 3000;
-	float r = xmf3CenterLS.x + 3000;
-	float t = xmf3CenterLS.y + 3000;
-	float f = xmf3CenterLS.z + 3000;
+	float l = xmf3CenterLS.x - 100;
+	float b = xmf3CenterLS.y - 100;
+	float n = xmf3CenterLS.z - 100;
+	float r = xmf3CenterLS.x + 100;
+	float t = xmf3CenterLS.y + 100;
+	float f = xmf3CenterLS.z + 100;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 
@@ -756,12 +758,12 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	XMMATRIX S = lightView * lightProj;
 
 	XMFLOAT4X4 xmf4x4LightViewProj;
-	XMStoreFloat4x4(&xmf4x4LightViewProj, S);
+	XMStoreFloat4x4(&xmf4x4LightViewProj, XMMatrixTranspose(S));
 
-	S = T * S;
+	S = S * T;
 
 	XMFLOAT4X4 xmf4x4ShadowTransform;
-	XMStoreFloat4x4(&xmf4x4ShadowTransform, S);
+	XMStoreFloat4x4(&xmf4x4ShadowTransform, XMMatrixTranspose(S));
 
 	CB_SHADOW cbShadow{ xmf4x4ShadowTransform, xmf4x4LightViewProj, m_pLight->GetPosition() };
 
