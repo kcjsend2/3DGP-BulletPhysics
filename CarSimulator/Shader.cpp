@@ -748,12 +748,12 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	// Ortho frustum in light space encloses scene.
 
-	float l = xmf3CenterLS.x - 300;
-	float b = xmf3CenterLS.y - 300;
-	float n = xmf3CenterLS.z - 300;
-	float r = xmf3CenterLS.x + 300;
-	float t = xmf3CenterLS.y + 300;
-	float f = xmf3CenterLS.z + 300;
+	float l = xmf3CenterLS.x - 400;
+	float b = xmf3CenterLS.y - 400;
+	float n = xmf3CenterLS.z - 400;
+	float r = xmf3CenterLS.x + 400;
+	float t = xmf3CenterLS.y + 400;
+	float f = xmf3CenterLS.z + 400;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 

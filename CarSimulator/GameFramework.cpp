@@ -348,7 +348,7 @@ void CGameFramework::BuildObjects()
 
 	for (int i = 0; i < 4; ++i)
 	{
-
+		m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer->GetWheels()[i]);
 	}
 
 	auto pInstancingShader = m_pScene->GetInstancingShader();

@@ -138,6 +138,7 @@ public:
 	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
+	CWheel** GetWheels() { return m_pWheel; }
 
 private:
 	CWheel* m_pWheel[4];
