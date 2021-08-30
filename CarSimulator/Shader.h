@@ -173,6 +173,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Update(float fTimeElapsed, XMFLOAT3 xmf3PlayerPosition);
 	CLight* GetDirectionalLight() { return &m_vLight[0]; }
 protected:
 	ID3D12Resource* m_pd3dcbLight = NULL;

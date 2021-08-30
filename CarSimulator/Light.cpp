@@ -55,3 +55,11 @@ void CLight::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_pMesh->Render(pd3dCommandList);
 	}
 }
+
+void CLight::Update(float fTimeElapsed, XMFLOAT3 xmf3PlayerPosition)
+{
+	if (m_itype == DIRECTIONAL_LIGHT)
+	{
+		SetPosition(xmf3PlayerPosition.x - 50, 100, xmf3PlayerPosition.z - 50);
+	}
+}

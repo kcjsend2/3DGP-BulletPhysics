@@ -60,7 +60,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	CreateDirect3DDevice();
 
-	m_pShadowMap = new CShadowMap(m_pd3dDevice, 2048, 2048);
+	m_pShadowMap = new CShadowMap(m_pd3dDevice, 10000, 10000);
 
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
@@ -346,6 +346,11 @@ void CGameFramework::BuildObjects()
 	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
 	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 
+	for (int i = 0; i < 4; ++i)
+	{
+
+	}
+
 	auto pInstancingShader = m_pScene->GetInstancingShader();
 	for (int i = 0; i < m_pScene->GetInstancingShaderNumber(); ++i)
 	{
@@ -451,7 +456,7 @@ void CGameFramework::ProcessInput()
 void CGameFramework::Update()
 {
 	ProcessInput();
-	if (m_pScene) m_pScene->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld);
+	if (m_pScene) m_pScene->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld, m_pPlayer->GetPosition());
 }
 
 void CGameFramework::WaitForGpuComplete()

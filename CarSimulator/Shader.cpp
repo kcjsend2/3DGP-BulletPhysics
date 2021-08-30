@@ -548,7 +548,7 @@ void CLightsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	//ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int type, XMFLOAT3 xmf3Strength, float fFalloffStart, XMFLOAT3 xmf3Direction, float fFalloffEnd, XMFLOAT3 xmf3Position, float fSpotPower
 
-	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 2000.0f, 100.0f, 2000.0f }, NULL);
+	m_vLight.emplace_back(pd3dDevice, pd3dCommandList, DIRECTIONAL_LIGHT, XMFLOAT3{ 0.5f, 0.5f, 0.5f }, NULL, XMFLOAT3{ 0.0f, -1.0f, 0.0f }, NULL, XMFLOAT3{ 1950.0f, 100.0f, 1950.0f }, NULL);
 	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -634,6 +634,14 @@ void CLightsShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	int vSize = m_vLight.size();
 	pd3dCommandList->SetGraphicsRootShaderResourceView(5, m_pd3dcbLight->GetGPUVirtualAddress());
 	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &vSize, 0);
+}
+
+void CLightsShader::Update(float fTimeElapsed, XMFLOAT3 xmf3PlayerPosition)
+{
+	for (int i = 0; i < m_vLight.size(); i++)
+	{
+		m_vLight[i].Update(fTimeElapsed, xmf3PlayerPosition);
+	}
 }
 
 CShadowShader::CShadowShader()
@@ -729,9 +737,10 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	XMVECTOR TargetPos = XMLoadFloat3(&xmf3TargetPos);
 	XMVECTOR lightUp = XMLoadFloat3(&m_pLight->GetUp());
 
-	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, TargetPos, lightUp);
+	XMVECTOR lightDir = XMVectorSubtract(lightPos, TargetPos);
+	float lightLength = XMVector3Length(lightDir).m128_f32[0];
 
-	/*XMVECTOR lightLook = Vector3::Normalize(lightPos - TargetPos);*/
+	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, TargetPos, lightUp);
 
 	// Transform bounding sphere to light space.
 	XMFLOAT3 xmf3CenterLS;
@@ -739,12 +748,12 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	// Ortho frustum in light space encloses scene.
 
-	float l = xmf3CenterLS.x - 100;
-	float b = xmf3CenterLS.y - 100;
-	float n = xmf3CenterLS.z - 100;
-	float r = xmf3CenterLS.x + 100;
-	float t = xmf3CenterLS.y + 100;
-	float f = xmf3CenterLS.z + 100;
+	float l = xmf3CenterLS.x - 300;
+	float b = xmf3CenterLS.y - 300;
+	float n = xmf3CenterLS.z - 300;
+	float r = xmf3CenterLS.x + 300;
+	float t = xmf3CenterLS.y + 300;
+	float f = xmf3CenterLS.z + 300;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 

@@ -14,7 +14,7 @@ public:
     XMFLOAT3 m_xmf3Direction;
     float m_fFalloffEnd;
     float m_fSpotPower;
-   
+
     CMeshFileRead* m_pMesh = NULL;
 
 public:
@@ -25,5 +25,5 @@ public:
     virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
     virtual void ReleaseUploadBuffers();
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-    
+    virtual void Update(float fTimeElapsed, XMFLOAT3 xmf3PlayerPosition);
 };

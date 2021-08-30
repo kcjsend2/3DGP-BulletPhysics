@@ -13,7 +13,7 @@ public:
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR* pKeysBuffer);
-	void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, XMFLOAT3 xmf3PlayerPosition);
 	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 	void ReleaseUploadBuffers();
