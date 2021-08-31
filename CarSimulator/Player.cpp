@@ -422,16 +422,44 @@ CVehiclePlayer::~CVehiclePlayer()
 
 void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
-	if (dwBehave & KEY_LEFT)
+	if (m_gVehicleSteering > 0)
 	{
 		m_gVehicleSteering -= m_steeringIncrement;
+		if (m_gVehicleSteering < 0)
+		{
+			m_gVehicleSteering = 0;
+		}
+	}
+
+	else if (m_gVehicleSteering < 0)
+	{
+		m_gVehicleSteering += m_steeringIncrement;
+		if (m_gVehicleSteering > 0)
+		{
+			m_gVehicleSteering = 0;
+		}
+	}
+
+	m_gBreakingForce = 0.0f;
+
+	if (m_gEngineForce > 0.0f)
+	{
+		m_gEngineForce -= 100.0f;
+		if (m_gEngineForce < 0.0f)
+			m_gEngineForce = 0.0f;
+	}
+
+
+	if (dwBehave & KEY_LEFT)
+	{
+		m_gVehicleSteering -= m_steeringIncrement * 2;
 		if (m_gVehicleSteering < -m_steeringClamp)
 			m_gVehicleSteering = -m_steeringClamp;
 	}
 
 	if (dwBehave & KEY_RIGHT)
 	{
-		m_gVehicleSteering += m_steeringIncrement;
+		m_gVehicleSteering += m_steeringIncrement * 2;
 		if (m_gVehicleSteering > m_steeringClamp)
 			m_gVehicleSteering = m_steeringClamp;
 	}
@@ -439,45 +467,16 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 	if (dwBehave & KEY_FORWARD)
 	{
 		m_gEngineForce = m_maxEngineForce;
-		m_gBreakingForce = 0.f;
 	}
 
 	if (dwBehave & KEY_BACKWARD)
 	{
 		m_gEngineForce = -m_maxEngineForce;
-		m_gBreakingForce = 0.f;
 	}
 
 	if (dwBehave & KEY_SHIFT)
 	{
 		m_gBreakingForce = 500.f;
-	}
-
-	if (dwBehave == KEY_FORWARD || dwBehave == KEY_BACKWARD || dwBehave == NULL || dwBehave == KEY_SHIFT)
-	{
-		if (m_gVehicleSteering > 0)
-		{
-			m_gVehicleSteering -= m_steeringIncrement;
-			if (m_gVehicleSteering < 0)
-			{
-				m_gVehicleSteering = 0;
-			}
-		}
-
-		else if (m_gVehicleSteering < 0)
-		{
-			m_gVehicleSteering += m_steeringIncrement;
-			if (m_gVehicleSteering > 0)
-			{
-				m_gVehicleSteering = 0;
-			}
-		}
-
-	}
-
-	if (dwBehave == KEY_LEFT || dwBehave == KEY_RIGHT || dwBehave == NULL || dwBehave == KEY_SHIFT)
-	{
-		m_gEngineForce = 0;
 	}
 
 
