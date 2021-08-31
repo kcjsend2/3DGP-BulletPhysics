@@ -475,7 +475,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 	}
 
-	if (dwBehave == KEY_LEFT || dwBehave == KEY_RIGHT || dwBehave == NULL)
+	if (dwBehave == KEY_LEFT || dwBehave == KEY_RIGHT || dwBehave == NULL || dwBehave == KEY_SHIFT)
 	{
 		m_gEngineForce = 0;
 	}

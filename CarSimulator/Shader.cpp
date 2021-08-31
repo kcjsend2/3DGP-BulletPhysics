@@ -398,7 +398,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 {
 	float fHeight = 10.0f, fLength = 10.0f, fDepth = 10.0f;
 
-	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength), btScalar(fHeight), btScalar(fDepth)));
+	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
 	btCollisionShapes.push_back(CubeShape);
 
