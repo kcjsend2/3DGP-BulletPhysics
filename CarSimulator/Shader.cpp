@@ -468,6 +468,8 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 				pRotatingObject->SetRigidBody(rbInfo);
 				pbtDynamicsWorld->addRigidBody(pRotatingObject->GetRigidBody());
 
+				pRotatingObject->SetInstanceNum(m_nObjects);
+
 				m_ppObjects[i++] = pRotatingObject;
 			}
 		}
@@ -676,8 +678,8 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
 	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
-	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
-	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.VS = CShader::CompileShaderFromFile(L"Shadow.hlsl", "VS", "vs_5_1", &pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
 	d3dPipelineStateDesc.RasterizerState.DepthBias = 10000.0f;
@@ -694,7 +696,13 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	d3dPipelineStateDesc.SampleDesc.Count = 1;
 	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+
+
+	d3dPipelineStateDesc.VS = CShader::CompileShaderFromFile(L"ShadowInstancing.hlsl", "VS", "vs_5_1", &pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"ShadowInstancing.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
+
+	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dInstancingPipelineState);
 
 
 	if (pd3dVertexShaderBlob)
@@ -719,10 +727,18 @@ D3D12_SHADER_BYTECODE CShadowShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlo
 
 void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer)
 {
-	CShader::Render(pd3dCommandList);
+	pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
 	UpdateShaderVariables(pd3dCommandList, pPlayer->GetPosition());
 
 	for (CGameObject* o : m_vpGameObjects)
+	{
+		if (o != NULL)
+		{
+			o->ShadowPassRender(pd3dCommandList);
+		}
+	}
+	pd3dCommandList->SetPipelineState(m_pd3dInstancingPipelineState);
+	for (CGameObject* o : m_vpInstancingGameObjects)
 	{
 		if (o != NULL)
 		{

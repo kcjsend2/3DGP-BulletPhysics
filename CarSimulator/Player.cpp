@@ -56,21 +56,21 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		//화살표 키 ‘↑’를 누르면 로컬 z-축 방향으로 이동(전진)한다. ‘↓’를 누르면 반대 방향으로 이동한다.
-		if (dwDirection & DIR_FORWARD)
+		if (dwDirection & KEY_FORWARD)
 			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
 
-		if (dwDirection & DIR_BACKWARD)
+		if (dwDirection & KEY_BACKWARD)
 			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
 
 		//화살표 키 ‘→’를 누르면 로컬 x-축 방향으로 이동한다. ‘←’를 누르면 반대 방향으로 이동한다.
-		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
+		if (dwDirection & KEY_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
+		if (dwDirection & KEY_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
 
 		//‘Page Up’을 누르면 로컬 y-축 방향으로 이동한다. ‘Page Down’을 누르면 반대 방향으로 이동한다.
-		if (dwDirection & DIR_UP)
+		if (dwDirection & KEY_UP)
 			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
 
-		if (dwDirection & DIR_DOWN)
+		if (dwDirection & KEY_DOWN)
 			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
 		//플레이어를 현재 위치 벡터에서 xmf3Shift 벡터만큼 이동한다.
 		Move(xmf3Shift, bUpdateVelocity);
@@ -422,32 +422,38 @@ CVehiclePlayer::~CVehiclePlayer()
 
 void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
-	if (dwBehave & DIR_LEFT)
+	if (dwBehave & KEY_LEFT)
 	{
 		m_gVehicleSteering -= m_steeringIncrement;
 		if (m_gVehicleSteering < -m_steeringClamp)
 			m_gVehicleSteering = -m_steeringClamp;
 	}
 
-	if (dwBehave & DIR_RIGHT)
+	if (dwBehave & KEY_RIGHT)
 	{
 		m_gVehicleSteering += m_steeringIncrement;
 		if (m_gVehicleSteering > m_steeringClamp)
 			m_gVehicleSteering = m_steeringClamp;
 	}
 
-	if (dwBehave & DIR_FORWARD)
+	if (dwBehave & KEY_FORWARD)
 	{
 		m_gEngineForce = m_maxEngineForce;
 		m_gBreakingForce = 0.f;
 	}
-	if (dwBehave & DIR_BACKWARD)
+
+	if (dwBehave & KEY_BACKWARD)
 	{
 		m_gEngineForce = -m_maxEngineForce;
 		m_gBreakingForce = 0.f;
 	}
 
-	if (dwBehave == DIR_FORWARD || dwBehave == DIR_BACKWARD || dwBehave == NULL)
+	if (dwBehave & KEY_SHIFT)
+	{
+		m_gBreakingForce = 500.f;
+	}
+
+	if (dwBehave == KEY_FORWARD || dwBehave == KEY_BACKWARD || dwBehave == NULL || dwBehave == KEY_SHIFT)
 	{
 		if (m_gVehicleSteering > 0)
 		{
@@ -469,7 +475,7 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 	}
 
-	if (dwBehave == DIR_LEFT || dwBehave == DIR_RIGHT || dwBehave == NULL)
+	if (dwBehave == KEY_LEFT || dwBehave == KEY_RIGHT || dwBehave == NULL)
 	{
 		m_gEngineForce = 0;
 	}

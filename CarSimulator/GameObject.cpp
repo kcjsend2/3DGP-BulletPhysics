@@ -105,11 +105,18 @@ void CGameObject::ShadowPassRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	UpdateShaderVariables(pd3dCommandList);
 
 	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
-	if (m_ppMeshes)
+	if (m_ppMeshes && m_nInstance == 1)
 	{
 		for (int i = 0; i < m_nMeshes; i++)
 		{
 			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
+	else if (m_ppMeshes && m_nInstance > 1)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList, m_nInstance);
 		}
 	}
 }

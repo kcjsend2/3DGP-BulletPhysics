@@ -352,14 +352,7 @@ void CGameFramework::BuildObjects()
 	}
 
 	auto pInstancingShader = m_pScene->GetInstancingShader();
-	for (int i = 0; i < m_pScene->GetInstancingShaderNumber(); ++i)
-	{
-		auto ppObjects = pInstancingShader->GetObjects();
-		for (int j = 0; j < pInstancingShader->GetObjectsNumber(); ++j)
-		{
-			m_pShadowMap->GetShader()->GetObjectVector()->push_back(ppObjects[i]);
-		}
-	}
+	m_pShadowMap->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjects()[0]);
 
 	m_GameTimer.Reset();
 }
@@ -441,12 +434,13 @@ void CGameFramework::ProcessInput()
 
 	if (::GetKeyboardState(pKeyBuffer))
 	{
-		if (pKeyBuffer[VK_UP] & 0xF0) dwBehave |= DIR_FORWARD;
-		if (pKeyBuffer[VK_DOWN] & 0xF0) dwBehave |= DIR_BACKWARD;
-		if (pKeyBuffer[VK_LEFT] & 0xF0) dwBehave |= DIR_LEFT;
-		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwBehave |= DIR_RIGHT;
-		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwBehave |= DIR_UP;
-		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= DIR_DOWN;
+		if (pKeyBuffer[VK_UP] & 0xF0) dwBehave |= KEY_FORWARD;
+		if (pKeyBuffer[VK_DOWN] & 0xF0) dwBehave |= KEY_BACKWARD;
+		if (pKeyBuffer[VK_LEFT] & 0xF0) dwBehave |= KEY_LEFT;
+		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwBehave |= KEY_RIGHT;
+		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwBehave |= KEY_UP;
+		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= KEY_DOWN;
+		if (pKeyBuffer[VK_LSHIFT & 0xF0]) dwBehave |= KEY_SHIFT;
 	}
 
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
@@ -456,7 +450,7 @@ void CGameFramework::ProcessInput()
 void CGameFramework::Update()
 {
 	ProcessInput();
-	if (m_pScene) m_pScene->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld, m_pPlayer->GetPosition());
+	if (m_pScene) m_pScene->Update(m_pd3dCommandList, m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld, m_pPlayer->GetPosition());
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -487,8 +481,6 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(0.0f);
 	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed(), 1);
 
-	Update();
-
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
@@ -513,6 +505,8 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap->GetViewport());
 	m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap->GetScissorRect());
+
+	Update();
 
 	m_pShadowMap->GetShader()->Render(m_pd3dCommandList, m_pPlayer);
 

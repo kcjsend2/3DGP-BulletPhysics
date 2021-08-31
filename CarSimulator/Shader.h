@@ -77,6 +77,7 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos);
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
 	std::vector<CGameObject*>* GetObjectVector() { return &m_vpGameObjects; }
+	std::vector<CGameObject*>* GetInstancingObjectVector() { return &m_vpInstancingGameObjects; }
 
 	struct CB_SHADOW
 	{
@@ -89,6 +90,8 @@ protected:
 	CLight* m_pLight = NULL;
 	UploadBuffer<CB_SHADOW>* m_ubShadowCB;
 	std::vector<CGameObject*> m_vpGameObjects;
+	std::vector<CGameObject*> m_vpInstancingGameObjects;
+	ID3D12PipelineState* m_pd3dInstancingPipelineState;
 };
 
 class CPlayerShader : public CShader
@@ -179,4 +182,5 @@ protected:
 	ID3D12Resource* m_pd3dcbLight = NULL;
 	std::vector<CLight> m_vLight;
 	VS_VB_LIGHT_INFO* m_pcbMappedLights = NULL;
+
 };

@@ -38,11 +38,12 @@ void CScene::ReleaseObjects()
 		delete m_pTerrain;
 }
 
-void CScene::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, XMFLOAT3 xmf3PlayerPosition)
+void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, XMFLOAT3 xmf3PlayerPosition)
 {
 	for (int i = 0; i < m_nShaders; i++)
 	{
 		m_pShaders[i].Update(fTimeElapsed, pbtDynamicsWorld);
+		m_pShaders[i].UpdateShaderVariables(pd3dCommandList);
 	}
 
 	for (int i = 0; i < m_nShaders; i++)

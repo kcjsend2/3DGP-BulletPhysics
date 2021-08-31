@@ -30,6 +30,7 @@ protected:
 	XMFLOAT4X4 m_xmf4x4World;
 	CShader* m_pShader = NULL;
 	btRigidBody* m_pbtRigidBody = NULL;
+	int m_nInstance = 1;
 
 public:
 	void ReleaseUploadBuffers();
@@ -56,6 +57,7 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();
 	bool IsVisible(CCamera* pCamera = NULL);
+	void SetInstanceNum(int nInstance) { m_nInstance = nInstance; }
 
 	//게임 객체의 월드 변환 행렬에서 위치 벡터와 방향(x-축, y-축, z-축) 벡터를 반환한다.
 	XMFLOAT3 GetPosition();
