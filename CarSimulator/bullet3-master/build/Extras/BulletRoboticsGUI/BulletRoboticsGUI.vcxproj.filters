@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\InProcessExampleBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsServerExample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsClientExample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\RemoteGUIHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\RemoteGUIHelperTCP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerExample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerExampleBullet2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\SharedMemoryInProcessPhysicsC_API.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\Common2dCanvasInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonCameraInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonExampleInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonFileIOInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonGraphicsAppInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonGUIHelperInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonMultiBodyBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonParameterInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonRenderInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonRigidBodyBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonWindowInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\OpenGLWindow\SimpleCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\tgaimage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\our_gl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\TinyRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\collisionFilterPlugin\collisionFilterPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\pdControlPlugin\pdControlPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoGUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoDirect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\IKTrajectoryHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\tinyRendererPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\TinyRendererVisualShapeConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\InProcessMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerSharedMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirectC_API.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerCommandProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3PluginManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory_C_API.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientC_API.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\SharedMemoryPublic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\Win32SharedMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PosixSharedMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ResourcePath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\RobotLoggingUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3Clock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\ChromeTraceUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ERPCFMHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ReferenceFrameHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\tinyxml2\tinyxml2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\stb_image\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Jacobian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\MatrixRmn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\VectorRn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\LoadMeshFromObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\BulletUrdfImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDF2Bullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\UrdfParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\urdfStringSplit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDFImporterInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDFJointTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\SDFAudioTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\UrdfRenderingInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MultiBodyCreationInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3PosixThreadSupport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3Win32ThreadSupport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3ThreadSupportInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsServerExample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsClientExample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\RemoteGUIHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsSharedMemoryCommands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsSharedMemoryPublic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRoboticsGUI\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C29277AF-A529-39B3-8B3A-F1F5A7AA49B3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{27C7555C-CF6A-346A-B1B5-C508B7CDE13C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

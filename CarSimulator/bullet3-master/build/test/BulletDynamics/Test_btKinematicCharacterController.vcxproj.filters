@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\test\BulletDynamics\test_btKinematicCharacterController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\kcjse\Desktop\bullet3-master\test\BulletDynamics\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{27C7555C-CF6A-346A-B1B5-C508B7CDE13C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

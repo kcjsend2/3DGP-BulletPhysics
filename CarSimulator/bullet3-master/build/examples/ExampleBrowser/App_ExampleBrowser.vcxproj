@@ -1,0 +1,717 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{87C48487-5BF1-3C62-8C42-9C77A0E717BB}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>App_ExampleBrowser</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">App_ExampleBrowser.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">App_ExampleBrowser.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">App_ExampleBrowser.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">App_ExampleBrowser.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/kcjse/Desktop/bullet3-master/data C:/Users/kcjse/Desktop/bullet3-master/build/data
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\lib\Debug\BulletExampleBrowserLib_Debug.lib;..\..\lib\Debug\Bullet3Common_Debug.lib;..\..\lib\Debug\BulletSoftBody_Debug.lib;..\..\lib\Debug\BulletDynamics_Debug.lib;..\..\lib\Debug\BulletCollision_Debug.lib;..\..\lib\Debug\BulletInverseDynamicsUtils_Debug.lib;..\..\lib\Debug\BulletInverseDynamics_Debug.lib;..\..\lib\Debug\LinearMath_Debug.lib;..\..\lib\Debug\OpenGLWindow_Debug.lib;..\..\lib\Debug\gwen_Debug.lib;..\..\lib\Debug\BussIK_Debug.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/Debug/App_ExampleBrowser.lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ProgramDataBaseFile>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/Debug/App_ExampleBrowser.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/kcjse/Desktop/bullet3-master/data C:/Users/kcjse/Desktop/bullet3-master/build/data
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\lib\Release\BulletExampleBrowserLib.lib;..\..\lib\Release\Bullet3Common.lib;..\..\lib\Release\BulletSoftBody.lib;..\..\lib\Release\BulletDynamics.lib;..\..\lib\Release\BulletCollision.lib;..\..\lib\Release\BulletInverseDynamicsUtils.lib;..\..\lib\Release\BulletInverseDynamics.lib;..\..\lib\Release\LinearMath.lib;..\..\lib\Release\OpenGLWindow.lib;..\..\lib\Release\gwen.lib;..\..\lib\Release\BussIK.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/Release/App_ExampleBrowser.lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ProgramDataBaseFile>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/Release/App_ExampleBrowser.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/kcjse/Desktop/bullet3-master/data C:/Users/kcjse/Desktop/bullet3-master/build/data
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\lib\MinSizeRel\BulletExampleBrowserLib_MinsizeRel.lib;..\..\lib\MinSizeRel\Bullet3Common_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletSoftBody_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletDynamics_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletCollision_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletInverseDynamicsUtils_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletInverseDynamics_MinsizeRel.lib;..\..\lib\MinSizeRel\LinearMath_MinsizeRel.lib;..\..\lib\MinSizeRel\OpenGLWindow_MinsizeRel.lib;..\..\lib\MinSizeRel\gwen_MinsizeRel.lib;..\..\lib\MinSizeRel\BussIK_MinsizeRel.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/MinSizeRel/App_ExampleBrowser.lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ProgramDataBaseFile>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/MinSizeRel/App_ExampleBrowser.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;INCLUDE_CLOTH_DEMOS;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\.;C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\glad;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/kcjse/Desktop/bullet3-master/data C:/Users/kcjse/Desktop/bullet3-master/build/data
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\lib\RelWithDebInfo\BulletExampleBrowserLib_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\Bullet3Common_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletSoftBody_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletDynamics_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletCollision_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletInverseDynamicsUtils_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletInverseDynamics_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\LinearMath_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\OpenGLWindow_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\gwen_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BussIK_RelWithDebugInfo.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/RelWithDebInfo/App_ExampleBrowser.lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ProgramDataBaseFile>C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/RelWithDebInfo/App_ExampleBrowser.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/examples/ExampleBrowser/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/examples/ExampleBrowser/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/examples/ExampleBrowser/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/examples/ExampleBrowser/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/examples/ExampleBrowser/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\main.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\ExampleEntries.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\ExampleEntries.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\Chain.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\Chain.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\Bridge.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\Bridge.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\RigidBodyFromObj.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\RigidBodyFromObj.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\SimpleBox.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\SimpleBox.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\MultipleBoxes.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\MultipleBoxes.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\CompoundBoxes.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\CompoundBoxes.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\SimpleCloth.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\SimpleCloth.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\SimpleJoint.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\SimpleJoint.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\NewtonsCradle.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\NewtonsCradle.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\InclinedPlane.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\InclinedPlane.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\MultiPendulum.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\MultiPendulum.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\BulletRobotics\FixJointBoxes.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\BulletRobotics\BoxStack.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\BulletRobotics\JointLimit.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\geometry.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\model.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\tgaimage.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\our_gl.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\TinyRenderer.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\collisionFilterPlugin\collisionFilterPlugin.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\collisionFilterPlugin\collisionFilterPlugin.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\pdControlPlugin\pdControlPlugin.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\pdControlPlugin\pdControlPlugin.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\tinyRendererPlugin.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\TinyRendererVisualShapeConverter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\IKTrajectoryHelper.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\IKTrajectoryHelper.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServer.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory_C_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClient.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientC_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsServerExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsClientExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\RemoteGUIHelper.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsServerExample.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsClientExample.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\RemoteGUIHelper.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsSharedMemoryCommands.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\GraphicsSharedMemoryPublic.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerExampleBullet2.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PosixSharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\Win32SharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\InProcessMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerSharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirect.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirect.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirectC_API.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirectC_API.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\SharedMemoryInProcessPhysicsC_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsLoopBack.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsLoopBack.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsLoopBackC_API.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsLoopBackC_API.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerCommandProcessor.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerCommandProcessor.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\SharedMemoryCommands.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\SharedMemoryPublic.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3PluginManager.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoGUI.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoGUI.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoDirect.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoDirect.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RobotSimulator\b3RobotSimulatorClientAPI.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RobotSimulator\b3RobotSimulatorClientAPI.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\BasicDemo\BasicExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\BasicDemo\BasicExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\InverseDynamics\InverseDynamicsExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\InverseDynamics\InverseDynamicsExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\InverseKinematics\InverseKinematicsExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\InverseKinematics\InverseKinematicsExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ForkLift\ForkLiftDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ForkLift\ForkLiftDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreadedDemo\MultiThreadedDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreadedDemo\MultiThreadedDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreadedDemo\CommonRigidBodyMTBase.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreadedDemo\CommonRigidBodyMTBase.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Heightfield\HeightfieldExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Heightfield\HeightfieldExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Tutorial\Tutorial.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Tutorial\Tutorial.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Tutorial\Dof6ConstraintTutorial.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Tutorial\Dof6ConstraintTutorial.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Evolution\NN3DWalkers.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Evolution\NN3DWalkers.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Evolution\NN3DWalkersTimeWarpBase.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\NewtonsRopeCradle.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExtendedTutorials\NewtonsRopeCradle.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\CollisionSdkC_Api.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\CollisionSdkC_Api.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\CollisionTutorialBullet2.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\CollisionTutorialBullet2.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\Internal\Bullet2CollisionSdk.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\Internal\Bullet2CollisionSdk.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\Internal\CollisionSdkInterface.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\Internal\RealTimeBullet3CollisionSdk.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Collision\Internal\RealTimeBullet3CollisionSdk.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\GyroscopicDemo\GyroscopicSetup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\GyroscopicDemo\GyroscopicSetup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Planar2D\Planar2D.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Planar2D\Planar2D.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RollingFrictionDemo\RollingFrictionDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RollingFrictionDemo\RollingFrictionDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\FractureDemo\FractureDemo.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\FractureDemo\btFractureBody.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\FractureDemo\btFractureDynamicsWorld.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\FractureDemo\FractureDemo.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\FractureDemo\btFractureBody.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\FractureDemo\btFractureDynamicsWorld.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DynamicControlDemo\MotorDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DynamicControlDemo\MotorDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\MultiThreadingExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3PosixThreadSupport.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3Win32ThreadSupport.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3ThreadSupportInterface.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TinyRendererSetup.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TimeSeriesCanvas.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TimeSeriesCanvas.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TimeSeriesFontData.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TimeSeriesFontData.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\DynamicTexturedCubeDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\DynamicTexturedCubeDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TinyVRGui.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TinyVRGui.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RoboticsLearning\GripperGraspExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RoboticsLearning\GripperGraspExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RoboticsLearning\R2D2GraspExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RoboticsLearning\R2D2GraspExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RoboticsLearning\KukaGraspExample.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RoboticsLearning\KukaGraspExample.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\CoordinateSystemDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\CoordinateSystemDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\RaytracerSetup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\RaytracerSetup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\RenderInstancingDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\RenderInstancingDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RenderingExamples\TimeSeriesExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Benchmarks\BenchmarkDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Benchmarks\BenchmarkDemo.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Benchmarks\landscapeData.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Benchmarks\TaruData.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Raycast\RaytestDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBsp\BspConverter.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBullet\SerializeSetup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBullet\SerializeSetup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletWorldImporter\btWorldImporter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletWorldImporter\btMultiBodyWorldImporter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletWorldImporter\btBulletWorldImporter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletFileLoader\bChunk.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletFileLoader\bFile.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletFileLoader\bDNA.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\Serialize\BulletFileLoader\btBulletFile.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBsp\BspLoader.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBsp\ImportBspExample.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\btMatrix4x4.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\ColladaGraphicsInstance.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\ImportColladaSetup.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\ImportObjExample.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\LoadMeshFromObj.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportSTLDemo\ImportSTLSetup.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportSTLDemo\LoadMeshFromSTL.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\ConvertRigidBodies2MultiBody.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\ImportURDFSetup.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDF2Bullet.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\urdf_samples.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\ImportMJCFSetup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\ImportMJCFSetup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBsp\BspConverter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBsp\BspLoader.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportBsp\ImportBspExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\ImportColladaSetup.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\ImportObjExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportSTLDemo\ImportSTLSetup.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportSDFDemo\ImportSDFSetup.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\ImportURDFSetup.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\UrdfParser.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\RobotLoggingUtil.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\RobotLoggingUtil.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\urdfStringSplit.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\BulletUrdfImporter.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\VoronoiFracture\VoronoiFractureDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\VoronoiFracture\VoronoiFractureDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\VoronoiFracture\btConvexConvexMprAlgorithm.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\VoronoiFracture\btConvexConvexMprAlgorithm.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Vehicles\Hinge2Vehicle.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Vehicles\Hinge2Vehicle.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\Pendulum.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\MultiBodySoftContact.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\TestJointTorqueSetup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\TestJointTorqueSetup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\InvertedPendulumPDControl.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\InvertedPendulumPDControl.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\MultiBodyConstraintFeedback.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\KinematicMultiBodyExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SoftDemo\SoftDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SoftDemo\SoftDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableContact.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableContact.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\GraspDeformable.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\GraspDeformable.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\Pinch.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\Pinch.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableSelfCollision.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableSelfCollision.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\PinchFriction.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\PinchFriction.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\ClothFriction.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\ClothFriction.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableMultibody.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableMultibody.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableRigid.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableRigid.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\SplitImpulse.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\SplitImpulse.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\VolumetricDeformable.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\VolumetricDeformable.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\Collide.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\Collide.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\LargeDeformation.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\LargeDeformation.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableClothAnchor.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\DeformableClothAnchor.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\MultibodyClothAnchor.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\DeformableDemo\MultibodyClothAnchor.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\MultiDofDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiBody\MultiDofDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RigidBody\RigidBodySoftContact.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\RigidBody\KinematicRigidBodyExample.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\TestHingeTorque.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\TestHingeTorque.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\ConstraintDemo.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\ConstraintDemo.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\Dof6Spring2Setup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\Dof6Spring2Setup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\ConstraintPhysicsSetup.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Constraints\ConstraintPhysicsSetup.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\stb_image\stb_image.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\stb_image\stb_image.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\stb_image\stb_image_write.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ExampleBrowser\InProcessExampleBrowser.cpp" />
+    <ResourceCompile Include="C:\Users\kcjse\Desktop\bullet3-master\build3\bullet.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\ZERO_CHECK.vcxproj">
+      <Project>{01AABAC2-81F5-3856-9074-CCA5BA69FCA0}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\src\Bullet3Common\Bullet3Common.vcxproj">
+      <Project>{60DB9FE4-0C6F-326D-8D59-BE928874C997}</Project>
+      <Name>Bullet3Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\src\BulletCollision\BulletCollision.vcxproj">
+      <Project>{81EEF3CA-5926-3621-865C-A9B3F29F338E}</Project>
+      <Name>BulletCollision</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\src\BulletDynamics\BulletDynamics.vcxproj">
+      <Project>{ACFED286-62BD-308A-AB18-07F740EB46E4}</Project>
+      <Name>BulletDynamics</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\examples\ExampleBrowser\BulletExampleBrowserLib.vcxproj">
+      <Project>{4B740089-1870-31D6-85B9-CC3A2FB05AFE}</Project>
+      <Name>BulletExampleBrowserLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\src\BulletInverseDynamics\BulletInverseDynamics.vcxproj">
+      <Project>{B652F821-CD7C-31D3-BF15-C63B22329B08}</Project>
+      <Name>BulletInverseDynamics</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\Extras\InverseDynamics\BulletInverseDynamicsUtils.vcxproj">
+      <Project>{E9C3987E-2A60-3961-88DD-9736274749E1}</Project>
+      <Name>BulletInverseDynamicsUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\src\BulletSoftBody\BulletSoftBody.vcxproj">
+      <Project>{1BA5B21A-7E32-35CF-A026-1DF3D8A1DB5F}</Project>
+      <Name>BulletSoftBody</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\examples\ThirdPartyLibs\BussIK\BussIK.vcxproj">
+      <Project>{85CAB59C-2C29-3170-AC8D-0E203649D5B6}</Project>
+      <Name>BussIK</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\src\LinearMath\LinearMath.vcxproj">
+      <Project>{A1616A68-E5CC-3000-8282-6BC7BE0E10A9}</Project>
+      <Name>LinearMath</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\examples\OpenGLWindow\OpenGLWindow.vcxproj">
+      <Project>{BA0A6F60-F39E-37ED-A7D8-B485D88A935B}</Project>
+      <Name>OpenGLWindow</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\examples\ThirdPartyLibs\Gwen\gwen.vcxproj">
+      <Project>{57C4CDC3-46AD-31BF-B9DA-6AE0FEC37D0D}</Project>
+      <Name>gwen</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

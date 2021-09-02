@@ -1,0 +1,468 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{72A39695-0FAC-34B7-B045-F70720A6C14E}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>BulletRobotics</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BulletRobotics.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BulletRobotics_Debug</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BulletRobotics.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BulletRobotics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">BulletRobotics.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">BulletRobotics_MinsizeRel</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">BulletRobotics.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">BulletRobotics_RelWithDebugInfo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN64;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;STATIC_LINK_SPD_PLUGIN;BT_ENABLE_VHACD;BT_ENABLE_CLSOCKET;BT_ENABLE_ENET;PHYSICS_SERVER_DIRECT;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\kcjse\Desktop\bullet3-master\src;C:\Users\kcjse\Desktop\bullet3-master\examples;C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include;C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\inc;C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\..\..\Extras\VHACD\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\BulletRobotics\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/Extras/BulletRobotics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/Extras/BulletRobotics/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\Extras\BulletRobotics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/Extras/BulletRobotics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/Extras/BulletRobotics/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\Extras\BulletRobotics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/Extras/BulletRobotics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/Extras/BulletRobotics/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\Extras\BulletRobotics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/kcjse/Desktop/bullet3-master/Extras/BulletRobotics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/kcjse/Desktop/bullet3-master -BC:/Users/kcjse/Desktop/bullet3-master/build --check-stamp-file C:/Users/kcjse/Desktop/bullet3-master/build/Extras/BulletRobotics/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\kcjse\Desktop\bullet3-master\build\Extras\BulletRobotics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\Common2dCanvasInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonCallbacks.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonCameraInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonExampleInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonFileIOInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonGraphicsAppInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonGUIHelperInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonMultiBodyBase.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonParameterInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonRenderInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonRigidBodyBase.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\CommonInterfaces\CommonWindowInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\OpenGLWindow\SimpleCamera.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\geometry.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\model.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\tgaimage.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\our_gl.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\TinyRenderer.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\collisionFilterPlugin\collisionFilterPlugin.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\pdControlPlugin\pdControlPlugin.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoGUI.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoDirect.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\IKTrajectoryHelper.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\tinyRendererPlugin.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\TinyRendererVisualShapeConverter.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\InProcessMemory.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServer.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClient.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerSharedMemory.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirect.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirectC_API.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerCommandProcessor.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3PluginManager.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory_C_API.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientC_API.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\SharedMemoryPublic.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\Win32SharedMemory.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PosixSharedMemory.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ResourcePath.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\RobotLoggingUtil.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3Clock.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\ChromeTraceUtil.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ERPCFMHelper.hpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ReferenceFrameHelper.hpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\stb_image\stb_image.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Jacobian.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR2.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR3.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR4.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\MatrixRmn.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Node.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Tree.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\VectorRn.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\LoadMeshFromObj.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\BulletUrdfImporter.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDF2Bullet.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\UrdfParser.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\urdfStringSplit.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDFImporterInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDFJointTypes.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\SDFAudioTypes.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\UrdfRenderingInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MultiBodyCreationInterface.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3PosixThreadSupport.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3Win32ThreadSupport.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3ThreadSupportInterface.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\SpAlg.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\SpAlg.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\Shape.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\Shape.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\RBDUtil.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\RBDUtil.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\RBDModel.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\RBDModel.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\MathUtil.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\MathUtil.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\KinTree.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\KinTree.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\BulletConversion.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\stablePDPlugin\BulletConversion.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\OpenGLWindow\SimpleCamera.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\geometry.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\model.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\tgaimage.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\our_gl.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\TinyRenderer\TinyRenderer.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\collisionFilterPlugin\collisionFilterPlugin.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\pdControlPlugin\pdControlPlugin.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoGUI.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3RobotSimulatorClientAPI_NoDirect.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\IKTrajectoryHelper.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\tinyRendererPlugin.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\plugins\tinyRendererPlugin\TinyRendererVisualShapeConverter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\InProcessMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClient.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServer.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerSharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirect.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsDirectC_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsServerCommandProcessor.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\b3PluginManager.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientSharedMemory_C_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientC_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\Win32SharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PosixSharedMemory.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3ResourcePath.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\RobotLoggingUtil.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\b3Clock.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Utils\ChromeTraceUtil.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\stb_image\stb_image.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Jacobian.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR2.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR3.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\LinearR4.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\MatrixRmn.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Misc.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Node.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\Tree.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\BussIK\VectorRn.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\UrdfParser.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3PosixThreadSupport.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3Win32ThreadSupport.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\MultiThreading\b3ThreadSupportInterface.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\VHACD\test\src\main_vhacd.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\VHACD\src\VHACD.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\VHACD\src\vhacdICHull.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\VHACD\src\vhacdManifoldMesh.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\VHACD\src\vhacdMesh.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\Extras\VHACD\src\vhacdVolume.cpp" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientUDP.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientUDP_C_API.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include\enet\win32.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include\enet\unix.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include\enet\callbacks.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include\enet\list.h" />
+    <ClInclude Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\include\enet\protocol.h" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientUDP.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientUDP_C_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\win32.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\unix.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\callbacks.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\compress.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\host.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\list.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\packet.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\peer.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\enet\protocol.c" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientTCP.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\SharedMemory\PhysicsClientTCP_C_API.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src\SimpleSocket.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src\ActiveSocket.cpp" />
+    <ClCompile Include="C:\Users\kcjse\Desktop\bullet3-master\examples\ThirdPartyLibs\clsocket\src\PassiveSocket.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\kcjse\Desktop\bullet3-master\build\ZERO_CHECK.vcxproj">
+      <Project>{01AABAC2-81F5-3856-9074-CCA5BA69FCA0}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
