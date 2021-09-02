@@ -387,6 +387,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+#Bullet Physics Engine Source
+bullet3-master/
 
 # JetBrains Rider
 .idea/
