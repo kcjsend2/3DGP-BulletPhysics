@@ -633,7 +633,7 @@ void CLightsShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 		m_pcbMappedLights[i] = VS_VB_LIGHT_INFO(m_vLight[i]);
 	}
 	
-	int vSize = m_vLight.size();
+	size_t vSize = m_vLight.size();
 	pd3dCommandList->SetGraphicsRootShaderResourceView(5, m_pd3dcbLight->GetGPUVirtualAddress());
 	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &vSize, 0);
 }
@@ -682,7 +682,7 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
-	d3dPipelineStateDesc.RasterizerState.DepthBias = 10000.0f;
+	d3dPipelineStateDesc.RasterizerState.DepthBias = 10000;
 	d3dPipelineStateDesc.RasterizerState.DepthBiasClamp = 0.0f;
 	d3dPipelineStateDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
 

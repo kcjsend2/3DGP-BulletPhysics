@@ -314,6 +314,6 @@ namespace BulletHelper
 
 	inline float RadianToEuler(float fRadian)
 	{
-		return fRadian / 360 * (2 * PI);
+		return fRadian / 360 * (float)(2 * PI);
 	}
 }
