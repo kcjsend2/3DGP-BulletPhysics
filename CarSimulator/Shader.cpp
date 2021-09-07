@@ -398,6 +398,26 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 {
 	float fHeight = 10.0f, fLength = 10.0f, fDepth = 10.0f;
 
+	std::unique_ptr<CTexture> ppTextures[6];
+	ppTextures[0] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Diffuse).dds", RESOURCE_TEXTURE2D, 0);
+
+	ppTextures[1] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	ppTextures[1]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Stone01.dds", RESOURCE_TEXTURE2D, 0);
+
+	ppTextures[2] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	ppTextures[2]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal01.dds", RESOURCE_TEXTURE2D, 0);
+
+	ppTextures[3] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	ppTextures[3]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal02.dds", RESOURCE_TEXTURE2D, 0);
+
+	ppTextures[4] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	ppTextures[4]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Rock01.dds", RESOURCE_TEXTURE2D, 0);
+
+	ppTextures[5] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	ppTextures[5]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D, 0);
+
+
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
 	btCollisionShapes.push_back(CubeShape);

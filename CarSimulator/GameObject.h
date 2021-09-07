@@ -40,11 +40,11 @@ private:
 	DXGI_FORMAT* m_pdxgiBufferFormats = NULL;
 	int* m_pnBufferElements = NULL;
 
-	int								m_nRootParameters = 0;
+	int	m_nRootParameters = 0;
 	int* m_pnRootParameterIndices = NULL;
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles = NULL;
 
-	int								m_nSamplers = 0;
+	int	m_nSamplers = 0;
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSamplerGpuDescriptorHandles = NULL;
 
 public:

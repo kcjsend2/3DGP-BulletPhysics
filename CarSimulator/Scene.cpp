@@ -199,21 +199,24 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
 	CD3DX12_ROOT_PARAMETER pd3dRootParameters[8];
 
+	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[2].InitAsConstants(1, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
+	//UploadBuffer 클래스를 이용하여 업로드
 	pd3dRootParameters[3].InitAsConstantBufferView(3);
 
+	//구조화 된 버퍼, stdafx.h의 CreateBufferResource 함수 이용해 업로드
 	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
 	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);
-
 
 	CD3DX12_DESCRIPTOR_RANGE texRange0(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
 	CD3DX12_DESCRIPTOR_RANGE texRange1(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
 
-	pd3dRootParameters[6].InitAsDescriptorTable(1, &texRange0);
-	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange1);
+	//디스크립터 테이블 이용하여 업로드
+	pd3dRootParameters[6].InitAsDescriptorTable(1, &texRange0); //쉐도우 맵
+	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange1); //텍스쳐 배열
 
 	auto staticSamplers = GetStaticSamplers();
 
