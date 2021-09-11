@@ -54,7 +54,7 @@ float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
     // Common convention to take alpha from diffuse albedo.
     
     cColor.a = material.DiffuseAlbedo.a;
-    cColor = gTextureMaps[gGameObjectInfos[input.InstanceID].m_nTextrueIndex].Sample(gsamLinearWrap, input.uv);
+    cColor *= gTextureMaps[gGameObjectInfos[input.InstanceID].m_nTextrueIndex].Sample(gsamLinearWrap, input.uv);
     
     return (cColor);
 }

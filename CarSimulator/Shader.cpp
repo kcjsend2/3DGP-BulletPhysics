@@ -389,6 +389,7 @@ void CInstancingShader::ReleaseUploadBuffers()
 //인스턴싱 정보(객체의 월드 변환 행렬과 색상)를 정점 버퍼에 복사한다.
 void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootShaderResourceView(4, m_pd3dcbGameObjects->GetGPUVirtualAddress());
 	for (int j = 0; j < m_nObjects; j++)
 	{
@@ -477,7 +478,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 				pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 				pRotatingObject->SetRotationSpeed(0.0f);
 
-				pRotatingObject->SetMaterial(XMFLOAT4(1.3f, 0.3f, 0.3f, 1.0f), XMFLOAT4(1.0f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
+				pRotatingObject->SetMaterial(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
 				pRotatingObject->SetPosition(xPosition, fHeight + (y * 100.0f * fyPitch) + 1000.0f, zPosition);
 
 				XMFLOAT3 xmf3ObjPosition = pRotatingObject->GetPosition();
