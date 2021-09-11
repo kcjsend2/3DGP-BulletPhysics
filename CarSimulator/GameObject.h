@@ -103,7 +103,7 @@ protected:
 public:
 	void ReleaseUploadBuffers();
 	void SetMesh(int nIndex, CMesh* pMesh);
-	void SetMesh(int nIndex, CCubeMeshDiffused* pMesh);
+	void SetMesh(int nIndex, CCubeMesh* pMesh);
 
 	//게임 객체를 회전(x-축, y-축, z-축)한다.
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);

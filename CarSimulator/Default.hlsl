@@ -58,6 +58,5 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     
     cColor.a = material.DiffuseAlbedo.a;
     
-    
     return (cColor);
 }

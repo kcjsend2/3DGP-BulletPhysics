@@ -213,7 +213,7 @@ void CGameObject::SetMesh(int nIndex, CMesh* pMesh)
 	}
 }
 
-void CGameObject::SetMesh(int nIndex, CCubeMeshDiffused* pMesh)
+void CGameObject::SetMesh(int nIndex, CCubeMesh* pMesh)
 {
 	if (m_ppMeshes)
 	{

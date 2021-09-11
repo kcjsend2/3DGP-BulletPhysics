@@ -8,6 +8,7 @@
 struct VS_VB_INSTANCE
 {
 	XMFLOAT4X4 m_xmf4x4Transform;
+	int m_nTextrueIndex;
 };
 
 struct VS_VB_LIGHT_INFO

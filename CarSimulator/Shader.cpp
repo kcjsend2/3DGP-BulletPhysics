@@ -117,6 +117,7 @@ D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR *pszFileName, LPCSTR 
 	if (errors != nullptr)
 	{
 		std::string s((char*)errors->GetBufferPointer());
+		s.c_str();
 	}
 
 	d3dShaderByteCode.BytecodeLength = (*ppd3dShaderBlob)->GetBufferSize();
@@ -392,6 +393,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCom
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->GetWorldTransformMatrix())));
+		m_pcbMappedGameObjects[j].m_nTextrueIndex = j % 6;
 		m_ppObjects[j]->UpdateShaderVariables(pd3dCommandList);
 	}
 }
@@ -497,7 +499,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	
 	
 	//인스턴싱을 사용하여 렌더링하기 위하여 하나의 게임 객체만 메쉬를 가진다.
-	CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, fLength, fHeight, fDepth);
+	CCubeMesh* pCubeMesh = new CCubeMesh(pd3dDevice, pd3dCommandList, fLength, fHeight, fDepth);
 	m_ppObjects[0]->SetMesh(0, pCubeMesh);
 
 

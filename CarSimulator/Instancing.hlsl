@@ -4,6 +4,7 @@ struct VS_INSTANCING_INPUT
 {
     float3 position : POSITION;
     float3 normal : NORMAL;
+    float2 uv : TEXCOORD;
 };
 
 struct VS_INSTANCING_OUTPUT
@@ -12,7 +13,8 @@ struct VS_INSTANCING_OUTPUT
     float4 position_shadow : POSITION0;
     float3 position_w : POSITION1;
     float3 normal : NORMAL;
-    
+    float2 uv : TEXCOORD;
+    int InstanceID : SV_InstanceID;
 };
 
 VS_INSTANCING_OUTPUT VS_Instancing(VS_INSTANCING_INPUT input, uint InstanceID : SV_InstanceID)
@@ -22,6 +24,8 @@ VS_INSTANCING_OUTPUT VS_Instancing(VS_INSTANCING_INPUT input, uint InstanceID : 
     output.position_w = mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gGameObjectInfos[InstanceID].m_mtxGameObject).xyz);
     output.position_shadow = mul(float4(output.position_w, 1.0f), gmtxShadowTransform);
+    output.uv = input.uv;
+    output.InstanceID = InstanceID;
     
     return (output);
 }
@@ -50,6 +54,7 @@ float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
     // Common convention to take alpha from diffuse albedo.
     
     cColor.a = material.DiffuseAlbedo.a;
+    cColor = gTextureMaps[gGameObjectInfos[input.InstanceID].m_nTextrueIndex].Sample(gsamLinearWrap, input.uv);
     
     return (cColor);
 }

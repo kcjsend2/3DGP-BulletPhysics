@@ -28,6 +28,7 @@ Texture2D gTextureMaps[6] : register(t1);
 struct INSTANCED_GAMEOBJECT_INFO
 {
     matrix m_mtxGameObject;
+    int m_nTextrueIndex;
 };
 StructuredBuffer<INSTANCED_GAMEOBJECT_INFO> gGameObjectInfos : register(t0, space1);
 

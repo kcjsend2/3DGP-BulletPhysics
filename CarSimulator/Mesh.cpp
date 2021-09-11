@@ -99,13 +99,13 @@ CTriangleMesh::CTriangleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_pd3dVertexBufferViews[0].SizeInBytes = m_nStride * m_nVertices;
 }
 
-CCubeMeshDiffused::~CCubeMeshDiffused()
+CCubeMesh::~CCubeMesh()
 {
 }
 
-CCubeMeshDiffused::CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
+CCubeMesh::CCubeMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
 {
-	//직육면체는 꼭지점(정점)이 8개이다.
+	//정육면체는 꼭지점(정점)이 8개이다.
 	m_nVertices = 8;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
@@ -131,12 +131,23 @@ CCubeMeshDiffused::CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_pxmf3Normals[6] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, 1.0f));
 	m_pxmf3Normals[7] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, 1.0f));
 
+	m_pxmf2TextureCoords = new XMFLOAT2[m_nVertices];
+	m_pxmf2TextureCoords[0] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[1] = XMFLOAT2(1.0f, 0.0f);
+	m_pxmf2TextureCoords[2] = XMFLOAT2(1.0f, 0.0f);
+	m_pxmf2TextureCoords[3] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[4] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf2TextureCoords[5] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[6] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[7] = XMFLOAT2(0.0f, 1.0f);
 
-	m_nVertexBufferViews = 2;
+	m_nVertexBufferViews = 3;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);
+	m_pd3dTextureCoordBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoordUploadBuffer);
+
 
 	m_pd3dVertexBufferViews[0].BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
 	m_pd3dVertexBufferViews[0].StrideInBytes = sizeof(XMFLOAT3);
@@ -145,6 +156,10 @@ CCubeMeshDiffused::CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_pd3dVertexBufferViews[1].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
 	m_pd3dVertexBufferViews[1].StrideInBytes = sizeof(XMFLOAT3);
 	m_pd3dVertexBufferViews[1].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	m_pd3dVertexBufferViews[2].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
+	m_pd3dVertexBufferViews[2].StrideInBytes = sizeof(XMFLOAT2);
+	m_pd3dVertexBufferViews[2].SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
 
 
 	/*인덱스 버퍼는 직육면체의 6개의 면(사각형)에 대한 기하 정보를 갖는다. 삼각형 리스트로 직육면체를 표현할 것이
