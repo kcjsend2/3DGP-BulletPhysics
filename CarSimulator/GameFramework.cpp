@@ -60,12 +60,8 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 
 	CreateDirect3DDevice();
-
-	m_pShadowMap = make_unique<CShadowMap>(m_pd3dDevice.Get(), 10000, 10000);
-
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
-	BuildDescriptorHeaps();
 	CreateSwapChain();
 	BulletInit();
 	BuildObjects();
@@ -80,21 +76,7 @@ void CGameFramework::OnDestroy()
 	//게임 객체(게임 월드 객체)를 소멸한다.
 	::CloseHandle(m_hFenceEvent);
 
-	//for (int i = 0; i < m_nSwapChainBuffers; i++)
-		//if (m_ppd3dRenderTargetBuffers[i])
-			//m_ppd3dRenderTargetBuffers[i]->Release();
-	//if (m_pd3dRtvDescriptorHeap) m_pd3dRtvDescriptorHeap->Release();
-	//if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
-	//if (m_pd3dDsvDescriptorHeap) m_pd3dDsvDescriptorHeap->Release();
-	//if (m_pd3dCommandAllocator) m_pd3dCommandAllocator->Release();
-	//if (m_pd3dCommandQueue) m_pd3dCommandQueue->Release();
-	//if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
-	//if (m_pd3dCommandList) m_pd3dCommandList->Release();
-	//if (m_pd3dFence) m_pd3dFence->Release();
 	m_pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
-	//if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
-	//if (m_pd3dDevice) m_pd3dDevice->Release();
-	//if (m_pdxgiFactory) m_pdxgiFactory->Release();
 
 #if defined(_DEBUG)
 	IDXGIDebug1 *pdxgiDebug = NULL;
@@ -241,12 +223,15 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 
 	m_nDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	//깊이-스텐실 서술자 힙의 원소의 크기를 저장한다.
+
+	m_nSrvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	//SRV 서술자 힙의 원소의 크기를 저장한다.
 }
 
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.NumDescriptors = 7;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -323,10 +308,14 @@ void CGameFramework::CreateDepthStencilView()
 void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
+
+	m_pShadowMap = make_unique<CShadowMap>(m_pd3dDevice.Get(), 10000, 10000);
+	BuildDescriptorHeaps();
+
 	m_pScene = make_unique<CScene>();
 
 	if (m_pScene)
-		m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_btCollisionShapes, m_pbtDynamicsWorld.get());
+		m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_btCollisionShapes, m_pbtDynamicsWorld.get(), m_pd3dSrvDescriptorHeap);
 	
 	CShadowShader* pShadowShader = new CShadowShader();
 	pShadowShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());

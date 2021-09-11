@@ -58,6 +58,7 @@ public:
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Update(float fTimeElapsed);
+	virtual void CreateShaderResourceViews(ID3D12Device* pd3dDevice, CTexture* pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
 
 protected:
 	ID3D12PipelineState* m_pd3dPipelineState = NULL;
@@ -140,14 +141,18 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
 	virtual void ReleaseShaderVariables();
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
 protected:
 	//인스턴스 데이터를 포함하는 버퍼와 포인터이다.
 	ID3D12Resource* m_pd3dcbGameObjects = NULL;
 	VS_VB_INSTANCE* m_pcbMappedGameObjects = NULL;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE m_d3dSrvCPUDescriptorHandle;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE m_d3dSrvGPUDescriptorHandle;
+	std::shared_ptr<CTexture> m_pTexture;
 };
 class CTerrainShader : public CShader
 {

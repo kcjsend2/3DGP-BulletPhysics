@@ -117,8 +117,6 @@ D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR *pszFileName, LPCSTR 
 	if (errors != nullptr)
 	{
 		std::string s((char*)errors->GetBufferPointer());
-
-		s.c_str();
 	}
 
 	d3dShaderByteCode.BytecodeLength = (*ppd3dShaderBlob)->GetBufferSize();
@@ -194,6 +192,10 @@ void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 }
 
 void CShader::Update(float fTimeElapsed)
+{
+}
+
+void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, CTexture* pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
 {
 }
 
@@ -394,29 +396,27 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCom
 	}
 }
 
-void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
 {
 	float fHeight = 10.0f, fLength = 10.0f, fDepth = 10.0f;
 
-	std::unique_ptr<CTexture> ppTextures[6];
-	ppTextures[0] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	ppTextures[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Diffuse).dds", RESOURCE_TEXTURE2D, 0);
+	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-	ppTextures[1] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	ppTextures[1]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Stone01.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Diffuse).dds", RESOURCE_TEXTURE2D_ARRAY, 0);
 
-	ppTextures[2] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	ppTextures[2]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal01.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
 
-	ppTextures[3] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	ppTextures[3]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal02.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
 
-	ppTextures[4] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	ppTextures[4]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Rock01.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
 
-	ppTextures[5] = std::make_unique<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	ppTextures[5]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
+	
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 1, 7);
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
@@ -512,6 +512,27 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
 	m_ppObjects[0]->Render(pd3dCommandList, m_nObjects);
+}
+
+void CInstancingShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
+{
+	UINT nSrvDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	m_d3dSrvCPUDescriptorHandle.ptr += (nSrvDescriptorIncrementSize * nDescriptorHeapIndex);
+	m_d3dSrvGPUDescriptorHandle.ptr += (nSrvDescriptorIncrementSize * nDescriptorHeapIndex);
+
+	int nTextures = pTexture->GetTextures();
+	for (int i = 0; i < nTextures; i++)
+	{
+		ID3D12Resource* pShaderResource = pTexture->GetResource(i);
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3dShaderResourceViewDesc = pTexture->GetShaderResourceViewDesc(i);
+		pd3dDevice->CreateShaderResourceView(pShaderResource, &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorHandle);
+		m_d3dSrvCPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
+		pTexture->SetGpuDescriptorHandle(i, m_d3dSrvGPUDescriptorHandle);
+		m_d3dSrvGPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
+	}
+	int nRootParameters = pTexture->GetRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetRootParameterIndex(i, nRootParameterStartIndex + i);
 }
 
 CTerrainShader::CTerrainShader()
