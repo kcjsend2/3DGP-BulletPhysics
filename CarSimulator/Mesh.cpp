@@ -105,151 +105,79 @@ CCubeMesh::~CCubeMesh()
 
 CCubeMesh::CCubeMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
 {
-	m_nVertices = 24;
+	m_nVertices = 36;
+	m_nStride = sizeof(CTexturedNormalVertex);
+	m_nOffset = 0;
+	m_nSlot = 0;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
 	float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
 
-	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
-	m_pxmf3Positions[0] = XMFLOAT3(-fx, +fy, -fz);
-	m_pxmf3Positions[1] = XMFLOAT3(+fx, +fy, -fz);
-	m_pxmf3Positions[2] = XMFLOAT3(+fx, -fy, -fz);
-	m_pxmf3Positions[3] = XMFLOAT3(-fx, -fy, -fz);
+	CTexturedNormalVertex pVertices[36];
+	int i = 0;
 
-	m_pxmf3Positions[4] = XMFLOAT3(+fx, +fy, +fz);
-	m_pxmf3Positions[5] = XMFLOAT3(-fx, +fy, +fz);
-	m_pxmf3Positions[6] = XMFLOAT3(-fx, -fy, +fz);
-	m_pxmf3Positions[7] = XMFLOAT3(+fx, -fy, +fz);
+	// 뒷면
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f));
 
-	m_pxmf3Positions[8] = XMFLOAT3(-fx, +fy, +fz);
-	m_pxmf3Positions[9] = XMFLOAT3(-fx, +fy, -fz);
-	m_pxmf3Positions[10] = XMFLOAT3(-fx, -fy, -fz);
-	m_pxmf3Positions[11] = XMFLOAT3(-fx, -fy, +fz);
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f));
 
-	m_pxmf3Positions[12] = XMFLOAT3(+fx, +fy, -fz);
-	m_pxmf3Positions[13] = XMFLOAT3(+fx, +fy, +fz);
-	m_pxmf3Positions[14] = XMFLOAT3(+fx, -fy, +fz);
-	m_pxmf3Positions[15] = XMFLOAT3(+fx, -fy, -fz);
+	//윗면
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
 
-	m_pxmf3Positions[16] = XMFLOAT3(-fx, +fy, +fz);
-	m_pxmf3Positions[17] = XMFLOAT3(+fx, +fy, +fz);
-	m_pxmf3Positions[18] = XMFLOAT3(+fx, +fy, -fz);
-	m_pxmf3Positions[19] = XMFLOAT3(-fx, +fy, -fz);
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
 
-	m_pxmf3Positions[20] = XMFLOAT3(-fx, -fy, -fz);
-	m_pxmf3Positions[21] = XMFLOAT3(+fx, -fy, -fz);
-	m_pxmf3Positions[22] = XMFLOAT3(+fx, -fy, +fz);
-	m_pxmf3Positions[23] = XMFLOAT3(-fx, -fy, +fz);
+	//앞면
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f));
 
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f));
 
-	m_pxmf3Normals = new XMFLOAT3[m_nVertices];
-	m_pxmf3Normals[0] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
-	m_pxmf3Normals[1] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
-	m_pxmf3Normals[2] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
-	m_pxmf3Normals[3] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
+	//아랫면
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
 
-	m_pxmf3Normals[4] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
-	m_pxmf3Normals[5] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
-	m_pxmf3Normals[6] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
-	m_pxmf3Normals[7] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
 
-	m_pxmf3Normals[8] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
-	m_pxmf3Normals[9] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
-	m_pxmf3Normals[10] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
-	m_pxmf3Normals[11] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	//왼쪽면
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
 
-	m_pxmf3Normals[12] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	m_pxmf3Normals[13] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	m_pxmf3Normals[14] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	m_pxmf3Normals[15] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
 
-	m_pxmf3Normals[16] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pxmf3Normals[17] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pxmf3Normals[18] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pxmf3Normals[19] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//오른쪽면
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
 
-	m_pxmf3Normals[20] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
-	m_pxmf3Normals[21] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
-	m_pxmf3Normals[22] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
-	m_pxmf3Normals[23] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedNormalVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
 
-
-
-	m_pxmf2TextureCoords = new XMFLOAT2[m_nVertices];
-	m_pxmf2TextureCoords[0] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[1] = XMFLOAT2(1.0f, 0.0f);	
-	m_pxmf2TextureCoords[2] = XMFLOAT2(1.0f, 1.0f);
-	m_pxmf2TextureCoords[3] = XMFLOAT2(0.0f, 1.0f);
-	m_pxmf2TextureCoords[4] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[5] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[6] = XMFLOAT2(1.0f, 1.0f);
-	m_pxmf2TextureCoords[7] = XMFLOAT2(0.0f, 1.0f);
-	m_pxmf2TextureCoords[8] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[9] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[10] = XMFLOAT2(1.0f, 1.0f);
-	m_pxmf2TextureCoords[11] = XMFLOAT2(0.0f, 1.0f);
-	m_pxmf2TextureCoords[12] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[13] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[14] = XMFLOAT2(1.0f, 1.0f);
-	m_pxmf2TextureCoords[15] = XMFLOAT2(0.0f, 1.0f);
-	m_pxmf2TextureCoords[16] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[17] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[18] = XMFLOAT2(1.0f, 1.0f);
-	m_pxmf2TextureCoords[19] = XMFLOAT2(0.0f, 1.0f);
-	m_pxmf2TextureCoords[20] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[21] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[22] = XMFLOAT2(1.0f, 1.0f);
-	m_pxmf2TextureCoords[23] = XMFLOAT2(0.0f, 1.0f);
-
-
-
-
-	m_nVertexBufferViews = 3;
+	m_nVertexBufferViews = 1;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
 
-	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
-	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);
-	m_pd3dTextureCoordBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoordUploadBuffer);
-
+	m_pd3dPositionBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 
 	m_pd3dVertexBufferViews[0].BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
-	m_pd3dVertexBufferViews[0].StrideInBytes = sizeof(XMFLOAT3);
-	m_pd3dVertexBufferViews[0].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
-
-	m_pd3dVertexBufferViews[1].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
-	m_pd3dVertexBufferViews[1].StrideInBytes = sizeof(XMFLOAT3);
-	m_pd3dVertexBufferViews[1].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
-
-	m_pd3dVertexBufferViews[2].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
-	m_pd3dVertexBufferViews[2].StrideInBytes = sizeof(XMFLOAT2);
-	m_pd3dVertexBufferViews[2].SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
-
-
-	/*인덱스 버퍼는 직육면체의 6개의 면(사각형)에 대한 기하 정보를 갖는다. 삼각형 리스트로 직육면체를 표현할 것이
-	므로 각 면은 2개의 삼각형을 가지고 각 삼각형은 3개의 정점이 필요하다. 즉, 인덱스 버퍼는 전체 36(=6*2*3)개의 인
-	덱스를 가져야 한다.*/
-	m_nIndices = 36;
-	UINT pnIndices[36] = {
-		// Front
-		0, 1, 2, 0, 2, 3,
-		// Back
-		4, 5, 6, 4, 6, 7,
-		// Left
-		8, 9, 10, 8, 10, 11,
-		// Right
-		12, 13, 14, 12, 14, 15,
-		// Top
-		16, 17, 18, 16, 18, 19,
-		// Bottom
-		20, 21, 22, 20, 22, 23
-	};
-
-	//인덱스 버퍼를 생성한다.
-	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pnIndices, sizeof(UINT)* m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
-
-	//인덱스 버퍼 뷰를 생성한다.
-	m_d3dIndexBufferView.BufferLocation = m_pd3dIndexBuffer->GetGPUVirtualAddress();
-	m_d3dIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
-	m_d3dIndexBufferView.SizeInBytes = sizeof(UINT) * m_nIndices;
+	m_pd3dVertexBufferViews[0].StrideInBytes = m_nStride;
+	m_pd3dVertexBufferViews[0].SizeInBytes = m_nStride * m_nVertices;
 
 	//메쉬의 바운딩 박스(모델 좌표계)를 생성한다.
 	m_xmBoundingBox = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(fx, fy, fz), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
