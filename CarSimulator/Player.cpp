@@ -24,7 +24,6 @@ CPlayer::CPlayer(int nMeshes) : CGameObject(nMeshes)
 CPlayer::~CPlayer()
 {
 	ReleaseShaderVariables();
-	if (m_pCamera) delete m_pCamera;
 }
 
 void CPlayer::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -38,9 +37,6 @@ void CPlayer::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 void CPlayer::ReleaseShaderVariables()
 {
 	CGameObject::ReleaseShaderVariables();
-
-	if (m_pCamera)
-		m_pCamera->ReleaseShaderVariables();
 }
 
 void CPlayer::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)

@@ -105,41 +105,103 @@ CCubeMesh::~CCubeMesh()
 
 CCubeMesh::CCubeMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
 {
-	//정육면체는 꼭지점(정점)이 8개이다.
-	m_nVertices = 8;
+	m_nVertices = 24;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
 
-	//정점 버퍼는 직육면체의 꼭지점 8개에 대한 정점 데이터를 가진다.
 	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
 	m_pxmf3Positions[0] = XMFLOAT3(-fx, +fy, -fz);
 	m_pxmf3Positions[1] = XMFLOAT3(+fx, +fy, -fz);
-	m_pxmf3Positions[2] = XMFLOAT3(+fx, +fy, +fz);
-	m_pxmf3Positions[3] = XMFLOAT3(-fx, +fy, +fz);
-	m_pxmf3Positions[4] = XMFLOAT3(-fx, -fy, -fz);
-	m_pxmf3Positions[5] = XMFLOAT3(+fx, -fy, -fz);
-	m_pxmf3Positions[6] = XMFLOAT3(+fx, -fy, +fz);
-	m_pxmf3Positions[7] = XMFLOAT3(-fx, -fy, +fz);
+	m_pxmf3Positions[2] = XMFLOAT3(+fx, -fy, -fz);
+	m_pxmf3Positions[3] = XMFLOAT3(-fx, -fy, -fz);
+
+	m_pxmf3Positions[4] = XMFLOAT3(+fx, +fy, +fz);
+	m_pxmf3Positions[5] = XMFLOAT3(-fx, +fy, +fz);
+	m_pxmf3Positions[6] = XMFLOAT3(-fx, -fy, +fz);
+	m_pxmf3Positions[7] = XMFLOAT3(+fx, -fy, +fz);
+
+	m_pxmf3Positions[8] = XMFLOAT3(-fx, +fy, +fz);
+	m_pxmf3Positions[9] = XMFLOAT3(-fx, +fy, -fz);
+	m_pxmf3Positions[10] = XMFLOAT3(-fx, -fy, -fz);
+	m_pxmf3Positions[11] = XMFLOAT3(-fx, -fy, +fz);
+
+	m_pxmf3Positions[12] = XMFLOAT3(+fx, +fy, -fz);
+	m_pxmf3Positions[13] = XMFLOAT3(+fx, +fy, +fz);
+	m_pxmf3Positions[14] = XMFLOAT3(+fx, -fy, +fz);
+	m_pxmf3Positions[15] = XMFLOAT3(+fx, -fy, -fz);
+
+	m_pxmf3Positions[16] = XMFLOAT3(-fx, +fy, +fz);
+	m_pxmf3Positions[17] = XMFLOAT3(+fx, +fy, +fz);
+	m_pxmf3Positions[18] = XMFLOAT3(+fx, +fy, -fz);
+	m_pxmf3Positions[19] = XMFLOAT3(-fx, +fy, -fz);
+
+	m_pxmf3Positions[20] = XMFLOAT3(-fx, -fy, -fz);
+	m_pxmf3Positions[21] = XMFLOAT3(+fx, -fy, -fz);
+	m_pxmf3Positions[22] = XMFLOAT3(+fx, -fy, +fz);
+	m_pxmf3Positions[23] = XMFLOAT3(-fx, -fy, +fz);
+
 
 	m_pxmf3Normals = new XMFLOAT3[m_nVertices];
-	m_pxmf3Normals[0] = Vector3::Normalize(XMFLOAT3(-1.0f, 1.0f, -1.0f));
-	m_pxmf3Normals[1] = Vector3::Normalize(XMFLOAT3(1.0f, 1.0f, -1.0f));
-	m_pxmf3Normals[2] = Vector3::Normalize(XMFLOAT3(1.0f, 1.0f, 1.0f));
-	m_pxmf3Normals[3] = Vector3::Normalize(XMFLOAT3(-1.0f, 1.0f, 1.0f));
-	m_pxmf3Normals[4] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, -1.0f));
-	m_pxmf3Normals[5] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, -1.0f));
-	m_pxmf3Normals[6] = Vector3::Normalize(XMFLOAT3(1.0f, -1.0f, 1.0f));
-	m_pxmf3Normals[7] = Vector3::Normalize(XMFLOAT3(-1.0f, -1.0f, 1.0f));
+	m_pxmf3Normals[0] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
+	m_pxmf3Normals[1] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
+	m_pxmf3Normals[2] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
+	m_pxmf3Normals[3] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, -1.0f));
+
+	m_pxmf3Normals[4] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
+	m_pxmf3Normals[5] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
+	m_pxmf3Normals[6] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
+	m_pxmf3Normals[7] = Vector3::Normalize(XMFLOAT3(0.0f, 0.0f, 1.0f));
+
+	m_pxmf3Normals[8] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	m_pxmf3Normals[9] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	m_pxmf3Normals[10] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	m_pxmf3Normals[11] = Vector3::Normalize(XMFLOAT3(-1.0f, 0.0f, 0.0f));
+
+	m_pxmf3Normals[12] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	m_pxmf3Normals[13] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	m_pxmf3Normals[14] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	m_pxmf3Normals[15] = Vector3::Normalize(XMFLOAT3(1.0f, 0.0f, 0.0f));
+
+	m_pxmf3Normals[16] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_pxmf3Normals[17] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_pxmf3Normals[18] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_pxmf3Normals[19] = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+	m_pxmf3Normals[20] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
+	m_pxmf3Normals[21] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
+	m_pxmf3Normals[22] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
+	m_pxmf3Normals[23] = Vector3::Normalize(XMFLOAT3(0.0f, -1.0f, 0.0f));
+
+
 
 	m_pxmf2TextureCoords = new XMFLOAT2[m_nVertices];
 	m_pxmf2TextureCoords[0] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[1] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[2] = XMFLOAT2(1.0f, 0.0f);
-	m_pxmf2TextureCoords[3] = XMFLOAT2(0.0f, 0.0f);
-	m_pxmf2TextureCoords[4] = XMFLOAT2(0.0f, 1.0f);
-	m_pxmf2TextureCoords[5] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[1] = XMFLOAT2(1.0f, 0.0f);	
+	m_pxmf2TextureCoords[2] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[3] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf2TextureCoords[4] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[5] = XMFLOAT2(1.0f, 0.0f);
 	m_pxmf2TextureCoords[6] = XMFLOAT2(1.0f, 1.0f);
 	m_pxmf2TextureCoords[7] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf2TextureCoords[8] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[9] = XMFLOAT2(1.0f, 0.0f);
+	m_pxmf2TextureCoords[10] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[11] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf2TextureCoords[12] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[13] = XMFLOAT2(1.0f, 0.0f);
+	m_pxmf2TextureCoords[14] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[15] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf2TextureCoords[16] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[17] = XMFLOAT2(1.0f, 0.0f);
+	m_pxmf2TextureCoords[18] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[19] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf2TextureCoords[20] = XMFLOAT2(0.0f, 0.0f);
+	m_pxmf2TextureCoords[21] = XMFLOAT2(1.0f, 0.0f);
+	m_pxmf2TextureCoords[22] = XMFLOAT2(1.0f, 1.0f);
+	m_pxmf2TextureCoords[23] = XMFLOAT2(0.0f, 1.0f);
+
+
+
 
 	m_nVertexBufferViews = 3;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
@@ -166,31 +228,20 @@ CCubeMesh::CCubeMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	므로 각 면은 2개의 삼각형을 가지고 각 삼각형은 3개의 정점이 필요하다. 즉, 인덱스 버퍼는 전체 36(=6*2*3)개의 인
 	덱스를 가져야 한다.*/
 	m_nIndices = 36;
-	UINT pnIndices[36];
-	//ⓐ 앞면(Front) 사각형의 위쪽 삼각형
-	pnIndices[0] = 3; pnIndices[1] = 1; pnIndices[2] = 0;
-	//ⓑ 앞면(Front) 사각형의 아래쪽 삼각형
-	pnIndices[3] = 2; pnIndices[4] = 1; pnIndices[5] = 3;
-	//ⓒ 윗면(Top) 사각형의 위쪽 삼각형
-	pnIndices[6] = 0; pnIndices[7] = 5; pnIndices[8] = 4;
-	//ⓓ 윗면(Top) 사각형의 아래쪽 삼각형
-	pnIndices[9] = 1; pnIndices[10] = 5; pnIndices[11] = 0;
-	//ⓔ 뒷면(Back) 사각형의 위쪽 삼각형
-	pnIndices[12] = 3; pnIndices[13] = 4; pnIndices[14] = 7;
-	//ⓕ 뒷면(Back) 사각형의 아래쪽 삼각형
-	pnIndices[15] = 0; pnIndices[16] = 4; pnIndices[17] = 3;
-	//ⓖ 아래면(Bottom) 사각형의 위쪽 삼각형
-	pnIndices[18] = 1; pnIndices[19] = 6; pnIndices[20] = 5;
-	//ⓗ 아래면(Bottom) 사각형의 아래쪽 삼각형
-	pnIndices[21] = 2; pnIndices[22] = 6; pnIndices[23] = 1;
-	//ⓘ 옆면(Left) 사각형의 위쪽 삼각형
-	pnIndices[24] = 2; pnIndices[25] = 7; pnIndices[26] = 6;
-	//ⓙ 옆면(Left) 사각형의 아래쪽 삼각형
-	pnIndices[27] = 3; pnIndices[28] = 7; pnIndices[29] = 2;
-	//ⓚ 옆면(Right) 사각형의 위쪽 삼각형
-	pnIndices[30] = 6; pnIndices[31] = 4; pnIndices[32] = 5;
-	//ⓛ 옆면(Right) 사각형의 아래쪽 삼각형
-	pnIndices[33] = 7; pnIndices[34] = 4; pnIndices[35] = 6;
+	UINT pnIndices[36] = {
+		// Front
+		0, 1, 2, 0, 2, 3,
+		// Back
+		4, 5, 6, 4, 6, 7,
+		// Left
+		8, 9, 10, 8, 10, 11,
+		// Right
+		12, 13, 14, 12, 14, 15,
+		// Top
+		16, 17, 18, 16, 18, 19,
+		// Bottom
+		20, 21, 22, 20, 22, 23
+	};
 
 	//인덱스 버퍼를 생성한다.
 	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pnIndices, sizeof(UINT)* m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
