@@ -197,7 +197,7 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[8];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[9];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -211,12 +211,12 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
 	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);
 
-	CD3DX12_DESCRIPTOR_RANGE texRange0(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
-	CD3DX12_DESCRIPTOR_RANGE texRange1(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
+	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
+	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
 
 	//디스크립터 테이블 이용하여 업로드
-	pd3dRootParameters[6].InitAsDescriptorTable(1, &texRange0); //쉐도우 맵
-	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange1); //텍스쳐 배열
+	pd3dRootParameters[6].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
+	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
 
 	auto staticSamplers = GetStaticSamplers();
 

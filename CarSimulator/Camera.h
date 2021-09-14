@@ -51,6 +51,7 @@ protected:
 	XMFLOAT4X4 m_xmf4x4Projection;
 
 	XMFLOAT4X4 m_xmf4x4CascadedProjection[3];
+	XMFLOAT4X4 m_xmf4x4CascadedViewProjection[3];
 
 	D3D12_VIEWPORT m_d3dViewport;
 	D3D12_RECT m_d3dScissorRect;
@@ -119,6 +120,7 @@ public:
 	void SetTimeLag(float fTimeLag) { m_fTimeLag = fTimeLag; }
 	float GetTimeLag() { return(m_fTimeLag); }XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
 	XMFLOAT4X4 GetProjectionMatrix() { return(m_xmf4x4Projection); }
+	XMFLOAT4X4* GetCascadedViewProjectionMatrix() { return m_xmf4x4CascadedViewProjection; }
 	D3D12_VIEWPORT GetViewport() { return(m_d3dViewport); }
 	D3D12_RECT GetScissorRect() { return(m_d3dScissorRect); }
 

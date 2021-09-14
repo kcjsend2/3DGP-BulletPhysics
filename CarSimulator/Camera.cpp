@@ -73,10 +73,17 @@ void CCamera::SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, f
 	m_d3dViewport.MaxDepth = fMaxZ;
 }
 
-void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance,
-	float fAspectRatio, float fFOVAngle)
+void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle)
 {
 	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if(i == 0)
+			m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance / 3 * (i + 1));
+		else
+			m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fFarPlaneDistance / 3 * i, fFarPlaneDistance / 3 * (i + 1));
+	}
 }
 
 void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up)
@@ -92,6 +99,10 @@ void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMF
 void CCamera::GenerateViewMatrix()
 {
 	m_xmf4x4View = Matrix4x4::LookAtLH(m_xmf3Position, m_xmf3LookAtWorld, m_xmf3Up);
+	for (int i = 0; i < 3; ++i)
+	{
+		m_xmf4x4CascadedViewProjection[i] = Matrix4x4::Multiply(m_xmf4x4CascadedViewProjection[i], m_xmf4x4View);
+	}
 }
 
 void CCamera::RegenerateViewMatrix()
@@ -114,6 +125,11 @@ void CCamera::RegenerateViewMatrix()
 	m_xmf4x4View._42 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Up);
 	m_xmf4x4View._43 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Look);
 
+	for (int i = 0; i < 3; ++i)
+	{
+		m_xmf4x4CascadedViewProjection[i] = Matrix4x4::Multiply(m_xmf4x4CascadedProjection[i], m_xmf4x4View);
+	}
+
 	//카메라 변환 행렬이 바뀔 때마다 절두체를 다시 생성한다(절두체는 월드 좌표계로 생성한다).
 	GenerateFrustum();
 }
@@ -128,6 +144,13 @@ void CCamera::GenerateFrustum()
 
 	//절두체를 카메라 변환 행렬의 역행렬로 변환한다(이제 절두체는 월드 좌표계로 표현된다).
 	m_xmFrustum.Transform(m_xmFrustum, xmmtxInversView);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		m_xmCascadedFrustum[i].CreateFromMatrix(m_xmCascadedFrustum[i], XMLoadFloat4x4(&m_xmf4x4CascadedProjection[i]));
+		m_xmFrustum.Transform(m_xmFrustum, xmmtxInversView);
+	}
+
 }
 
 bool CCamera::IsInFrustum(BoundingOrientedBox& xmBoundingBox)
