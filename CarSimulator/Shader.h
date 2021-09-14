@@ -90,7 +90,7 @@ public:
 			m_xmf4x4LightViewProj = xmf4x4LightViewProj;
 			m_xmf3ShadowCamPos = xmf3ShadowCamPos;
 			for (int i = 0; i < 3; ++i)
-				m_xmf4x4CascadedViewProj[i] = xmf4x4CascadedViewProj[i];
+				XMStoreFloat4x4(&m_xmf4x4CascadedViewProj[i], XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4CascadedViewProj[i])));
 		}
 
 		XMFLOAT4X4 m_xmf4x4ShadowTransform;
