@@ -67,7 +67,8 @@ void CCamera::SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, f
 {
 	m_d3dViewport.TopLeftX = float(xTopLeft);
 	m_d3dViewport.TopLeftY = float(yTopLeft);
-	m_d3dViewport.Width = float(nWidth); m_d3dViewport.Height = float(nHeight);
+	m_d3dViewport.Width = float(nWidth);
+	m_d3dViewport.Height = float(nHeight);
 	m_d3dViewport.MinDepth = fMinZ;
 	m_d3dViewport.MaxDepth = fMaxZ;
 }
@@ -78,8 +79,7 @@ void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlane
 	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
 }
 
-void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3
-	xmf3Up)
+void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up)
 {
 	m_xmf3Position = xmf3Position;
 	m_xmf3LookAtWorld = xmf3LookAt;

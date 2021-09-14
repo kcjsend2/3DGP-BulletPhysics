@@ -476,7 +476,11 @@ void CGameFramework::FrameAdvance()
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_pd3dSrvDescriptorHeap.Get() };
 	m_pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
+	m_pd3dCommandList->SetGraphicsRootSignature(m_pScene->GetGraphicsRootSignature());
+	Update();
 
+	// ½¦µµ¿ì ¸Ê ·»´õ
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Change to DEPTH_WRITE.
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(),
 		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
@@ -490,18 +494,18 @@ void CGameFramework::FrameAdvance()
 	// Note the active PSO also must specify a render target count of 0.
 	m_pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &m_pShadowMap->GetDsv());
 
-	m_pd3dCommandList->SetGraphicsRootSignature(m_pScene->GetGraphicsRootSignature());
 
 	m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap->GetViewport());
 	m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap->GetScissorRect());
-
-	Update();
 
 	m_pShadowMap->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get());
 
 	// Change back to GENERIC_READ so we can read the texture in a shader.
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
-	
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// ·»´õÅ¸°Ù ·»´õ
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
@@ -530,6 +534,7 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	hResult = m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };

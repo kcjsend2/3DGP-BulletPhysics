@@ -28,6 +28,7 @@ protected:
 	XMFLOAT3 m_xmf3Look;
 
 	BoundingFrustum m_xmFrustum;
+	BoundingFrustum m_xmCascadedFrustum[3];
 
 	//카메라가 x-축, z-축, y-축으로 얼마만큼 회전했는 가를 나타내는 각도이다.
 	float m_fPitch;
@@ -48,6 +49,9 @@ protected:
 
 	XMFLOAT4X4 m_xmf4x4View;
 	XMFLOAT4X4 m_xmf4x4Projection;
+
+	XMFLOAT4X4 m_xmf4x4CascadedProjection[3];
+
 	D3D12_VIEWPORT m_d3dViewport;
 	D3D12_RECT m_d3dScissorRect;
 
