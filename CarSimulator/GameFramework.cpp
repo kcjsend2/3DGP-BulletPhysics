@@ -440,6 +440,7 @@ void CGameFramework::Update()
 {
 	ProcessInput();
 	if (m_pScene) m_pScene->Update(m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), m_pPlayer->GetPosition());
+	m_pShadowMap->GetShader()->SetCascadedMatrix(m_pCamera->GetCascadedViewProjectionMatrix());
 }
 
 void CGameFramework::WaitForGpuComplete()
