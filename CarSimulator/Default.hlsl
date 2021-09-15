@@ -14,7 +14,6 @@ struct VS_DEFAULT_OUTPUT
     float4 position_shadow : POSITION0;
     float3 position_w : POSITION1;
     float3 normal : NORMAL;
-    float3 color : COLOR;
 };
 
 
@@ -25,28 +24,6 @@ VS_DEFAULT_OUTPUT VS_Default(VS_DEFAULT_INPUT input)
     output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
     output.position_shadow = mul(float4(output.position_w, 1.0f), gmtxShadowTransform);
-    
-    for (int i = 0; i < 3; ++i)
-    {
-        float4 Cascaded = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxCascadedViewProj[i]);
-        float3 base = float3(0.0f, 0.0f, 0.0f);
-        Cascaded = Cascaded / Cascaded.w;
-        if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
-        {
-            if (i == 0)
-            {
-                output.color = float4(1.0f, 0.0f, 0.0f, 0.0f);
-            }
-            if (i == 1)
-            {
-                output.color = float4(0.0f, 1.0f, 0.0f, 0.0f);
-            }
-            if (i == 2)
-            {
-                output.color = float4(0.0f, 0.0f, 1.0f, 0.0f);
-            }
-        }
-    }
     
     return (output);
 }
@@ -81,7 +58,34 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     
     cColor.a = material.DiffuseAlbedo.a;
     
-    cColor = float4(input.color, 0.0f);
+    
+    float4 debugColor;
+    for (int i = 0; i < 3; ++i)
+    {
+        float4 Cascaded = mul(float4(input.position_w, 1.0f), gmtxCascadedViewProj[i]);
+        float3 base = float3(0.0f, 0.0f, 0.0f);
+        Cascaded = Cascaded / Cascaded.w;
+        if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
+        {
+            if (i == 0)
+            {
+                debugColor = float4(1.0f, 0.1f, 0.1f, 1.0f);
+                break;
+            }
+            if (i == 1)
+            {
+                debugColor = float4(0.1f, 1.0f, 0.1f, 1.0f);
+                break;
+            }
+            if (i == 2)
+            {
+                debugColor = float4(0.1f, 0.1f, 1.0f, 1.0f);
+                break;
+            }
+        }
+    }
+    
+    cColor *= debugColor;
     
     return (cColor);
 }

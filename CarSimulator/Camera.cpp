@@ -84,10 +84,9 @@ void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlane
 {
 	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
 
-	for (int i = 0; i < 3; ++i)
-	{
-		m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance / 3 * (i + 1));
-	}
+	m_xmf4x4CascadedProjection[0] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, 500);
+	m_xmf4x4CascadedProjection[1] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, 1000);
+	m_xmf4x4CascadedProjection[2] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, 5000);
 }
 
 void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up)
