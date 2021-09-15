@@ -86,7 +86,7 @@ void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlane
 
 	for (int i = 0; i < 3; ++i)
 	{
-		m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
+		m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance / 3 * (i + 1));
 	}
 }
 

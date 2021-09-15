@@ -19,8 +19,8 @@ cbuffer cbShadowInfo : register(b3)
 {
     matrix gmtxShadowTransform;
     matrix gmtxLightViewProj;
-    float3 ShadowCameraPos;
     matrix gmtxCascadedViewProj[3];
+    float3 ShadowCameraPos;
 }
 
 Texture2D gShadowMap : register(t0);
