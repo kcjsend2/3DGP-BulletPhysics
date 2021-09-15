@@ -28,10 +28,11 @@ VS_DEFAULT_OUTPUT VS_Default(VS_DEFAULT_INPUT input)
     
     for (int i = 0; i < 3; ++i)
     {
-        float4 Cascaded = mul(float4(output.position_w, 1.0f), gmtxCascadedViewProj[i]);
-        if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
+        float4 Cascaded = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxCascadedViewProj[i]);
+        float3 base = float3(0.0f, 0.0f, 0.0f);
+        if (Cascaded.x / Cascaded.w > -1.0f && Cascaded.x / Cascaded.w < 1.0f && Cascaded.z / Cascaded.w > -1.0f && Cascaded.z / Cascaded.w < 1.0f && Cascaded.y / Cascaded.w > -1.0f && Cascaded.y / Cascaded.w < 1.0f)
         {
-            if(i == 0)
+            if (i == 0)
             {
                 output.color = float4(1.0f, 0.0f, 0.0f, 0.0f);
             }

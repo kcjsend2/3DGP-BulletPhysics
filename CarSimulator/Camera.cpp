@@ -34,6 +34,13 @@ CCamera::CCamera(CCamera* pCamera)
 		//카메라가 없으면 기본 정보를 설정한다.
 		m_xmf4x4View = Matrix4x4::Identity();
 		m_xmf4x4Projection = Matrix4x4::Identity();
+
+		for (int i = 0; i < 3; ++i)
+		{
+			m_xmf4x4CascadedProjection[i] = Matrix4x4::Identity();
+			m_xmf4x4CascadedViewProjection[i] = Matrix4x4::Identity();
+		}
+
 		m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
 		m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT };
 		m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -79,10 +86,7 @@ void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlane
 
 	for (int i = 0; i < 3; ++i)
 	{
-		if(i == 0)
-			m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance / 3 * (i + 1));
-		else
-			m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fFarPlaneDistance / 3 * i, fFarPlaneDistance / 3 * (i + 1));
+		m_xmf4x4CascadedProjection[i] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
 	}
 }
 
@@ -101,7 +105,13 @@ void CCamera::GenerateViewMatrix()
 	m_xmf4x4View = Matrix4x4::LookAtLH(m_xmf3Position, m_xmf3LookAtWorld, m_xmf3Up);
 	for (int i = 0; i < 3; ++i)
 	{
-		m_xmf4x4CascadedViewProjection[i] = Matrix4x4::Multiply(m_xmf4x4CascadedViewProjection[i], m_xmf4x4View);
+		XMFLOAT4X4 xmf4x4View;
+		XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
+
+		XMFLOAT4X4 xmf4x4CascadedProjection;
+		XMStoreFloat4x4(&xmf4x4CascadedProjection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4CascadedProjection[i])));
+
+		XMStoreFloat4x4(&m_xmf4x4CascadedViewProjection[i], XMLoadFloat4x4(&Matrix4x4::Multiply((XMFLOAT4X4&)xmf4x4CascadedProjection, (XMFLOAT4X4&)xmf4x4View)));
 	}
 }
 
@@ -127,7 +137,13 @@ void CCamera::RegenerateViewMatrix()
 
 	for (int i = 0; i < 3; ++i)
 	{
-		m_xmf4x4CascadedViewProjection[i] = Matrix4x4::Multiply(m_xmf4x4CascadedProjection[i], m_xmf4x4View);
+		XMFLOAT4X4 xmf4x4View;
+		XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
+
+		XMFLOAT4X4 xmf4x4CascadedProjection;
+		XMStoreFloat4x4(&xmf4x4CascadedProjection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4CascadedProjection[i])));
+
+		XMStoreFloat4x4(&m_xmf4x4CascadedViewProjection[i], XMLoadFloat4x4(&Matrix4x4::Multiply((XMFLOAT4X4&)xmf4x4CascadedProjection, (XMFLOAT4X4&)xmf4x4View)));
 	}
 
 	//카메라 변환 행렬이 바뀔 때마다 절두체를 다시 생성한다(절두체는 월드 좌표계로 생성한다).
@@ -144,12 +160,6 @@ void CCamera::GenerateFrustum()
 
 	//절두체를 카메라 변환 행렬의 역행렬로 변환한다(이제 절두체는 월드 좌표계로 표현된다).
 	m_xmFrustum.Transform(m_xmFrustum, xmmtxInversView);
-
-	for (int i = 0; i < 3; ++i)
-	{
-		m_xmCascadedFrustum[i].CreateFromMatrix(m_xmCascadedFrustum[i], XMLoadFloat4x4(&m_xmf4x4CascadedProjection[i]));
-		m_xmFrustum.Transform(m_xmFrustum, xmmtxInversView);
-	}
 
 }
 
