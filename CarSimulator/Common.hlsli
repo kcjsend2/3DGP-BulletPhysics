@@ -12,13 +12,14 @@ cbuffer cbCameraInfo : register(b1)
 cbuffer cbLightInfo : register(b2)
 {
     int nLights : packoffset(c0);
-    //size : 1
+    int nShadowIndex : packoffset(c4);
+    //size : 2
 }
 
 cbuffer cbShadowInfo : register(b3)
 {
     matrix gmtxShadowTransform[3];
-    matrix gmtxLightViewProj;
+    matrix gmtxLightViewProj[3];
     matrix gmtxCascadedViewProj[3];
     float3 ShadowCameraPos;
 }

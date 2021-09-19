@@ -88,18 +88,19 @@ public:
 
 	struct CB_SHADOW
 	{
-		CB_SHADOW(XMFLOAT4X4* xmf4x4ShadowTransform, XMFLOAT4X4 xmf4x4LightViewProj, XMFLOAT3 xmf3ShadowCamPos, XMFLOAT4X4* xmf4x4CascadedViewProj)
+		CB_SHADOW(XMFLOAT4X4* xmf4x4ShadowTransform, XMFLOAT4X4* xmf4x4LightViewProj, XMFLOAT3 xmf3ShadowCamPos, XMFLOAT4X4* xmf4x4CascadedViewProj)
 		{
 			for (int i = 0; i < 3; ++i)
 				m_xmf4x4ShadowTransform[i] = xmf4x4ShadowTransform[i];
-			m_xmf4x4LightViewProj = xmf4x4LightViewProj;
+			for (int i = 0; i < 3; ++i)
+				m_xmf4x4LightViewProj[i] = xmf4x4LightViewProj[i];
 			m_xmf3ShadowCamPos = xmf3ShadowCamPos;
 			for (int i = 0; i < 3; ++i)
 				m_xmf4x4CascadedViewProj[i] = xmf4x4CascadedViewProj[i];
 		}
 
 		XMFLOAT4X4 m_xmf4x4ShadowTransform[3];
-		XMFLOAT4X4 m_xmf4x4LightViewProj;
+		XMFLOAT4X4 m_xmf4x4LightViewProj[3];
 		XMFLOAT4X4 m_xmf4x4CascadedViewProj[3];
 		XMFLOAT3 m_xmf3ShadowCamPos;
 	};
@@ -112,6 +113,7 @@ protected:
 	std::vector<CGameObject*> m_vpInstancingGameObjects;
 	ID3D12PipelineState* m_pd3dInstancingPipelineState;
 	XMFLOAT4X4 m_xmf4x4ShadowTransform[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
+	XMFLOAT4X4 m_xmf4x4LightViewProj[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 };
 
 class CPlayerShader : public CShader

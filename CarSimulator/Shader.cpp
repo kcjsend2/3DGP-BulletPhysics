@@ -830,15 +830,15 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	XMMATRIX S = lightView * lightProj;
 
-	XMFLOAT4X4 xmf4x4LightViewProj;
-	XMStoreFloat4x4(&xmf4x4LightViewProj, XMMatrixTranspose(S));
+	XMStoreFloat4x4(&m_xmf4x4LightViewProj[nShadowIndex], XMMatrixTranspose(S));
 
 	S = S * T;
 
 	XMStoreFloat4x4(&m_xmf4x4ShadowTransform[nShadowIndex], XMMatrixTranspose(S));
 
-	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, xmf4x4LightViewProj, m_pLight->GetPosition(), m_xmf4x4CascadedViewProj};
+	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, m_xmf4x4LightViewProj, m_pLight->GetPosition(), m_xmf4x4CascadedViewProj};
 
-	m_ubShadowCB->CopyData(0, cbShadow); 
+	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &nShadowIndex, 1);
+	m_ubShadowCB->CopyData(0, cbShadow);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());
 }

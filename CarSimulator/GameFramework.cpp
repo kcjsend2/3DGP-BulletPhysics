@@ -341,21 +341,17 @@ void CGameFramework::BuildObjects()
 	WaitForGpuComplete();
 
 	Update();
+	// 쉐도우맵은 모든 오브젝트를 그려야한다.
+	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
+	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer.get());
 
-	for (int i = 0; i < 3; ++i)
+	for (int j = 0; j< 4; ++j)
 	{
-		// 쉐도우맵은 모든 오브젝트를 그려야한다.
-		m_pShadowMap[i]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
-		m_pShadowMap[i]->GetShader()->GetObjectVector()->push_back(m_pPlayer.get());
-
-		for (int j = 0; j< 4; ++j)
-		{
-			m_pShadowMap[i]->GetShader()->GetObjectVector()->push_back(m_pPlayer->GetWheels()[j]);
-		}
-
-		auto pInstancingShader = m_pScene->GetInstancingShader();
-		m_pShadowMap[i]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjects()[0]);
+		m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer->GetWheels()[j]);
 	}
+
+	auto pInstancingShader = m_pScene->GetInstancingShader();
+	m_pShadowMap[0]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjects()[0]);
 	m_GameTimer.Reset();
 }
 
@@ -513,11 +509,10 @@ void CGameFramework::FrameAdvance()
 		// Note the active PSO also must specify a render target count of 0.
 		m_pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &m_pShadowMap[i]->GetDsv());
 
-
 		m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap[i]->GetViewport());
 		m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap[i]->GetScissorRect());
 
-		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 400 * (i + 1), i);
+		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 50, i); // 50 - 400 - 1750
 
 		// Change back to GENERIC_READ so we can read the texture in a shader.
 		m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap[i]->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));

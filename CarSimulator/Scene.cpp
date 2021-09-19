@@ -202,7 +202,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[2].InitAsConstants(1, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[2].InitAsConstants(2, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	//UploadBuffer 클래스를 이용하여 업로드
 	pd3dRootParameters[3].InitAsConstantBufferView(3);
