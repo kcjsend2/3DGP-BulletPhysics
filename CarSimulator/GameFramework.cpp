@@ -316,7 +316,7 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
 	for(int i = 0; i < 3; ++i)
-		m_pShadowMap[i] = make_unique<CShadowMap>(m_pd3dDevice.Get(), 10000, 10000);
+		m_pShadowMap[i] = make_unique<CShadowMap>(m_pd3dDevice.Get(), 2000, 2000);
 
 	BuildDescriptorHeaps();
 
