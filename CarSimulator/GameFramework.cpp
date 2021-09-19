@@ -231,7 +231,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 7;
+	srvHeapDesc.NumDescriptors = 9;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -526,7 +526,6 @@ void CGameFramework::FrameAdvance()
 
 	// ·»´õÅ¸°Ù ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));

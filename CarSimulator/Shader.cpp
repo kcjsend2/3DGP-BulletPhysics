@@ -403,6 +403,8 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 {
 	float fHeight = 10.0f, fLength = 10.0f, fDepth = 10.0f;
 
+	UINT nSrvDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
@@ -419,7 +421,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 1, 7);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 

@@ -211,12 +211,12 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
 	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);
 
-	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
-	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
+	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 3개, 0 ~ 2
+	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 6개, 3 ~ 8
 
 	//디스크립터 테이블 이용하여 업로드
 	pd3dRootParameters[6].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵 - 6, 7, 8
-	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열 - 9, 10, 11
+	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열 - 9, 10, 11, 12, 13, 14
 
 	auto staticSamplers = GetStaticSamplers();
 
