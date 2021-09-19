@@ -10,8 +10,7 @@ struct VS_INSTANCING_INPUT
 struct VS_INSTANCING_OUTPUT
 {
     float4 position : SV_POSITION;
-    float4 position_shadow : POSITION0;
-    float3 position_w : POSITION1;
+    float3 position_w : POSITION;
     float3 normal : NORMAL;
     float2 uv : TEXCOORD;
     int InstanceID : SV_InstanceID;
@@ -23,7 +22,6 @@ VS_INSTANCING_OUTPUT VS_Instancing(VS_INSTANCING_INPUT input, uint InstanceID : 
     output.position = mul(mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject), gmtxViewProj);
     output.position_w = mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gGameObjectInfos[InstanceID].m_mtxGameObject).xyz);
-    output.position_shadow = mul(float4(output.position_w, 1.0f), gmtxShadowTransform);
     output.uv = input.uv;
     output.InstanceID = InstanceID;
     
@@ -34,7 +32,22 @@ float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
 {
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
-    shadowFactor[0] = CalcShadowFactor(input.position_shadow);
+    
+    int cascadedIndex = 0;
+    for (int i = 0; i < 3; ++i)
+    {
+        float4 Cascaded = mul(float4(input.position_w, 1.0f), gmtxCascadedViewProj[i]);
+        float3 base = float3(0.0f, 0.0f, 0.0f);
+        Cascaded = Cascaded / Cascaded.w;
+        if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
+        {
+            cascadedIndex = i;
+            break;
+        }
+    }
+    
+    float4 position_shadow = mul(float4(input.position_w, 1.0f), gmtxShadowTransform[cascadedIndex]);
+    shadowFactor[0] = CalcShadowFactor(position_shadow, cascadedIndex);
     
     float3 toEyeW = normalize(cameraPos - input.position_w);
     

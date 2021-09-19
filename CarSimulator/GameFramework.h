@@ -76,7 +76,7 @@ private:
 	UINT64 m_nFenceValues[m_nSwapChainBuffers];
 	std::unique_ptr<CScene> m_pScene;
 
-	std::unique_ptr<CShadowMap> m_pShadowMap;
+	std::unique_ptr<CShadowMap> m_pShadowMap[3];
 
 public:
 	CCamera* m_pCamera = NULL;

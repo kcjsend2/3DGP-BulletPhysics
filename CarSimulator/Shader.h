@@ -75,8 +75,8 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer);
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer, float fBoundary, int nShadowIndex);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos, float fBoundary, int nShadowIndex);
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
 	void SetCascadedMatrix(XMFLOAT4X4* xmf4x4CascadedViewProj)
 	{
@@ -88,16 +88,17 @@ public:
 
 	struct CB_SHADOW
 	{
-		CB_SHADOW(XMFLOAT4X4 xmf4x4ShadowTransform, XMFLOAT4X4 xmf4x4LightViewProj, XMFLOAT3 xmf3ShadowCamPos, XMFLOAT4X4* xmf4x4CascadedViewProj)
+		CB_SHADOW(XMFLOAT4X4* xmf4x4ShadowTransform, XMFLOAT4X4 xmf4x4LightViewProj, XMFLOAT3 xmf3ShadowCamPos, XMFLOAT4X4* xmf4x4CascadedViewProj)
 		{
-			m_xmf4x4ShadowTransform = xmf4x4ShadowTransform;
+			for (int i = 0; i < 3; ++i)
+				m_xmf4x4ShadowTransform[i] = xmf4x4ShadowTransform[i];
 			m_xmf4x4LightViewProj = xmf4x4LightViewProj;
 			m_xmf3ShadowCamPos = xmf3ShadowCamPos;
 			for (int i = 0; i < 3; ++i)
-				XMStoreFloat4x4(&m_xmf4x4CascadedViewProj[i], XMLoadFloat4x4(&xmf4x4CascadedViewProj[i]));
+				m_xmf4x4CascadedViewProj[i] = xmf4x4CascadedViewProj[i];
 		}
 
-		XMFLOAT4X4 m_xmf4x4ShadowTransform;
+		XMFLOAT4X4 m_xmf4x4ShadowTransform[3];
 		XMFLOAT4X4 m_xmf4x4LightViewProj;
 		XMFLOAT4X4 m_xmf4x4CascadedViewProj[3];
 		XMFLOAT3 m_xmf3ShadowCamPos;
@@ -110,6 +111,7 @@ protected:
 	std::vector<CGameObject*> m_vpGameObjects;
 	std::vector<CGameObject*> m_vpInstancingGameObjects;
 	ID3D12PipelineState* m_pd3dInstancingPipelineState;
+	XMFLOAT4X4 m_xmf4x4ShadowTransform[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 };
 
 class CPlayerShader : public CShader

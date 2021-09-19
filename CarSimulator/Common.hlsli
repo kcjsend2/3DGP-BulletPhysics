@@ -17,14 +17,14 @@ cbuffer cbLightInfo : register(b2)
 
 cbuffer cbShadowInfo : register(b3)
 {
-    matrix gmtxShadowTransform;
+    matrix gmtxShadowTransform[3];
     matrix gmtxLightViewProj;
     matrix gmtxCascadedViewProj[3];
     float3 ShadowCameraPos;
 }
 
-Texture2D gShadowMap : register(t0);
-Texture2D gTextureMaps[6] : register(t1);
+Texture2D gShadowMap[3] : register(t0);
+Texture2D gTextureMaps[6] : register(t3);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {
@@ -43,7 +43,7 @@ SamplerState gsamAnisotropicWrap : register(s4);
 SamplerState gsamAnisotropicClamp : register(s5);
 SamplerComparisonState gsamShadow : register(s6);
 
-float CalcShadowFactor(float4 shadowPosH)
+float CalcShadowFactor(float4 shadowPosH, uint shadowIndex)
 {
     // Complete projection by doing division by w.
     shadowPosH.xyz /= shadowPosH.w;
@@ -52,7 +52,7 @@ float CalcShadowFactor(float4 shadowPosH)
     float depth = shadowPosH.z;
 
     uint width, height, numMips;
-    gShadowMap.GetDimensions(0, width, height, numMips);
+    gShadowMap[shadowIndex].GetDimensions(0, width, height, numMips);
 
     // Texel size.
     float dx = 1.0f / (float) width;
@@ -68,7 +68,7 @@ float CalcShadowFactor(float4 shadowPosH)
     [unroll]
     for (int i = 0; i < 9; ++i)
     {
-        percentLit += gShadowMap.SampleCmpLevelZero(gsamShadow, shadowPosH.xy + offsets[i], depth).r;
+        percentLit += gShadowMap[shadowIndex].SampleCmpLevelZero(gsamShadow, shadowPosH.xy + offsets[i], depth).r;
     }
     
     return percentLit / 9.0f;
