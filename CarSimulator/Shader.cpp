@@ -809,8 +809,6 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&xmf3TargetPos), lightView));
 
 	// Ortho frustum in light space encloses scene.
-
-	// 0¹ø ½¦µµ¿ì ¸Ê
 	float l = xmf3CenterLS.x - fBoundary;
 	float b = xmf3CenterLS.y - fBoundary;
 	float n = xmf3CenterLS.z - fBoundary;
@@ -838,7 +836,7 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, m_xmf4x4LightViewProj, m_pLight->GetPosition(), m_xmf4x4CascadedViewProj};
 
-	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &nShadowIndex, 1);
 	m_ubShadowCB->CopyData(0, cbShadow);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &nShadowIndex, 1);
 }

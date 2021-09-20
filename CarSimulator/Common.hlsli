@@ -13,7 +13,6 @@ cbuffer cbLightInfo : register(b2)
 {
     int nLights : packoffset(c0);
     int nShadowIndex : packoffset(c4);
-    //size : 2
 }
 
 cbuffer cbShadowInfo : register(b3)

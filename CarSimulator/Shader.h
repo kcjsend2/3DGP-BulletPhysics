@@ -107,7 +107,7 @@ public:
 
 protected:
 	CLight* m_pLight = NULL;
-	XMFLOAT4X4 m_xmf4x4CascadedViewProj[3];
+	XMFLOAT4X4 m_xmf4x4CascadedViewProj[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 	UploadBuffer<CB_SHADOW>* m_ubShadowCB;
 	std::vector<CGameObject*> m_vpGameObjects;
 	std::vector<CGameObject*> m_vpInstancingGameObjects;

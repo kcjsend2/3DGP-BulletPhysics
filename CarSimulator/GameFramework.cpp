@@ -493,6 +493,7 @@ void CGameFramework::FrameAdvance()
 	// 쉐도우 맵 렌더
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
+	// 오류 - 가장 먼저 렌더링한 정밀도의 쉐도우맵으로 모든 쉐도우맵이 통일된다.
 	// 0번이 가장 세밀한 쉐도우맵
 	for (int i = 0; i < 3; ++i)
 	{
@@ -512,7 +513,7 @@ void CGameFramework::FrameAdvance()
 		m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap[i]->GetViewport());
 		m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap[i]->GetScissorRect());
 
-		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 50, i); // 50 - 400 - 1750
+		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 50 * pow((i + 1), 3), i); // 50 - 400 - 1750
 
 		// Change back to GENERIC_READ so we can read the texture in a shader.
 		m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap[i]->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));

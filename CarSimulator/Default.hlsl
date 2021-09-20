@@ -41,7 +41,7 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
         if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
         {
             cascadedIndex = i;
-            break;
+            break; 
         }
     }
     
