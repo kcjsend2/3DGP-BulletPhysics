@@ -449,8 +449,6 @@ void CGameFramework::Update()
 {
 	ProcessInput();
 	if (m_pScene) m_pScene->Update(m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), m_pPlayer->GetPosition());
-	for(int i = 0; i < 3; ++i)
-		m_pShadowMap[i]->GetShader()->SetCascadedMatrix(m_pCamera->GetCascadedViewProjectionMatrix());
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -513,7 +511,7 @@ void CGameFramework::FrameAdvance()
 		m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap[i]->GetViewport());
 		m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap[i]->GetScissorRect());
 
-		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 50 * (i + 1), i); // 50 - 100 - 150
+		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 50 * pow((i + 1), 3), i); // 50 - 400 - 1350
 
 		// Change back to GENERIC_READ so we can read the texture in a shader.
 		m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap[i]->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));

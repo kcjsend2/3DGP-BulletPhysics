@@ -78,36 +78,27 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer, float fBoundary, int nShadowIndex);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos, float fBoundary, int nShadowIndex);
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
-	void SetCascadedMatrix(XMFLOAT4X4* xmf4x4CascadedViewProj)
-	{
-		for (int i = 0; i < 3; ++i)
-			m_xmf4x4CascadedViewProj[i] = xmf4x4CascadedViewProj[i];
-	}
 	std::vector<CGameObject*>* GetObjectVector() { return &m_vpGameObjects; }
 	std::vector<CGameObject*>* GetInstancingObjectVector() { return &m_vpInstancingGameObjects; }
 
 	struct CB_SHADOW
 	{
-		CB_SHADOW(XMFLOAT4X4* xmf4x4ShadowTransform, XMFLOAT4X4* xmf4x4LightViewProj, XMFLOAT3 xmf3ShadowCamPos, XMFLOAT4X4* xmf4x4CascadedViewProj)
+		CB_SHADOW(XMFLOAT4X4* xmf4x4ShadowTransform, XMFLOAT4X4* xmf4x4LightViewProj, XMFLOAT3 xmf3ShadowCamPos)
 		{
 			for (int i = 0; i < 3; ++i)
 				m_xmf4x4ShadowTransform[i] = xmf4x4ShadowTransform[i];
 			for (int i = 0; i < 3; ++i)
 				m_xmf4x4LightViewProj[i] = xmf4x4LightViewProj[i];
 			m_xmf3ShadowCamPos = xmf3ShadowCamPos;
-			for (int i = 0; i < 3; ++i)
-				m_xmf4x4CascadedViewProj[i] = xmf4x4CascadedViewProj[i];
 		}
 
 		XMFLOAT4X4 m_xmf4x4ShadowTransform[3];
 		XMFLOAT4X4 m_xmf4x4LightViewProj[3];
-		XMFLOAT4X4 m_xmf4x4CascadedViewProj[3];
 		XMFLOAT3 m_xmf3ShadowCamPos;
 	};
 
 protected:
 	CLight* m_pLight = NULL;
-	XMFLOAT4X4 m_xmf4x4CascadedViewProj[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 	UploadBuffer<CB_SHADOW>* m_ubShadowCB;
 	std::vector<CGameObject*> m_vpGameObjects;
 	std::vector<CGameObject*> m_vpInstancingGameObjects;

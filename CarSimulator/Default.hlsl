@@ -31,12 +31,11 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     
     float4 debugColor;
-    int cascadedIndex = 0;
+    int cascadedIndex = 2;
     
     for (int i = 0; i < 3; ++i)
     {
-        float4 Cascaded = mul(float4(input.position_w, 1.0f), gmtxCascadedViewProj[i]);
-        float3 base = float3(0.0f, 0.0f, 0.0f);
+        float4 Cascaded = mul(float4(input.position_w, 1.0f), gmtxLightViewProj[i]);
         Cascaded = Cascaded / Cascaded.w;
         if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
         {

@@ -19,7 +19,6 @@ cbuffer cbShadowInfo : register(b3)
 {
     matrix gmtxShadowTransform[3];
     matrix gmtxLightViewProj[3];
-    matrix gmtxCascadedViewProj[3];
     float3 ShadowCameraPos;
 }
 

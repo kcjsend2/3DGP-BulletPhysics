@@ -34,13 +34,6 @@ CCamera::CCamera(CCamera* pCamera)
 		//카메라가 없으면 기본 정보를 설정한다.
 		m_xmf4x4View = Matrix4x4::Identity();
 		m_xmf4x4Projection = Matrix4x4::Identity();
-
-		for (int i = 0; i < 3; ++i)
-		{
-			m_xmf4x4CascadedProjection[i] = Matrix4x4::Identity();
-			m_xmf4x4CascadedViewProjection[i] = Matrix4x4::Identity();
-		}
-
 		m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
 		m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT };
 		m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -83,10 +76,6 @@ void CCamera::SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, f
 void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle)
 {
 	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
-
-	m_xmf4x4CascadedProjection[0] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, 500);
-	m_xmf4x4CascadedProjection[1] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, 1000);
-	m_xmf4x4CascadedProjection[2] = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, 5000);
 }
 
 void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up)
@@ -102,16 +91,6 @@ void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMF
 void CCamera::GenerateViewMatrix()
 {
 	m_xmf4x4View = Matrix4x4::LookAtLH(m_xmf3Position, m_xmf3LookAtWorld, m_xmf3Up);
-	for (int i = 0; i < 3; ++i)
-	{
-		XMFLOAT4X4 xmf4x4View;
-		XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
-
-		XMFLOAT4X4 xmf4x4CascadedProjection;
-		XMStoreFloat4x4(&xmf4x4CascadedProjection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4CascadedProjection[i])));
-
-		XMStoreFloat4x4(&m_xmf4x4CascadedViewProjection[i], XMLoadFloat4x4(&Matrix4x4::Multiply((XMFLOAT4X4&)xmf4x4CascadedProjection, (XMFLOAT4X4&)xmf4x4View)));
-	}
 }
 
 void CCamera::RegenerateViewMatrix()
@@ -133,18 +112,6 @@ void CCamera::RegenerateViewMatrix()
 	m_xmf4x4View._41 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Right);
 	m_xmf4x4View._42 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Up);
 	m_xmf4x4View._43 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Look);
-
-	for (int i = 0; i < 3; ++i)
-	{
-		XMFLOAT4X4 xmf4x4View;
-		XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
-
-		XMFLOAT4X4 xmf4x4CascadedProjection;
-		XMStoreFloat4x4(&xmf4x4CascadedProjection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4CascadedProjection[i])));
-
-		XMStoreFloat4x4(&m_xmf4x4CascadedViewProjection[i], XMLoadFloat4x4(&Matrix4x4::Multiply((XMFLOAT4X4&)xmf4x4CascadedProjection, (XMFLOAT4X4&)xmf4x4View)));
-	}
-
 	//카메라 변환 행렬이 바뀔 때마다 절두체를 다시 생성한다(절두체는 월드 좌표계로 생성한다).
 	GenerateFrustum();
 }
