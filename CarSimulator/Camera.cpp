@@ -67,19 +67,18 @@ void CCamera::SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, f
 {
 	m_d3dViewport.TopLeftX = float(xTopLeft);
 	m_d3dViewport.TopLeftY = float(yTopLeft);
-	m_d3dViewport.Width = float(nWidth); m_d3dViewport.Height = float(nHeight);
+	m_d3dViewport.Width = float(nWidth);
+	m_d3dViewport.Height = float(nHeight);
 	m_d3dViewport.MinDepth = fMinZ;
 	m_d3dViewport.MaxDepth = fMaxZ;
 }
 
-void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance,
-	float fAspectRatio, float fFOVAngle)
+void CCamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle)
 {
 	m_xmf4x4Projection = Matrix4x4::PerspectiveFovLH(XMConvertToRadians(fFOVAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
 }
 
-void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3
-	xmf3Up)
+void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up)
 {
 	m_xmf3Position = xmf3Position;
 	m_xmf3LookAtWorld = xmf3LookAt;
@@ -113,7 +112,6 @@ void CCamera::RegenerateViewMatrix()
 	m_xmf4x4View._41 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Right);
 	m_xmf4x4View._42 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Up);
 	m_xmf4x4View._43 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Look);
-
 	//카메라 변환 행렬이 바뀔 때마다 절두체를 다시 생성한다(절두체는 월드 좌표계로 생성한다).
 	GenerateFrustum();
 }
@@ -128,6 +126,7 @@ void CCamera::GenerateFrustum()
 
 	//절두체를 카메라 변환 행렬의 역행렬로 변환한다(이제 절두체는 월드 좌표계로 표현된다).
 	m_xmFrustum.Transform(m_xmFrustum, xmmtxInversView);
+
 }
 
 bool CCamera::IsInFrustum(BoundingOrientedBox& xmBoundingBox)

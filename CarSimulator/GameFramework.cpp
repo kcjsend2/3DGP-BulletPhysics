@@ -216,10 +216,10 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 	m_nRtvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//렌더 타겟 서술자 힙의 원소의 크기를 저장한다.
 
-	d3dDescriptorHeapDesc.NumDescriptors = 2;
+	d3dDescriptorHeapDesc.NumDescriptors = 4;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, IID_PPV_ARGS(&m_pd3dDsvDescriptorHeap));
-	//깊이-스텐실 서술자 힙(서술자의 개수는 2)을 생성한다.
+	//깊이-스텐실 서술자 힙(서술자의 개수는 4)을 생성한다.
 
 	m_nDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	//깊이-스텐실 서술자 힙의 원소의 크기를 저장한다.
@@ -231,7 +231,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 7;
+	srvHeapDesc.NumDescriptors = 9;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -252,7 +252,13 @@ void CGameFramework::BuildDescriptorHeaps()
 	hCpuDsv.ptr = dsvCpuStart.ptr + m_nDsvDescriptorIncrementSize;
 
 	CreateDepthStencilView();
-	m_pShadowMap->BuildDescriptors(hCpuSrv, hGpuSrv, hCpuDsv);
+	for (int i = 0; i < 3; ++i)
+	{
+		m_pShadowMap[i]->BuildDescriptors(hCpuSrv, hGpuSrv, hCpuDsv);
+		hCpuSrv.ptr += m_nSrvDescriptorIncrementSize;
+		hGpuSrv.ptr += m_nSrvDescriptorIncrementSize;
+		hCpuDsv.ptr += m_nDsvDescriptorIncrementSize;
+	}
 }
 
 //스왑체인의 각 후면 버퍼에 대한 렌더 타겟 뷰를 생성한다.
@@ -309,7 +315,9 @@ void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
-	m_pShadowMap = make_unique<CShadowMap>(m_pd3dDevice.Get(), 10000, 10000);
+	for(int i = 0; i < 3; ++i)
+		m_pShadowMap[i] = make_unique<CShadowMap>(m_pd3dDevice.Get(), 2000, 2000);
+
 	BuildDescriptorHeaps();
 
 	m_pScene = make_unique<CScene>();
@@ -319,8 +327,11 @@ void CGameFramework::BuildObjects()
 	
 	CShadowShader* pShadowShader = new CShadowShader();
 	pShadowShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
-	m_pShadowMap->SetShader(pShadowShader);
-	m_pShadowMap->GetShader()->SetLight(m_pScene->GetLightShader()[0].GetDirectionalLight());
+	for (int i = 0; i < 3; ++i)
+	{
+		m_pShadowMap[i]->SetShader(pShadowShader);
+		m_pShadowMap[i]->GetShader()->SetLight(m_pScene->GetLightShader()[0].GetDirectionalLight());
+	}
 
 	m_pPlayer = make_unique<CVehiclePlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_btCollisionShapes, m_pbtDynamicsWorld.get(), 1);
 	m_pCamera = m_pPlayer->GetCamera();
@@ -330,19 +341,17 @@ void CGameFramework::BuildObjects()
 	WaitForGpuComplete();
 
 	Update();
-
 	// 쉐도우맵은 모든 오브젝트를 그려야한다.
-	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
-	m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer.get());
+	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
+	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer.get());
 
-	for (int i = 0; i < 4; ++i)
+	for (int j = 0; j< 4; ++j)
 	{
-		m_pShadowMap->GetShader()->GetObjectVector()->push_back(m_pPlayer->GetWheels()[i]);
+		m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer->GetWheels()[j]);
 	}
 
 	auto pInstancingShader = m_pScene->GetInstancingShader();
-	m_pShadowMap->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjects()[0]);
-
+	m_pShadowMap[0]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjects()[0]);
 	m_GameTimer.Reset();
 }
 
@@ -476,33 +485,42 @@ void CGameFramework::FrameAdvance()
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_pd3dSrvDescriptorHeap.Get() };
 	m_pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-
-	// Change to DEPTH_WRITE.
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(),
-		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-
-	// Clear the back buffer and depth buffer.
-	m_pd3dCommandList->ClearDepthStencilView(m_pShadowMap->GetDsv(),
-		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-
-	// Set null render target because we are only going to draw to
-	// depth buffer.  Setting a null render target will disable color writes.
-	// Note the active PSO also must specify a render target count of 0.
-	m_pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &m_pShadowMap->GetDsv());
-
 	m_pd3dCommandList->SetGraphicsRootSignature(m_pScene->GetGraphicsRootSignature());
-
-	m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap->GetViewport());
-	m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap->GetScissorRect());
-
 	Update();
 
-	m_pShadowMap->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get());
-
-	// Change back to GENERIC_READ so we can read the texture in a shader.
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
+	// 쉐도우 맵 렌더
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
-	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap->GetSrv());
+	// 오류 - 가장 먼저 렌더링한 정밀도의 쉐도우맵으로 모든 쉐도우맵이 통일된다.
+	// 0번이 가장 세밀한 쉐도우맵
+	for (int i = 0; i < 3; ++i)
+	{
+		// Change to DEPTH_WRITE.
+		m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap[i]->GetResource(),
+			D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+
+		// Clear the back buffer and depth buffer.
+		m_pd3dCommandList->ClearDepthStencilView(m_pShadowMap[i]->GetDsv(),
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+
+		// Set null render target because we are only going to draw to
+		// depth buffer.  Setting a null render target will disable color writes.
+		// Note the active PSO also must specify a render target count of 0.
+		m_pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &m_pShadowMap[i]->GetDsv());
+
+		m_pd3dCommandList->RSSetViewports(1, &m_pShadowMap[i]->GetViewport());
+		m_pd3dCommandList->RSSetScissorRects(1, &m_pShadowMap[i]->GetScissorRect());
+
+		m_pShadowMap[i]->GetShader()->Render(m_pd3dCommandList.Get(), m_pPlayer.get(), 50 * pow((i + 1), 3), i); // 50 - 400 - 1350
+
+		// Change back to GENERIC_READ so we can read the texture in a shader.
+		m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap[i]->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
+	}
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// 렌더타겟 렌더
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -530,6 +548,7 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	hResult = m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };

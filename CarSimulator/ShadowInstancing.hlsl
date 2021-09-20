@@ -18,7 +18,7 @@ VertexOut VS(VertexIn vin, uint InstanceID : SV_InstanceID)
     float4 posW = mul(float4(vin.PosL, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject);
 
     // Transform to homogeneous clip space.
-    vout.PosH = mul(posW, gmtxLightViewProj);
+    vout.PosH = mul(posW, gmtxLightViewProj[nShadowIndex]);
     
     return vout;
 }

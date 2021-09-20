@@ -403,6 +403,8 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 {
 	float fHeight = 10.0f, fLength = 10.0f, fDepth = 10.0f;
 
+	UINT nSrvDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
@@ -419,7 +421,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 1, 7);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
@@ -769,10 +771,10 @@ D3D12_SHADER_BYTECODE CShadowShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlo
 	return(CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", ppd3dShaderBlob));
 }
 
-void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer)
+void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer, float fBoundary, int nShadowIndex)
 {
 	pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
-	UpdateShaderVariables(pd3dCommandList, pPlayer->GetPosition());
+	UpdateShaderVariables(pd3dCommandList, pPlayer->GetPosition(), fBoundary, nShadowIndex);
 
 	for (CGameObject* o : m_vpGameObjects)
 	{
@@ -791,7 +793,7 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 	}
 }
 
-void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos)
+void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos, float fBoundary, int nShadowIndex)
 {
 	XMVECTOR lightPos = XMLoadFloat3(&m_pLight->GetPosition());
 	XMVECTOR TargetPos = XMLoadFloat3(&xmf3TargetPos);
@@ -807,15 +809,15 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	XMStoreFloat3(&xmf3CenterLS, XMVector3TransformCoord(XMLoadFloat3(&xmf3TargetPos), lightView));
 
 	// Ortho frustum in light space encloses scene.
+	float l = xmf3CenterLS.x - fBoundary;
+	float b = xmf3CenterLS.y - fBoundary;
+	float n = xmf3CenterLS.z - fBoundary;
+	float r = xmf3CenterLS.x + fBoundary;
+	float t = xmf3CenterLS.y + fBoundary;
+	float f = xmf3CenterLS.z + fBoundary;
 
-	float l = xmf3CenterLS.x - 400;
-	float b = xmf3CenterLS.y - 400;
-	float n = xmf3CenterLS.z - 400;
-	float r = xmf3CenterLS.x + 400;
-	float t = xmf3CenterLS.y + 400;
-	float f = xmf3CenterLS.z + 400;
-
-	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
+	XMMATRIX lightProj;
+	lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 
 	// Transform NDC space [-1,+1]^2 to texture space [0,1]^2
 	XMMATRIX T(
@@ -826,16 +828,15 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 
 	XMMATRIX S = lightView * lightProj;
 
-	XMFLOAT4X4 xmf4x4LightViewProj;
-	XMStoreFloat4x4(&xmf4x4LightViewProj, XMMatrixTranspose(S));
+	XMStoreFloat4x4(&m_xmf4x4LightViewProj[nShadowIndex], XMMatrixTranspose(S));
 
 	S = S * T;
 
-	XMFLOAT4X4 xmf4x4ShadowTransform;
-	XMStoreFloat4x4(&xmf4x4ShadowTransform, XMMatrixTranspose(S));
+	XMStoreFloat4x4(&m_xmf4x4ShadowTransform[nShadowIndex], XMMatrixTranspose(S));
 
-	CB_SHADOW cbShadow{ xmf4x4ShadowTransform, xmf4x4LightViewProj, m_pLight->GetPosition() };
+	CB_SHADOW cbShadow{ m_xmf4x4ShadowTransform, m_xmf4x4LightViewProj, m_pLight->GetPosition() };
 
-	m_ubShadowCB->CopyData(0, cbShadow); 
+	m_ubShadowCB->CopyData(0, cbShadow);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &nShadowIndex, 1);
 }

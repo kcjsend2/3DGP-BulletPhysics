@@ -202,7 +202,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[2].InitAsConstants(1, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[2].InitAsConstants(2, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	//UploadBuffer 클래스를 이용하여 업로드
 	pd3dRootParameters[3].InitAsConstantBufferView(3);
@@ -211,12 +211,12 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
 	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);
 
-	CD3DX12_DESCRIPTOR_RANGE texRange0(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
-	CD3DX12_DESCRIPTOR_RANGE texRange1(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
+	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 3개, 0 ~ 2
+	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 6개, 3 ~ 8
 
 	//디스크립터 테이블 이용하여 업로드
-	pd3dRootParameters[6].InitAsDescriptorTable(1, &texRange0); //쉐도우 맵
-	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange1); //텍스쳐 배열
+	pd3dRootParameters[6].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵 - 6, 7, 8
+	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열 - 9, 10, 11, 12, 13, 14
 
 	auto staticSamplers = GetStaticSamplers();
 
@@ -225,13 +225,15 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	ID3DBlob* pd3dSignatureBlob = NULL;
 	ID3DBlob* pd3dErrorBlob = NULL;
 	::D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pd3dSignatureBlob, &pd3dErrorBlob);
-	pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&pd3dGraphicsRootSignature);
+
 	if (pd3dErrorBlob != NULL)
 	{
 		auto tmp = (char*)pd3dErrorBlob->GetBufferPointer();
 		std::string p = tmp;
-		return 0;
+		p.c_str();
 	}
+
+	pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&pd3dGraphicsRootSignature);
 
 	if (pd3dSignatureBlob)
 		pd3dSignatureBlob->Release();

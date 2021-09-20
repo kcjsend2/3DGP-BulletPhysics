@@ -11,8 +11,7 @@ struct VS_DEFAULT_INPUT
 struct VS_DEFAULT_OUTPUT
 {
     float4 position : SV_POSITION;
-    float4 position_shadow : POSITION0;
-    float3 position_w : POSITION1;
+    float3 position_w : POSITION;
     float3 normal : NORMAL;
 };
 
@@ -20,10 +19,9 @@ struct VS_DEFAULT_OUTPUT
 VS_DEFAULT_OUTPUT VS_Default(VS_DEFAULT_INPUT input)
 {
     VS_DEFAULT_OUTPUT output;
-    output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
+    output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj/*gmtxLightViewProj*/);
     output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
-    output.position_shadow = mul(float4(output.position_w, 1.0f), gmtxShadowTransform);
     
     return (output);
 }
@@ -32,16 +30,32 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
 {
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     
+    float4 debugColor;
+    int cascadedIndex = 2;
+    
+    for (int i = 0; i < 3; ++i)
+    {
+        float4 Cascaded = mul(float4(input.position_w, 1.0f), gmtxLightViewProj[i]);
+        Cascaded = Cascaded / Cascaded.w;
+        if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
+        {
+            cascadedIndex = i;
+            break;
+        }
+    }
+    
+    float4 position_shadow = mul(float4(input.position_w, 1.0f), gmtxShadowTransform[cascadedIndex]);
+    
     cColor += material.AmbientLight * material.DiffuseAlbedo;
     
     float3 toEyeW = normalize(cameraPos - input.position_w);
     
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
-    shadowFactor[0] = CalcShadowFactor(input.position_shadow);
+    shadowFactor[0] = CalcShadowFactor(position_shadow, cascadedIndex);
     
     for (int i = 0; i < nLights; i++)
     {
-        if (input.position_shadow.x < 0.0f || input.position_shadow.x > 1.0f || input.position_shadow.z < 0.0f || input.position_shadow.z > 1.0f || input.position_shadow.y < 0.0f || input.position_shadow.y > 1.0f)
+        if (position_shadow.x < 0.0f || position_shadow.x > 1.0f || position_shadow.z < 0.0f || position_shadow.z > 1.0f || position_shadow.y < 0.0f || position_shadow.y > 1.0f)
             cColor += ComputeLighting(light[i], input.position_w, input.normal, toEyeW, 1.0f);
         else
             cColor += ComputeLighting(light[i], input.position_w, input.normal, toEyeW, shadowFactor[0]);
@@ -57,6 +71,8 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     // Common convention to take alpha from diffuse albedo.
     
     cColor.a = material.DiffuseAlbedo.a;
+    
+    // cColor *= debugColor;
     
     return (cColor);
 }
