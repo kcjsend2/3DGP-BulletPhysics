@@ -11,8 +11,8 @@ cbuffer cbCameraInfo : register(b1)
 
 cbuffer cbLightInfo : register(b2)
 {
-    int nLights : packoffset(c0);
-    int nShadowIndex : packoffset(c4);
+    int nLights : packoffset(c0.x);
+    int nShadowIndex : packoffset(c0.y);
 }
 
 cbuffer cbShadowInfo : register(b3)
