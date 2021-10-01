@@ -196,8 +196,25 @@ void CShader::Update(float fTimeElapsed)
 {
 }
 
-void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, CTexture* pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
+void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
 {
+	UINT nSrvDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	m_d3dSrvCPUDescriptorHandle.ptr += (nSrvDescriptorIncrementSize * nDescriptorHeapIndex);
+	m_d3dSrvGPUDescriptorHandle.ptr += (nSrvDescriptorIncrementSize * nDescriptorHeapIndex);
+
+	int nTextures = pTexture->GetTextures();
+	for (int i = 0; i < nTextures; i++)
+	{
+		ID3D12Resource* pShaderResource = pTexture->GetResource(i);
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3dShaderResourceViewDesc = pTexture->GetShaderResourceViewDesc(i);
+		pd3dDevice->CreateShaderResourceView(pShaderResource, &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorHandle);
+		m_d3dSrvCPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
+		pTexture->SetGpuDescriptorHandle(i, m_d3dSrvGPUDescriptorHandle);
+		m_d3dSrvGPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
+	}
+	int nRootParameters = pTexture->GetRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetRootParameterIndex(i, nRootParameterStartIndex + i);
 }
 
 CPlayerShader::CPlayerShader()
@@ -409,17 +426,13 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
 	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Diffuse).dds", RESOURCE_TEXTURE2D_ARRAY, 0);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
-
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
-
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
-
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
-	
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Lava(Diffuse).dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
 
@@ -519,27 +532,6 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_ppObjects[0]->Render(pd3dCommandList, m_nObjects);
 }
 
-void CInstancingShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
-{
-	UINT nSrvDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	m_d3dSrvCPUDescriptorHandle.ptr += (nSrvDescriptorIncrementSize * nDescriptorHeapIndex);
-	m_d3dSrvGPUDescriptorHandle.ptr += (nSrvDescriptorIncrementSize * nDescriptorHeapIndex);
-
-	int nTextures = pTexture->GetTextures();
-	for (int i = 0; i < nTextures; i++)
-	{
-		ID3D12Resource* pShaderResource = pTexture->GetResource(i);
-		D3D12_SHADER_RESOURCE_VIEW_DESC d3dShaderResourceViewDesc = pTexture->GetShaderResourceViewDesc(i);
-		pd3dDevice->CreateShaderResourceView(pShaderResource, &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorHandle);
-		m_d3dSrvCPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
-		pTexture->SetGpuDescriptorHandle(i, m_d3dSrvGPUDescriptorHandle);
-		m_d3dSrvGPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
-	}
-	int nRootParameters = pTexture->GetRootParameters();
-	for (int i = 0; i < nRootParameters; i++) pTexture->SetRootParameterIndex(i, nRootParameterStartIndex + i);
-}
-
 CTerrainShader::CTerrainShader()
 {
 }
@@ -565,21 +557,40 @@ D3D12_INPUT_LAYOUT_DESC CTerrainShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Terrain.hlsl", "VS_Terrain", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Terrain.hlsl", "PS_Terrain", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CTerrainShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pTexture->UpdateShaderVariables(pd3dCommandList);
+}
+
+void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+{
+	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+	m_pTexture = std::make_shared<CTexture>(2, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Base_Texture.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 9, 7);
 }
 
 void CTerrainShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+}
+
+void CTerrainShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	UpdateShaderVariables(pd3dCommandList);
 }
 
 CLightsShader::CLightsShader()
