@@ -5,6 +5,8 @@ struct VS_Terrain_INPUT
 {
     float3 position : POSITION;
     float3 normal : NORMAL;
+    float2 uv0 : TEXCOORD0;
+    float2 uv1 : TEXCOORD1;
 };
 
 //정점 셰이더의 출력(픽셀 셰이더의 입력)을 위한 구조체를 선언한다.
@@ -13,6 +15,8 @@ struct VS_Terrain_OUTPUT
     float4 position : SV_POSITION;
     float3 position_w : POSITION;
     float3 normal : NORMAL;
+    float2 uv0 : TEXCOORD0;
+    float2 uv1 : TEXCOORD1;
 };
 
 
@@ -22,6 +26,8 @@ VS_Terrain_OUTPUT VS_Terrain(VS_Terrain_INPUT input)
     output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj /*gmtxLightViewProj*/);
     output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
+    output.uv0 = input.uv0;
+    output.uv1 = input.uv1;
     
     return (output);
 }
@@ -73,6 +79,11 @@ float4 PS_Terrain(VS_Terrain_OUTPUT input) : SV_TARGET
     cColor.a = material.DiffuseAlbedo.a;
     
     // cColor *= debugColor;
+    
+    float4 cBaseTexColor = gtxtTerrain[0].Sample(gsamLinearWrap, input.uv0);
+    float4 cDetailTexColor = gtxtTerrain[1].Sample(gsamLinearWrap, input.uv1);
+    
+    cColor *= saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
     
     return (cColor);
 }

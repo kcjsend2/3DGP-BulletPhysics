@@ -298,6 +298,12 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	
 	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
 	m_pxmf3Normals = new XMFLOAT3[m_nVertices];
+	m_pxmf2TextureCoords = new XMFLOAT2[m_nVertices];
+	m_pxmf2DetailTextureCoords = new XMFLOAT2[m_nVertices];
+
+	CHeightMapImage* pHeightMapImage = (CHeightMapImage*)pContext;
+	int cxHeightMap = pHeightMapImage->GetHeightMapWidth();
+	int czHeightMap = pHeightMapImage->GetHeightMapLength();
 
 	/*xStart와 zStart는 격자의 시작 위치(x-좌표와 z-좌표)를 나타낸다. 커다란 지형은 격자들의 이차원 배열로 만들 필
 	요가 있기 때문에 전체 지형에서 각 격자의 시작 위치를 나타내는 정보가 필요하다.*/
@@ -313,6 +319,9 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 			m_pxmf3Positions[i] = XMFLOAT3((x * m_xmf3Scale.x), fHeight, (z * m_xmf3Scale.z));
 			m_pxmf3Normals[i] = OnGetNormal(x, z, pContext);
 
+			m_pxmf2TextureCoords[i] = XMFLOAT2(float(x) / float(cxHeightMap - 1), float(czHeightMap - 1 - z) / float(czHeightMap - 1));
+			m_pxmf2DetailTextureCoords[i] = XMFLOAT2(float(x) / float(m_xmf3Scale.x * 0.5f), float(z) / float(m_xmf3Scale.z * 0.5f));
+
 			if (fHeight / m_xmf3Scale.y < fMinHeight)
 				fMinHeight = fHeight / m_xmf3Scale.y;
 
@@ -323,11 +332,14 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		}
 	}
 
-	m_nVertexBufferViews = 2;
+	m_nVertexBufferViews = 4;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 	m_pd3dNormalBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dNormalUploadBuffer);
+	m_pd3dTextureCoordBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoordUploadBuffer);
+	m_pd3dDetailTextureBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Normals, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dDetailTextureUploadBuffer);
+
 
 	m_pd3dVertexBufferViews[0].BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
 	m_pd3dVertexBufferViews[0].StrideInBytes = sizeof(XMFLOAT3);
@@ -336,6 +348,14 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	m_pd3dVertexBufferViews[1].BufferLocation = m_pd3dNormalBuffer->GetGPUVirtualAddress();
 	m_pd3dVertexBufferViews[1].StrideInBytes = sizeof(XMFLOAT3);
 	m_pd3dVertexBufferViews[1].SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	m_pd3dVertexBufferViews[2].BufferLocation = m_pd3dTextureCoordBuffer->GetGPUVirtualAddress();
+	m_pd3dVertexBufferViews[2].StrideInBytes = sizeof(XMFLOAT2);
+	m_pd3dVertexBufferViews[2].SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+
+	m_pd3dVertexBufferViews[3].BufferLocation = m_pd3dDetailTextureBuffer->GetGPUVirtualAddress();
+	m_pd3dVertexBufferViews[3].StrideInBytes = sizeof(XMFLOAT2);
+	m_pd3dVertexBufferViews[3].SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
 
 
 	m_nIndices = ((nWidth * 2) * (nLength - 1)) + ((nLength - 1) - 1);

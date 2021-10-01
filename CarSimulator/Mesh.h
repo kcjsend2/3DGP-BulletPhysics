@@ -181,6 +181,10 @@ protected:
 	¼ö ÀÖ´Ù.*/
 	XMFLOAT3 m_xmf3Scale;
 
+	XMFLOAT2* m_pxmf2DetailTextureCoords = NULL;
+	ID3D12Resource* m_pd3dDetailTextureBuffer = NULL;
+	ID3D12Resource* m_pd3dDetailTextureUploadBuffer = NULL;
+
 public:
 	CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength, float* pHeightmapData, float& fMaxHeight, float& fMinHeight, XMFLOAT3 xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f), void* pContext = NULL);
 	virtual ~CHeightMapGridMesh();
