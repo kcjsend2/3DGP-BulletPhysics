@@ -25,14 +25,14 @@ void CScene::ReleaseObjects()
 	if (m_pd3dGraphicsRootSignature)
 		m_pd3dGraphicsRootSignature->Release();
 
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
-		m_pShaders[i].ReleaseShaderVariables();
-		m_pShaders[i].ReleaseObjects();
+		m_pInstancingShaders[i].ReleaseShaderVariables();
+		m_pInstancingShaders[i].ReleaseObjects();
 	}
 
-	if (m_pShaders)
-		delete[] m_pShaders;
+	if (m_pInstancingShaders)
+		delete[] m_pInstancingShaders;
 	
 	if (m_pTerrain)
 		delete m_pTerrain;
@@ -40,15 +40,20 @@ void CScene::ReleaseObjects()
 
 void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, XMFLOAT3 xmf3PlayerPosition)
 {
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
-		m_pShaders[i].Update(fTimeElapsed, pbtDynamicsWorld);
-		m_pShaders[i].UpdateShaderVariables(pd3dCommandList);
+		m_pInstancingShaders[i].Update(fTimeElapsed, pbtDynamicsWorld);
+		m_pInstancingShaders[i].UpdateShaderVariables(pd3dCommandList);
 	}
 
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nLightShaders; i++)
 	{
 		m_pLightShaders[i].Update(fTimeElapsed, xmf3PlayerPosition);
+	}
+
+	for (int i = 0; i < m_nSkyboxShaders; i++)
+	{
+		m_pSkyboxShaders[i].Update(fTimeElapsed);
 	}
 }
 
@@ -70,17 +75,22 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Assets/Image/Terrain/PlaneMap.raw"), 512, 512, 512, 512, xmf3Scale, btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
 	//m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Assets/Image/Terrain/HeightMap.raw"), 217, 217, 217, 217, xmf3Scale, btCollisionShapes, pbtDynamicsWorld);
 
-	m_nShaders = 1;
-	m_pShaders = new CInstancingShader[m_nShaders];
-	m_pShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain, btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
+	m_nInstancingShaders = 1;
+	m_pInstancingShaders = new CInstancingShader[m_nInstancingShaders];
+	m_pInstancingShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain, btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
+
+	m_nSkyboxShaders = 1;
+	m_pSkyboxShaders = new CSkyBoxShader[m_nSkyboxShaders];
+	m_pSkyboxShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pSkyboxShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 
 }
 
 void CScene::ReleaseUploadBuffers()
 {
-	for (int i = 0; i < m_nShaders; i++)
-		m_pShaders[i].ReleaseUploadBuffers();
+	for (int i = 0; i < m_nInstancingShaders; i++)
+		m_pInstancingShaders[i].ReleaseUploadBuffers();
 	
 	if (m_pTerrain)
 		m_pTerrain->ReleaseUploadBuffers();
@@ -106,6 +116,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
+	for (int i = 0; i < m_nSkyboxShaders; i++)
+	{
+		m_pSkyboxShaders[i].Render(pd3dCommandList, pCamera);
+	}
+
 	for (int i = 0; i < m_nLightShaders; ++i)
 	{
 		m_pLightShaders[i].Render(pd3dCommandList);
@@ -116,9 +131,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pTerrain->Render(pd3dCommandList);
 	}
 
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
-		m_pShaders[i].Render(pd3dCommandList);
+		m_pInstancingShaders[i].Render(pd3dCommandList);
 	}
 
 	
@@ -197,12 +212,12 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[9];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[10];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[2].InitAsConstants(2, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[2].InitAsConstants(3, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	//UploadBuffer 클래스를 이용하여 업로드
 	pd3dRootParameters[3].InitAsConstantBufferView(3);
@@ -214,11 +229,13 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 3개, 0 ~ 2
 	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 6개, 3 ~ 8
 	CD3DX12_DESCRIPTOR_RANGE TerrainRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 9, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 2개, 9 ~ 10
+	CD3DX12_DESCRIPTOR_RANGE SkyboxRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 11, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 6개, 11 ~ 16
 
 	//디스크립터 테이블 이용하여 업로드
 	pd3dRootParameters[6].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
 	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
 	pd3dRootParameters[8].InitAsDescriptorTable(1, &TerrainRange); // 베이스 텍스쳐 + 디테일 텍스쳐
+	pd3dRootParameters[9].InitAsDescriptorTable(1, &SkyboxRange); // 스카이박스 텍스쳐
 
 	auto staticSamplers = GetStaticSamplers();
 

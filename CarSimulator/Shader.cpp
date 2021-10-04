@@ -853,3 +853,90 @@ void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubShadowCB->Resource()->GetGPUVirtualAddress());
 	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &nShadowIndex, 1);
 }
+
+CSkyBoxShader::CSkyBoxShader()
+{
+}
+
+CSkyBoxShader::~CSkyBoxShader()
+{
+}
+
+D3D12_DEPTH_STENCIL_DESC CSkyBoxShader::CreateDepthStencilState()
+{
+	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
+	d3dDepthStencilDesc.DepthEnable = FALSE;
+	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
+	d3dDepthStencilDesc.StencilEnable = FALSE;
+	d3dDepthStencilDesc.StencilReadMask = 0xff;
+	d3dDepthStencilDesc.StencilWriteMask = 0xff;
+	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_INCR;
+	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_DECR;
+	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+	return(d3dDepthStencilDesc);
+}
+
+D3D12_SHADER_BYTECODE CSkyBoxShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"Skybox.hlsl", "VSSkyBox", "vs_5_1", ppd3dShaderBlob));
+}
+
+
+D3D12_SHADER_BYTECODE CSkyBoxShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"Skybox.hlsl", "PSSkyBox", "ps_5_1", ppd3dShaderBlob));
+}
+
+void CSkyBoxShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pTexture->UpdateShaderVariables(pd3dCommandList);
+}
+
+D3D12_INPUT_LAYOUT_DESC CSkyBoxShader::CreateInputLayout()
+{
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+{
+	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D, 0, 1);
+
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Back_0.dds", RESOURCE_TEXTURE2D, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Left_0.dds", RESOURCE_TEXTURE2D, 2);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Right_0.dds", RESOURCE_TEXTURE2D, 3);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
+
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 11, 9);
+
+	m_pSkybox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList);
+}
+
+void CSkyBoxShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CShader::Render(pd3dCommandList);
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	m_pSkybox->Render(pd3dCommandList, pCamera);
+}

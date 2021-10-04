@@ -127,6 +127,7 @@
     <FxCompile Include="Shadow.hlsl" />
     <FxCompile Include="ShadowInstancing.hlsl" />
     <FxCompile Include="Terrain.hlsl" />
+    <FxCompile Include="Skybox.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

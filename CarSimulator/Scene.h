@@ -23,11 +23,14 @@ public:
 
 protected:
 	//배치(Batch) 처리를 하기 위하여 씬을 셰이더들의 리스트로 표현한다.
-	CInstancingShader* m_pShaders = NULL;
-	int m_nShaders = 0;
+	CInstancingShader* m_pInstancingShaders = NULL;
+	int m_nInstancingShaders = 0;
 
 	CLightsShader* m_pLightShaders = NULL;
 	int m_nLightShaders = 0;
+
+	CSkyBoxShader* m_pSkyboxShaders = NULL;
+	int m_nSkyboxShaders = 0;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 
@@ -37,8 +40,8 @@ protected:
 
 public:
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain); }
-	CInstancingShader* GetInstancingShader() { return m_pShaders; }
-	int GetInstancingShaderNumber() { return m_nShaders; }
+	CInstancingShader* GetInstancingShader() { return m_pInstancingShaders; }
+	int GetInstancingShaderNumber() { return m_nInstancingShaders; }
 
 	CLightsShader* GetLightShader() { return m_pLightShaders; }
 	int GetLightShaderNumber() { return m_nLightShaders; }

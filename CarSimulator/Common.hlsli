@@ -5,14 +5,13 @@ cbuffer cbCameraInfo : register(b1)
 {
     matrix gmtxViewProj : packoffset(c0);
     float3 cameraPos : packoffset(c4);
-    
-    //size : 19
 };
 
-cbuffer cbLightInfo : register(b2)
+cbuffer cbCommonInfo : register(b2)
 {
     int nLights : packoffset(c0.x);
     int nShadowIndex : packoffset(c0.y);
+    int nSkyboxTextureIndex : packoffset(c0.z);
 }
 
 cbuffer cbShadowInfo : register(b3)

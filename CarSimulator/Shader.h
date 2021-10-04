@@ -203,3 +203,21 @@ protected:
 	VS_VB_LIGHT_INFO* m_pcbMappedLights = NULL;
 
 };
+
+class CSkyBoxShader : public CShader
+{
+public:
+	CSkyBoxShader();
+	virtual ~CSkyBoxShader();
+
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+
+protected:
+	std::unique_ptr<CSkyBox> m_pSkybox;
+};

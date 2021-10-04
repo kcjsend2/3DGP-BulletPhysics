@@ -520,3 +520,46 @@ CHeightMapTerrain::~CHeightMapTerrain(void)
 	if (m_pHeightMapImage)
 		delete m_pHeightMapImage;
 }
+
+CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) : CGameObject(6)
+{
+	CTexturedRectMesh* pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, +10.0f);
+	SetMesh(0, pSkyBoxMesh); // 전
+
+	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, -10.0f);
+	SetMesh(1, pSkyBoxMesh); // 후
+
+	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, -10.0f, 0.0f, 0.0f);
+	SetMesh(2, pSkyBoxMesh); // 좌
+
+	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, +10.0f, 0.0f, 0.0f);
+	SetMesh(3, pSkyBoxMesh); // 우
+
+	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, +10.0f, 0.0f);
+	SetMesh(4, pSkyBoxMesh); // 상
+
+	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, -10.0f, 0.0f);
+	SetMesh(5, pSkyBoxMesh); // 하
+}
+
+CSkyBox::~CSkyBox()
+{
+}
+
+void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	XMFLOAT3 xmf3CameraPos = pCamera->GetPosition();
+	SetPosition(xmf3CameraPos.x, xmf3CameraPos.y, xmf3CameraPos.z);
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	OnPrepareRender();
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &i, 2);
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
+}
