@@ -728,6 +728,8 @@ CBillBoardMesh::CBillBoardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_nSlot = 0;
 	m_nVertices = 1;
 
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+
 	std::unique_ptr<XMFLOAT2> pfSize= std::make_unique<XMFLOAT2>(fHeight, fWidth);
 
 	m_pd3dSizeBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pfSize.get(), sizeof(float), D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dSizeUploadBuffer);

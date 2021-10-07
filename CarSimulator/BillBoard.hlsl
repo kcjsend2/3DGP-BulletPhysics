@@ -13,10 +13,10 @@ struct GS_BILLBOARD_INPUT
 
 struct GS_BILLBOARD_OUTPUT
 {
-    float4 position : SV_POSITION;
     uint p_id : SV_PrimitiveID;
     float2 uv : TEXCOORD;
     uint textureIndex : INDEX;
+    float4 position : SV_POSITION;
 };
 
 GS_BILLBOARD_INPUT VS_BillBoard(VS_BILLBOARD_INPUT input)

@@ -977,6 +977,41 @@ D3D12_SHADER_BYTECODE CBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dSha
 	return(CShader::CompileShaderFromFile(L"BillBoard.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
 }
 
+void CBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
+	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
+	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.GS = CreateGeometryShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+	d3dPipelineStateDesc.BlendState = CreateBlendState();
+	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
+	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
+	d3dPipelineStateDesc.SampleMask = UINT_MAX;
+	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+	d3dPipelineStateDesc.NumRenderTargets = 1;
+	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dPipelineStateDesc.SampleDesc.Count = 1;
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+
+	if (pd3dVertexShaderBlob)
+		pd3dVertexShaderBlob->Release();
+
+	if (pd3dPixelShaderBlob)
+		pd3dPixelShaderBlob->Release();
+
+	if (pd3dGeometryShaderBlob)
+		pd3dGeometryShaderBlob->Release();
+
+	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
+		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
+}
 
 void CBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -1010,15 +1045,15 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 17, 10);
 
-	std::shared_ptr<CBillBoardMesh> pMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, 5, 5);
+	CBillBoardMesh* pMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, 5, 5);
 
-	m_vBillBoard.reserve(10000);
-	for (int i = 0; i < 100; ++i)
+	m_vBillBoard.reserve(100);
+	for (int i = 0; i < 10; ++i)
 	{
-		for (int j = 0; j < 100; ++j)
+		for (int j = 0; j < 10; ++j)
 		{
 			m_vBillBoard.emplace_back(pd3dDevice, pd3dCommandList, XMFLOAT3{ float(i * 5), 5.0f, float(j * 5) });
-			m_vBillBoard[m_vBillBoard.size() - 1].SetMesh(0, pMesh.get());
+			m_vBillBoard[m_vBillBoard.size() - 1].SetMesh(0, pMesh);
 		}
 	}
 }
