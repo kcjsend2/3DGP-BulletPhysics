@@ -1024,7 +1024,7 @@ D3D12_INPUT_LAYOUT_DESC CBillBoardShader::CreateInputLayout()
 {
 	UINT nInputElementDescs = 1;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-	pd3dInputElementDescs[0] = { "SIZE", 0, DXGI_FORMAT_R32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[0] = { "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
@@ -1047,12 +1047,12 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 
 	CBillBoardMesh* pMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, 5, 5);
 
-	m_vBillBoard.reserve(100);
-	for (int i = 0; i < 10; ++i)
+	m_vBillBoard.reserve(2000);
+	for (int i = 0; i < 40; ++i)
 	{
-		for (int j = 0; j < 10; ++j)
+		for (int j = 0; j < 40; ++j)
 		{
-			m_vBillBoard.emplace_back(pd3dDevice, pd3dCommandList, XMFLOAT3{ float(i * 5), 0.0f, float(j * 5) });
+			m_vBillBoard.emplace_back(XMFLOAT3{ float(i * 20), 0.0f, float(j * 20) });
 			m_vBillBoard[m_vBillBoard.size() - 1].SetMesh(0, pMesh);
 		}
 	}

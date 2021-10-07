@@ -209,6 +209,6 @@ public:
 class CBillBoard : public CGameObject
 {
 public:
-	CBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position);
+	CBillBoard(XMFLOAT3 xmf3Position);
 	virtual ~CBillBoard();
 };

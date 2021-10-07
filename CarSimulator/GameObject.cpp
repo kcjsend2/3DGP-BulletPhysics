@@ -400,7 +400,8 @@ void CGameObject::MoveUp(float fDistance)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
 	XMFLOAT3 xmf3Up = GetUp();
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Up, fDistance); CGameObject::SetPosition(xmf3Position);
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Up, fDistance);
+	CGameObject::SetPosition(xmf3Position);
 }
 //게임 객체를 로컬 z-축 방향으로 이동한다.
 void CGameObject::MoveForward(float fDistance)
@@ -564,7 +565,7 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	}
 }
 
-CBillBoard::CBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position)
+CBillBoard::CBillBoard(XMFLOAT3 xmf3Position)
 {
 	SetPosition(xmf3Position);
 }
