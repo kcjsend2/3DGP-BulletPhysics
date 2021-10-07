@@ -32,6 +32,9 @@ protected:
 	CSkyBoxShader* m_pSkyboxShaders = NULL;
 	int m_nSkyboxShaders = 0;
 
+	CBillBoardShader* m_pBillBoardShaders = NULL;
+	int m_nBillBoardShaders = 0;
+
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 
 

@@ -205,3 +205,10 @@ public:
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };
+
+class CBillBoard : public CGameObject
+{
+public:
+	CBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position);
+	virtual ~CBillBoard();
+};

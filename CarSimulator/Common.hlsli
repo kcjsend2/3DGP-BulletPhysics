@@ -23,9 +23,9 @@ cbuffer cbShadowInfo : register(b3)
 
 Texture2D gShadowMap[3] : register(t0);
 Texture2D gTextureMaps[6] : register(t3);
-
 Texture2D gtxtTerrain[2] : register(t9);
 Texture2D gtxtSkybox[6] : register(t11);
+Texture2DArray gtxtBillBoard[2] : register(t17);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {

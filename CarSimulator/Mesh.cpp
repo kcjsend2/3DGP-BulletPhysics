@@ -636,6 +636,7 @@ void CMeshFileRead::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 CTexturedRectMesh::CTexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth, float fxPosition, float fyPosition, float fzPosition) : CMesh(pd3dDevice, pd3dCommandList)
 {
+	m_nSlot = 0;
 	m_nVertices = 6;
 	m_nStride = sizeof(CTexturedVertex);
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -722,3 +723,23 @@ CTexturedRectMesh::~CTexturedRectMesh()
 {
 }
 
+CBillBoardMesh::CBillBoardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	m_nSlot = 0;
+	m_nVertices = 1;
+
+	std::unique_ptr<XMFLOAT2> pfSize= std::make_unique<XMFLOAT2>(fHeight, fWidth);
+
+	m_pd3dSizeBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pfSize.get(), sizeof(float), D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dSizeUploadBuffer);
+
+	m_nVertexBufferViews = 1;
+	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
+
+	m_pd3dVertexBufferViews[0].BufferLocation = m_pd3dSizeBuffer->GetGPUVirtualAddress();
+	m_pd3dVertexBufferViews[0].StrideInBytes = sizeof(XMFLOAT2);
+	m_pd3dVertexBufferViews[0].SizeInBytes = sizeof(XMFLOAT2);
+}
+
+CBillBoardMesh::~CBillBoardMesh()
+{
+}

@@ -12,7 +12,7 @@ struct VS_TEXTURED_OUTPUT
     float2 uv : TEXCOORD;
 };
 
-VS_TEXTURED_OUTPUT VSSkyBox(VS_TEXTURED_INPUT input)
+VS_TEXTURED_OUTPUT VS_SkyBox(VS_TEXTURED_INPUT input)
 {
     VS_TEXTURED_OUTPUT output;
     
@@ -24,7 +24,7 @@ VS_TEXTURED_OUTPUT VSSkyBox(VS_TEXTURED_INPUT input)
 }
 
 
-float4 PSSkyBox(VS_TEXTURED_OUTPUT input) : SV_TARGET
+float4 PS_SkyBox(VS_TEXTURED_OUTPUT input) : SV_TARGET
 {
     float4 cColor = gtxtSkybox[nSkyboxTextureIndex].Sample(gsamLinearClamp, input.uv);
 

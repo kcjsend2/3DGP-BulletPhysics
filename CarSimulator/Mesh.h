@@ -230,3 +230,15 @@ public:
 	CTexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 20.0f, float fxPosition = 0.0f, float fyPosition = 0.0f, float fzPosition = 0.0f);
 	virtual ~CTexturedRectMesh();
 };
+
+class CBillBoardMesh : public CMesh
+{
+public:
+	CBillBoardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight);
+	virtual ~CBillBoardMesh();
+
+protected:
+	ID3D12Resource* m_pd3dSizeBuffer = NULL;
+	ID3D12Resource* m_pd3dSizeUploadBuffer = NULL;
+
+};

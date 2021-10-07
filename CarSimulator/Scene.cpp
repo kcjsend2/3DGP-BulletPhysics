@@ -50,11 +50,6 @@ void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElaps
 	{
 		m_pLightShaders[i].Update(fTimeElapsed, xmf3PlayerPosition);
 	}
-
-	for (int i = 0; i < m_nSkyboxShaders; i++)
-	{
-		m_pSkyboxShaders[i].Update(fTimeElapsed);
-	}
 }
 
 void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
@@ -68,7 +63,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pLightShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
 
 	//지형을 확대할 스케일 벡터이다. x-축과 z-축은 32배, y-축은 8배 확대한다.
-	XMFLOAT3 xmf3Scale(16.0f, 1.0f, 16.0f);
+	XMFLOAT3 xmf3Scale(10.0f, 1.0f, 10.0f);
 
 	//지형을 높이 맵 이미지 파일(HeightMap.raw)을 사용하여 생성한다. 높이 맵의 크기는 가로x세로(257x257)이다.
 	//지형을 하나의 격자 메쉬(257x257)로 생성한다.
@@ -85,6 +80,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pSkyboxShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pSkyboxShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 
+	m_nBillBoardShaders = 1;
+	m_pBillBoardShaders = new CBillBoardShader[m_nBillBoardShaders];
+	m_pBillBoardShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pBillBoardShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -98,8 +97,6 @@ void CScene::ReleaseUploadBuffers()
 	for(int i = 0; i < m_nLightShaders; i++)
 		m_pLightShaders[i].ReleaseUploadBuffers();
 }
-
-
 
 bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 {
@@ -134,6 +131,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
 		m_pInstancingShaders[i].Render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < m_nBillBoardShaders; i++)
+	{
+		m_pBillBoardShaders[i].Render(pd3dCommandList);
 	}
 
 	
@@ -212,7 +214,7 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[10];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[11];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -230,12 +232,14 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 6개, 3 ~ 8
 	CD3DX12_DESCRIPTOR_RANGE TerrainRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 9, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 2개, 9 ~ 10
 	CD3DX12_DESCRIPTOR_RANGE SkyboxRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 11, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 6개, 11 ~ 16
+	CD3DX12_DESCRIPTOR_RANGE BillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 17, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 2개, 17 ~ 18
 
 	//디스크립터 테이블 이용하여 업로드
 	pd3dRootParameters[6].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
 	pd3dRootParameters[7].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
 	pd3dRootParameters[8].InitAsDescriptorTable(1, &TerrainRange); // 베이스 텍스쳐 + 디테일 텍스쳐
 	pd3dRootParameters[9].InitAsDescriptorTable(1, &SkyboxRange); // 스카이박스 텍스쳐
+	pd3dRootParameters[10].InitAsDescriptorTable(1, &BillboardRange); // 빌보드 텍스쳐
 
 	auto staticSamplers = GetStaticSamplers();
 

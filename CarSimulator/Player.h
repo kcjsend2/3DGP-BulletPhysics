@@ -153,7 +153,7 @@ private:
 	float m_defaultBreakingForce = 10.f;
 	float m_gBreakingForce = 100.f;
 
-	float m_maxEngineForce = 1000.f;
+	float m_maxEngineForce = 2000.f;
 	float m_EngineForceIncrement = 5.0f;
 
 	float m_gVehicleSteering = 0.f;
