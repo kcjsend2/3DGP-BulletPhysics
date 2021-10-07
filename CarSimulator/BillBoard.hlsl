@@ -24,7 +24,7 @@ GS_BILLBOARD_INPUT VS_BillBoard(VS_BILLBOARD_INPUT input)
     GS_BILLBOARD_INPUT output;
     
     output.position_w = mul(float4(0.0f, 0.0f, 0.0f, 0.0f), gmtxWorld).xyz;
-    output.size = input.size;
+    output.size = float2(5.0f, 5.0f);
 
     return (output);
 }

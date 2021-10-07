@@ -1052,7 +1052,7 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 	{
 		for (int j = 0; j < 10; ++j)
 		{
-			m_vBillBoard.emplace_back(pd3dDevice, pd3dCommandList, XMFLOAT3{ float(i * 5), 5.0f, float(j * 5) });
+			m_vBillBoard.emplace_back(pd3dDevice, pd3dCommandList, XMFLOAT3{ float(i * 5), 0.0f, float(j * 5) });
 			m_vBillBoard[m_vBillBoard.size() - 1].SetMesh(0, pMesh);
 		}
 	}
