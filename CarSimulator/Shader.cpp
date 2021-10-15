@@ -1013,18 +1013,12 @@ void CBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignatur
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
-void CBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
-	for (int i = 0; i < m_vBillBoard.size(); ++i)
-		m_vBillBoard[i].UpdateShaderVariables(pd3dCommandList);
-}
-
 D3D12_INPUT_LAYOUT_DESC CBillBoardShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 1;
+	UINT nInputElementDescs = 2;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-	pd3dInputElementDescs[0] = { "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
@@ -1045,25 +1039,43 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 17, 10);
 
-	CBillBoardMesh* pMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, 5, 5);
+	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[10000];
 
-	m_vBillBoard.reserve(2000);
-	for (int i = 0; i < 40; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
-		for (int j = 0; j < 40; ++j)
+		for (int j = 0; j < 100; ++j)
 		{
-			m_vBillBoard.emplace_back(XMFLOAT3{ float(i * 20), 0.0f, float(j * 20) });
-			m_vBillBoard[m_vBillBoard.size() - 1].SetMesh(0, pMesh);
+			pxmf3GrassPosition[(i * 100) + j] = XMFLOAT3{float(i * 20), 0.0f, float(j * 20) };
 		}
 	}
+
+	CBillBoardMesh* pGrassMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 10000);
+
+	XMFLOAT3* pxmf3TreePosition = new XMFLOAT3[2500];
+
+	for (int i = 0; i < 50; ++i)
+	{
+		for (int j = 0; j < 50; ++j)
+		{
+			pxmf3TreePosition[(i * 50) + j] = XMFLOAT3{ float(i * 100) + 5.0f, 0.0f, float(j * 100) + 5.0f };
+		}
+	}
+
+	CBillBoardMesh* pTreeMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, pxmf3TreePosition, 20, 20, 2500);
+
+	m_pBillBoard = new CBillBoard(2);
+	m_pBillBoard->SetMesh(0, pGrassMesh);
+	m_pBillBoard->SetMesh(1, pTreeMesh);
+}
+
+void CBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CShader::Render(pd3dCommandList);
-
 	UpdateShaderVariables(pd3dCommandList);
-
-	for(int i = 0; i < m_vBillBoard.size(); ++i)
-		m_vBillBoard[i].Render(pd3dCommandList);
+	m_pBillBoard->Render(pd3dCommandList);
 }

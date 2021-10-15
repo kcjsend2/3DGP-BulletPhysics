@@ -565,9 +565,8 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	}
 }
 
-CBillBoard::CBillBoard(XMFLOAT3 xmf3Position)
+CBillBoard::CBillBoard(int nMeshes) : CGameObject(nMeshes)
 {
-	SetPosition(xmf3Position);
 }
 
 CBillBoard::~CBillBoard()

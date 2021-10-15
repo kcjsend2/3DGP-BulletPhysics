@@ -345,7 +345,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btCarTransform.setIdentity();
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
-	m_pbtRigidBody = BulletHelper::CreateRigidBody(800.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(1000.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
 	m_vehicleRayCaster = new btDefaultVehicleRaycaster(pbtDynamicsWorld);
 	m_vehicle = new btRaycastVehicle(m_tuning, m_pbtRigidBody, m_vehicleRayCaster);
@@ -385,8 +385,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	connectionPointCS0 = btVector3(vehicleExtents.x - (0.3 * wheelWidth), connectionHeight, -vehicleExtents.z + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
-
-	
 
 	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
 	{

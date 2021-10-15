@@ -234,7 +234,7 @@ public:
 class CBillBoardMesh : public CMesh
 {
 public:
-	CBillBoardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight);
+	CBillBoardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3* pxmf3Position, float fWidth, float fHeight, int nVertices);
 	virtual ~CBillBoardMesh();
 
 protected:

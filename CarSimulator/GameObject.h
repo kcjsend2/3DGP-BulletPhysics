@@ -209,6 +209,6 @@ public:
 class CBillBoard : public CGameObject
 {
 public:
-	CBillBoard(XMFLOAT3 xmf3Position);
+	CBillBoard(int nMeshes);
 	virtual ~CBillBoard();
 };
