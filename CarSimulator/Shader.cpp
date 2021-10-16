@@ -378,7 +378,7 @@ void CInstancingShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignatu
 void CInstancingShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//인스턴스 정보를 저장할 정점 버퍼를 업로드 힙 유형으로 생성한다.
-	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, sizeof(VS_VB_INSTANCE) * m_nObjects, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
+	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, sizeof(VS_VB_INSTANCE) * m_vpObjects.size(), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
 
 	//정점 버퍼(업로드 힙)에 대한 포인터를 저장한다.
 	m_pd3dcbGameObjects->Map(0, NULL, (void**)&m_pcbMappedGameObjects);
@@ -403,11 +403,11 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCom
 {
 	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootShaderResourceView(4, m_pd3dcbGameObjects->GetGPUVirtualAddress());
-	for (int j = 0; j < m_vpObjects.size(); j++)
+	for (int i = 0; i < m_vpObjects.size(); i++)
 	{
-		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform, XMMatrixTranspose(XMLoadFloat4x4(&m_vpObjects[j]->GetWorldTransformMatrix())));
-		m_pcbMappedGameObjects[j].m_nTextrueIndex = j % 6;
-		m_vpObjects[j]->UpdateShaderVariables(pd3dCommandList);
+		XMStoreFloat4x4(&m_pcbMappedGameObjects[i].m_xmf4x4Transform, XMMatrixTranspose(XMLoadFloat4x4(&m_vpObjects[i]->GetWorldTransformMatrix())));
+		m_pcbMappedGameObjects[i].m_nTextrueIndex = i % 6;
+		m_vpObjects[i]->UpdateShaderVariables(pd3dCommandList);
 	}
 }
 
@@ -524,7 +524,7 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	UpdateShaderVariables(pd3dCommandList);
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
-	m_vpObjects[0]->Render(pd3dCommandList, m_nObjects);
+	m_vpObjects[0]->Render(pd3dCommandList, m_vpObjects.size());
 }
 
 CTerrainShader::CTerrainShader()

@@ -138,7 +138,7 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual std::vector<std::shared_ptr<CGameObject>> GetObjectVector() { return m_vpObjects; }
+	virtual std::vector<std::shared_ptr<CGameObject>>& GetObjectVector() { return m_vpObjects; }
 	virtual int GetObjectsNumber() { return m_nObjects; }
 
 protected:

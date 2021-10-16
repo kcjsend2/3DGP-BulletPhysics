@@ -474,7 +474,7 @@ void CVehiclePlayer::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	if (dwBehave & KEY_SHIFT)
 	{
-		m_gBreakingForce = 10.f;
+		m_gBreakingForce = 30.f;
 	}
 	
 	if (dwBehave & KEY_X)

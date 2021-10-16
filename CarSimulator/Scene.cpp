@@ -53,22 +53,22 @@ void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElaps
 
 	if (pBullet)
 	{
-		std::vector<std::shared_ptr<CGameObject>> vpInstancingObjects = m_pInstancingShaders[0].GetObjectVector();
-
-		BoundingOrientedBox bulletBB = pBullet->GetBoudingBox(0);
-		BoundingOrientedBox meshBB = vpInstancingObjects[0]->GetBoudingBox(0);
+		std::vector<std::shared_ptr<CGameObject>>& vpInstancingObjects = m_pInstancingShaders[0].GetObjectVector();
 
 		for (auto i = vpInstancingObjects.begin(); i < vpInstancingObjects.end(); ++i)
 		{
+			BoundingOrientedBox bulletBB = pBullet->GetBoudingBox(0);
+			BoundingOrientedBox meshBB = vpInstancingObjects[0]->GetBoudingBox(0);
+
 			XMMATRIX xmMatrix;
 
 			xmMatrix = XMLoadFloat4x4(&i->get()->GetWorldTransformMatrix());
-			bulletBB.Transform(bulletBB, xmMatrix);
-
-			xmMatrix = XMLoadFloat4x4(&pBullet->GetWorldTransformMatrix());
 			meshBB.Transform(meshBB, xmMatrix);
 
-			if (bulletBB.Intersects(meshBB))
+			xmMatrix = XMLoadFloat4x4(&pBullet->GetWorldTransformMatrix());
+			bulletBB.Transform(bulletBB, xmMatrix);
+
+			if (bulletBB.Intersects(meshBB) && vpInstancingObjects.size() > 1)
 			{
 				if (i == vpInstancingObjects.begin())
 				{
@@ -79,6 +79,10 @@ void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElaps
 
 				break;
 			}
+		}
+		for (auto i = vpInstancingObjects.begin(); i < vpInstancingObjects.end(); ++i)
+		{
+			i->get()->SetInstanceNum(vpInstancingObjects.size());
 		}
 	}
 }
