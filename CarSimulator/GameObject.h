@@ -104,6 +104,7 @@ public:
 	void ReleaseUploadBuffers();
 	void SetMesh(int nIndex, CMesh* pMesh);
 	void SetMesh(int nIndex, CCubeMesh* pMesh);
+	CMesh* GetMesh(int nIndex) { return m_ppMeshes[nIndex]; }
 
 	//게임 객체를 회전(x-축, y-축, z-축)한다.
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
@@ -118,6 +119,7 @@ public:
 	virtual btRigidBody* GetRigidBody() { return m_pbtRigidBody; }
 	virtual void SetRigidBody(btRigidBody* pbtRigidBody) { m_pbtRigidBody = pbtRigidBody; }
 	virtual void SetMatrix(XMFLOAT4X4 xmf4x4Matrix) { m_xmf4x4World = xmf4x4Matrix; }
+	virtual BoundingOrientedBox GetBoudingBox(int index);
 public:
 	//상수 버퍼를 생성한다.
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -206,9 +208,14 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };
 
-class CBillBoard : public CGameObject
+class CBullet : public CGameObject
 {
 public:
-	CBillBoard(int nMeshes);
-	virtual ~CBillBoard();
+	CBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, btVector3 btf3Forward, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	virtual ~CBullet();
+	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	float GetTimeRemain() { return m_fTimeRemain; };
+
+private:
+	float m_fTimeRemain = 2.0f;
 };

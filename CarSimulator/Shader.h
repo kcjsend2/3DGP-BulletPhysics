@@ -82,8 +82,8 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer, float fBoundary, int nShadowIndex);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos, float fBoundary, int nShadowIndex);
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
-	std::vector<CGameObject*>* GetObjectVector() { return &m_vpGameObjects; }
-	std::vector<CGameObject*>* GetInstancingObjectVector() { return &m_vpInstancingGameObjects; }
+	std::vector<std::shared_ptr<CGameObject>>* GetObjectVector() { return &m_vpGameObjects; }
+	std::vector<std::shared_ptr<CGameObject>>* GetInstancingObjectVector() { return &m_vpInstancingGameObjects; }
 
 	struct CB_SHADOW
 	{
@@ -104,8 +104,8 @@ public:
 protected:
 	CLight* m_pLight = NULL;
 	UploadBuffer<CB_SHADOW>* m_ubShadowCB;
-	std::vector<CGameObject*> m_vpGameObjects;
-	std::vector<CGameObject*> m_vpInstancingGameObjects;
+	std::vector<std::shared_ptr<CGameObject>> m_vpGameObjects;
+	std::vector<std::shared_ptr<CGameObject>> m_vpInstancingGameObjects;
 	ID3D12PipelineState* m_pd3dInstancingPipelineState;
 	XMFLOAT4X4 m_xmf4x4ShadowTransform[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 	XMFLOAT4X4 m_xmf4x4LightViewProj[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
@@ -138,11 +138,11 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual CGameObject** GetObjects() { return m_ppObjects; }
+	virtual std::vector<std::shared_ptr<CGameObject>> GetObjectVector() { return m_vpObjects; }
 	virtual int GetObjectsNumber() { return m_nObjects; }
 
 protected:
-	CGameObject** m_ppObjects = NULL;
+	std::vector<std::shared_ptr<CGameObject>> m_vpObjects;
 	int m_nObjects = 0;
 };
 
@@ -240,5 +240,5 @@ public:
 
 protected:
 	int m_nBillBoard;
-	CBillBoard* m_pBillBoard;
+	CGameObject* m_pBillBoard;
 };

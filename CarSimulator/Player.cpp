@@ -347,6 +347,11 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pbtRigidBody = BulletHelper::CreateRigidBody(1000.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
 
+	btTransform btCenterOfMassTransform;
+	btCenterOfMassTransform.setIdentity();
+	btCenterOfMassTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y - 4.0f, m_xmf3Position.z));
+	m_pbtRigidBody->setCenterOfMassTransform(btCenterOfMassTransform);
+
 	m_vehicleRayCaster = new btDefaultVehicleRaycaster(pbtDynamicsWorld);
 	m_vehicle = new btRaycastVehicle(m_tuning, m_pbtRigidBody, m_vehicleRayCaster);
 
@@ -362,11 +367,11 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	float wheelWidth = wheelExtents.x;
 	float wheelRadius = wheelExtents.z;
-	float wheelFriction = 1000;  //BT_LARGE_FLOAT;
+	float wheelFriction = 5000;  //BT_LARGE_FLOAT;
 	float suspensionStiffness = 20.f;
 	float suspensionDamping = 2.3f;
 	float suspensionCompression = 4.4f;
-	float rollInfluence = 0.1f;  //1.0f;
+	float rollInfluence = 0.01f;  //1.0f;
 
 	// 앞바퀴
 	bool isFrontWheel = true;
@@ -379,7 +384,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	// 뒷바퀴
 	isFrontWheel = false;
-
+	
 	connectionPointCS0 = btVector3(-vehicleExtents.x + (0.3 * wheelWidth), connectionHeight, -vehicleExtents.z + wheelRadius);
 	m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, 0.6, wheelRadius, m_tuning, isFrontWheel);
 
@@ -394,7 +399,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		wheel.m_wheelsDampingCompression = suspensionCompression;
 		wheel.m_frictionSlip = wheelFriction;
 		wheel.m_rollInfluence = rollInfluence;
-		
 	}
 
 	CPlayerShader* pShader = new CPlayerShader();
@@ -403,7 +407,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	for (int i = 0; i < 4; ++i)
 	{
-		m_pWheel[i] = new CWheel(pWheelMesh);
+		m_pWheel[i] = std::make_shared<CWheel>(pWheelMesh);
 		m_pWheel[i]->SetShader(pShader);
 	}
 }
@@ -414,7 +418,7 @@ CVehiclePlayer::~CVehiclePlayer()
 	if (m_pCamera) delete m_pCamera;
 }
 
-void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
+void CVehiclePlayer::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave)
 {
 	if (m_gVehicleSteering > 0)
 	{
@@ -470,7 +474,13 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 
 	if (dwBehave & KEY_SHIFT)
 	{
-		m_gBreakingForce = 500.f;
+		m_gBreakingForce = 10.f;
+	}
+	
+	if (dwBehave & KEY_X)
+	{
+		if(m_pBullet == NULL)
+			FireBullet(pd3dDevice, pd3dCommandList, pbtDynamicsWorld);
 	}
 
 
@@ -508,6 +518,15 @@ void CVehiclePlayer::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyna
 		m_pWheel[i]->Update(fTimeElapsed, m_vehicle, i);
 	}
 
+	if (m_pBullet)
+	{
+		m_pBullet->Update(fTimeElapsed, pbtDynamicsWorld);
+		if (m_pBullet->GetTimeRemain() < 0.0f)
+		{
+			m_pBullet = NULL;
+		}
+	}
+
 	//카메라의 카메라 변환 행렬을 다시 생성한다.
 	m_pCamera->RegenerateViewMatrix();
 }
@@ -537,6 +556,11 @@ void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	for (int i = 0; i < 4; ++i)
 	{
 		m_pWheel[i]->Render(pd3dCommandList);
+	}
+
+	if (m_pBullet)
+	{
+		m_pBullet->Render(pd3dCommandList);
 	}
 }
 
@@ -597,6 +621,11 @@ CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
 
 	return(m_pCamera);
+}
+
+void CVehiclePlayer::FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld)
+{
+	m_pBullet = std::make_shared<CBullet>(pd3dDevice, pd3dCommandList, m_xmf3Position, m_vehicle->getForwardVector(), pbtDynamicsWorld);
 }
 
 CVehiclePlayer::CWheel::CWheel(CMeshFileRead* pWheelMesh)

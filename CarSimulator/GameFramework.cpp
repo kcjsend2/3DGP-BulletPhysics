@@ -343,7 +343,7 @@ void CGameFramework::BuildObjects()
 	Update();
 	// 쉐도우맵은 모든 오브젝트를 그려야한다.
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
-	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer.get());
+	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 
 	for (int j = 0; j< 4; ++j)
 	{
@@ -351,7 +351,7 @@ void CGameFramework::BuildObjects()
 	}
 
 	auto pInstancingShader = m_pScene->GetInstancingShader();
-	m_pShadowMap[0]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjects()[0]);
+	m_pShadowMap[0]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjectVector()[0]);
 	m_GameTimer.Reset();
 }
 
@@ -438,17 +438,18 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwBehave |= KEY_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwBehave |= KEY_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= KEY_DOWN;
-		if (pKeyBuffer[VK_LSHIFT & 0xF0]) dwBehave |= KEY_SHIFT;
+		if (pKeyBuffer[VK_LSHIFT] & 0xF0) dwBehave |= KEY_SHIFT;
+		if (pKeyBuffer[0x58] & 0xF0) dwBehave |= KEY_X;
 	}
 
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), dwBehave);
+	m_pPlayer->Update(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), dwBehave);
 }
 
 void CGameFramework::Update()
 {
 	ProcessInput();
-	if (m_pScene) m_pScene->Update(m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), m_pPlayer->GetPosition());
+	if (m_pScene) m_pScene->Update(m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), m_pPlayer);
 }
 
 void CGameFramework::WaitForGpuComplete()

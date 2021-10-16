@@ -6,7 +6,8 @@
 #define KEY_RIGHT 0x08
 #define KEY_UP 0x10
 #define KEY_DOWN 0x20
-#define KEY_SHIFT 0x30
+#define KEY_SHIFT 0x40
+#define KEY_X 0x80
 
 
 #include "GameObject.h"
@@ -134,26 +135,31 @@ private:
 public:
 	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes = 5);
 	virtual ~CVehiclePlayer();
-
-	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);
+	std::shared_ptr<CBullet> GetBullet() { return m_pBullet; };
+	virtual void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);
 	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
-	CWheel** GetWheels() { return m_pWheel; }
+	void FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld);
+	void EraseBullet() { m_pBullet = NULL; }
+
+	std::shared_ptr<CWheel>* GetWheels() { return m_pWheel; }
 
 private:
-	CWheel* m_pWheel[4];
+	std::shared_ptr<CWheel> m_pWheel[4];
 
 	btRaycastVehicle::btVehicleTuning m_tuning;
 	btVehicleRaycaster* m_vehicleRayCaster;
 	btRaycastVehicle* m_vehicle;
 
+	std::shared_ptr<CBullet> m_pBullet;
+
 	float m_gEngineForce = 0.f;
 
 	float m_defaultBreakingForce = 10.f;
-	float m_gBreakingForce = 100.f;
+	float m_gBreakingForce = 0.f;
 
-	float m_maxEngineForce = 2000.f;
+	float m_maxEngineForce = 3000.f;
 	float m_EngineForceIncrement = 5.0f;
 
 	float m_gVehicleSteering = 0.f;

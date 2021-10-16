@@ -33,12 +33,9 @@ void CScene::ReleaseObjects()
 
 	if (m_pInstancingShaders)
 		delete[] m_pInstancingShaders;
-	
-	if (m_pTerrain)
-		delete m_pTerrain;
 }
 
-void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, XMFLOAT3 xmf3PlayerPosition)
+void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, std::shared_ptr<CVehiclePlayer> pPlayer)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
@@ -48,7 +45,41 @@ void CScene::Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElaps
 
 	for (int i = 0; i < m_nLightShaders; i++)
 	{
-		m_pLightShaders[i].Update(fTimeElapsed, xmf3PlayerPosition);
+		m_pLightShaders[i].Update(fTimeElapsed, pPlayer->GetPosition());
+	}
+
+
+	auto pBullet = pPlayer->GetBullet();
+
+	if (pBullet)
+	{
+		std::vector<std::shared_ptr<CGameObject>> vpInstancingObjects = m_pInstancingShaders[0].GetObjectVector();
+
+		BoundingOrientedBox bulletBB = pBullet->GetBoudingBox(0);
+		BoundingOrientedBox meshBB = vpInstancingObjects[0]->GetBoudingBox(0);
+
+		for (auto i = vpInstancingObjects.begin(); i < vpInstancingObjects.end(); ++i)
+		{
+			XMMATRIX xmMatrix;
+
+			xmMatrix = XMLoadFloat4x4(&i->get()->GetWorldTransformMatrix());
+			bulletBB.Transform(bulletBB, xmMatrix);
+
+			xmMatrix = XMLoadFloat4x4(&pBullet->GetWorldTransformMatrix());
+			meshBB.Transform(meshBB, xmMatrix);
+
+			if (bulletBB.Intersects(meshBB))
+			{
+				if (i == vpInstancingObjects.begin())
+				{
+					vpInstancingObjects[1]->SetMesh(0, i->get()->GetMesh(0));
+				}
+				vpInstancingObjects.erase(i);
+				pPlayer->EraseBullet();
+
+				break;
+			}
+		}
 	}
 }
 
@@ -67,13 +98,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	//지형을 높이 맵 이미지 파일(HeightMap.raw)을 사용하여 생성한다. 높이 맵의 크기는 가로x세로(257x257)이다.
 	//지형을 하나의 격자 메쉬(257x257)로 생성한다.
-	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Assets/Image/Terrain/PlaneMap.raw"), 512, 512, 512, 512, xmf3Scale, btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
+	m_pTerrain = std::make_shared<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Assets/Image/Terrain/PlaneMap.raw"), 512, 512, 512, 512, xmf3Scale, btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
 	//m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Assets/Image/Terrain/HeightMap.raw"), 217, 217, 217, 217, xmf3Scale, btCollisionShapes, pbtDynamicsWorld);
 
 	m_nInstancingShaders = 1;
 	m_pInstancingShaders = new CInstancingShader[m_nInstancingShaders];
 	m_pInstancingShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain, btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
+	m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get(), btCollisionShapes, pbtDynamicsWorld, pd3dSrvDescriptorHeap);
 
 	m_nSkyboxShaders = 1;
 	m_pSkyboxShaders = new CSkyBoxShader[m_nSkyboxShaders];

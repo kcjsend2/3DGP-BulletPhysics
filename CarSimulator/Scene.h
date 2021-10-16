@@ -13,7 +13,7 @@ public:
 	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR* pKeysBuffer);
-	void Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, XMFLOAT3 xmf3PlayerPosition);
+	void Update(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, std::shared_ptr<CVehiclePlayer> pPlayer);
 	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 	void ReleaseUploadBuffers();
@@ -39,10 +39,10 @@ protected:
 
 
 protected:
-	CHeightMapTerrain* m_pTerrain = NULL;
+	std::shared_ptr <CHeightMapTerrain> m_pTerrain = NULL;
 
 public:
-	CHeightMapTerrain* GetTerrain() { return(m_pTerrain); }
+	std::shared_ptr<CHeightMapTerrain> GetTerrain() { return(m_pTerrain); }
 	CInstancingShader* GetInstancingShader() { return m_pInstancingShaders; }
 	int GetInstancingShaderNumber() { return m_nInstancingShaders; }
 

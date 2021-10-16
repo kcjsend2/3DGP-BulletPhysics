@@ -300,6 +300,11 @@ void CGameObject::ReleaseUploadBuffers()
 	}
 }
 
+BoundingOrientedBox CGameObject::GetBoudingBox(int index)
+{
+	return m_ppMeshes[index]->GetBoundingBox();
+}
+
 void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }
@@ -565,10 +570,38 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	}
 }
 
-CBillBoard::CBillBoard(int nMeshes) : CGameObject(nMeshes)
+CBullet::CBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, btVector3 btf3Forward, btDiscreteDynamicsWorld* pbtDynamicsWorld) : CGameObject(1)
+{
+	SetMaterial(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
+
+	CMeshFileRead* pMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Sphere.bin", false, {0.7f, 0.7f, 0.7f});
+
+	btScalar radius = pMesh->GetBoundingBox().Extents.x * 0.7f;
+
+	btCollisionShape* bulletShape = new btSphereShape(radius);
+	SetMesh(0, pMesh);
+
+	btTransform btBulletTransform;
+	btBulletTransform.setIdentity();
+
+	btVector3 btf3BulletPosition = 10 * btf3Forward;
+
+	btBulletTransform.setOrigin(btVector3(xmf3Position.x + btf3BulletPosition.x(), xmf3Position.y + btf3BulletPosition.y(), xmf3Position.z + btf3BulletPosition.z()));
+	m_pbtRigidBody = BulletHelper::CreateRigidBody(10.0f, btBulletTransform, bulletShape, pbtDynamicsWorld);
+	m_pbtRigidBody->setLinearVelocity(btf3Forward * 300);
+}
+
+CBullet::~CBullet()
 {
 }
 
-CBillBoard::~CBillBoard()
+void CBullet::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld)
 {
+	auto CollisionObjectArray = pbtDynamicsWorld->getCollisionObjectArray();
+	btScalar* m = new btScalar[16];
+	CollisionObjectArray[CollisionObjectArray.findLinearSearch(m_pbtRigidBody)]->getWorldTransform().getOpenGLMatrix(m);
+
+	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
+
+	m_fTimeRemain -= fTimeElapsed;
 }
