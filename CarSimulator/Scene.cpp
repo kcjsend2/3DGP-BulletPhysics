@@ -46,7 +46,7 @@ void CScene::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 	{
 		std::vector<std::shared_ptr<CGameObject>>& vpInstancingObjects = m_pInstancingShader[0].GetObjectVector();
 
-		for (auto i = vpInstancingObjects.begin(); i < vpInstancingObjects.end(); ++i)
+		for (auto i = vpInstancingObjects.begin(); i < vpInstancingObjects.end();)
 		{
 			BoundingOrientedBox bulletBB = pBullet->GetBoudingBox(0);
 			BoundingOrientedBox meshBB = vpInstancingObjects[0]->GetBoudingBox(0);
@@ -68,10 +68,16 @@ void CScene::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 
 				m_pAnimatedBillBoardShader->AddBillBoard(pd3dDevice, pd3dCommandList, i->get()->GetPosition(), 20, 5, 4, std::vector<float>(20, 0.1f));
 
-				vpInstancingObjects.erase(i);
+				pbtDynamicsWorld->removeRigidBody(i->get()->GetRigidBody());
+				i = vpInstancingObjects.erase(i);
 				pPlayer->EraseBullet();
+				pBullet = NULL;
 
 				break;
+			}
+			else
+			{
+				i++;
 			}
 		}
 		for (auto i = vpInstancingObjects.begin(); i < vpInstancingObjects.end(); ++i)

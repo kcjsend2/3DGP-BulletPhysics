@@ -459,7 +459,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 				btTransform btCubeTransform;
 				btCubeTransform.setIdentity();
 
-				btScalar mass(100.0f);
+				btScalar mass(5000.0f);
 
 				//rigidbody is dynamic if and only if mass is non zero, otherwise static
 				bool isDynamic = (mass != 0.f);
