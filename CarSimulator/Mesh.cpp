@@ -756,4 +756,6 @@ CBillBoardMesh::CBillBoardMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 CBillBoardMesh::~CBillBoardMesh()
 {
+	if (m_pd3dSizeBuffer)
+		m_pd3dSizeBuffer->Release();
 }

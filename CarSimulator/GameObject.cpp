@@ -160,26 +160,11 @@ D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)
 CGameObject::CGameObject(int nMeshes)
 {
 	m_xmf4x4World = Matrix4x4::Identity();
-	m_nMeshes = nMeshes;
-	m_ppMeshes = NULL;
-	if (m_nMeshes > 0)
-	{
-		m_ppMeshes = new CMesh * [m_nMeshes];
-		for (int i = 0; i < m_nMeshes; i++) m_ppMeshes[i] = NULL;
-	}
+	m_vpMeshes.reserve(nMeshes);
 }
 
 CGameObject::~CGameObject()
 {
-	if (m_ppMeshes)
-	{
-		for (int i = 0; i < m_nMeshes; i++)
-		{
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Release();
-			m_ppMeshes[i] = NULL;
-		}
-		delete[] m_ppMeshes;
-	}
 	if (m_pShader)
 	{
 		m_pShader->ReleaseShaderVariables();
@@ -198,33 +183,14 @@ void CGameObject::SetShader(CShader* pShader)
 		m_pShader->AddRef();
 }
 
-void CGameObject::SetMesh(int nIndex, CMesh* pMesh)
+void CGameObject::SetMesh(std::shared_ptr<CMesh> pMesh)
 {
-	if (m_ppMeshes)
-	{
-		if (m_ppMeshes[nIndex])
-			m_ppMeshes[nIndex]->Release();
-
-		m_ppMeshes[nIndex] = pMesh;
-
-
-		if (pMesh)
-			pMesh->AddRef();
-	}
+	m_vpMeshes.push_back(pMesh);
 }
 
-void CGameObject::SetMesh(int nIndex, CCubeMesh* pMesh)
+void CGameObject::SetMesh(std::shared_ptr<CCubeMesh> pMesh)
 {
-	if (m_ppMeshes)
-	{
-		if (m_ppMeshes[nIndex])
-			m_ppMeshes[nIndex]->Release();
-
-		m_ppMeshes[nIndex] = pMesh;
-
-		if (pMesh)
-			pMesh->AddRef();
-	}
+	m_vpMeshes.push_back(pMesh);
 }
 
 void CGameObject::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld)
@@ -244,12 +210,9 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_pShader->Render(pd3dCommandList);
 
 	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
-	if (m_ppMeshes)
+	for (int i = 0; i < m_vpMeshes.size(); i++)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
-		{
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
-		}
+		if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList);
 	}
 }
 
@@ -260,18 +223,18 @@ void CGameObject::ShadowPassRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 
 	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
-	if (m_ppMeshes && m_nInstance == 1)
+	if (m_vpMeshes.size() > 0 && m_nInstance == 1)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
+		for (int i = 0; i < m_vpMeshes.size(); i++)
 		{
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
+			m_vpMeshes[i]->Render(pd3dCommandList);
 		}
 	}
-	else if (m_ppMeshes && m_nInstance > 1)
+	else if (m_vpMeshes.size() > 0 && m_nInstance > 1)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
+		for (int i = 0; i < m_vpMeshes.size(); i++)
 		{
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList, m_nInstance);
+			m_vpMeshes[i]->Render(pd3dCommandList, m_nInstance);
 		}
 	}
 }
@@ -280,29 +243,27 @@ void CGameObject::ShadowPassRender(ID3D12GraphicsCommandList* pd3dCommandList)
 void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nInstances)
 {
 	OnPrepareRender();
-	if (m_ppMeshes)
+	for (int i = 0; i < m_vpMeshes.size(); i++)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
-		{
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList, nInstances);
-		}
+		if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList, nInstances);
 	}
 }
 
 void CGameObject::ReleaseUploadBuffers()
 {
-	if (m_ppMeshes)
+	for (int i = 0; i < m_vpMeshes.size(); i++)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
-		{
-			m_ppMeshes[i]->ReleaseUploadBuffers();
-		}
+		m_vpMeshes[i]->ReleaseUploadBuffers();
 	}
 }
 
 BoundingOrientedBox CGameObject::GetBoudingBox(int index)
 {
-	return m_ppMeshes[index]->GetBoundingBox();
+	if (m_vpMeshes.size() >= index)
+		return m_vpMeshes[index]->GetBoundingBox();
+
+	else
+		return BoundingOrientedBox();
 }
 
 void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -311,23 +272,6 @@ void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12Graphics
 
 void CGameObject::ReleaseShaderVariables()
 {
-}
-
-bool CGameObject::IsVisible(CCamera* pCamera)
-{
-	OnPrepareRender();
-	bool bIsVisible = false;
-
-	for (int i = 0; i < m_nMeshes; ++i)
-	{
-		BoundingOrientedBox xmBoundingBox = m_ppMeshes[i]->GetBoundingBox();
-		//모델 좌표계의 바운딩 박스를 월드 좌표계로 변환한다.
-		xmBoundingBox.Transform(xmBoundingBox, XMLoadFloat4x4(&m_xmf4x4World));
-		if (pCamera && bIsVisible == false)
-			bIsVisible = pCamera->IsInFrustum(xmBoundingBox);
-	}
-
-	return(bIsVisible);
 }
 
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -443,7 +387,7 @@ void CRotatingObject::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDyn
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
 }
 
-CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, LPCTSTR pFileName, int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap) : CGameObject((m_nWidth - 1) / (nBlockWidth - 1) * (m_nLength - 1) / (nBlockLength - 1))
+CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, LPCTSTR pFileName, int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap) : CGameObject((nWidth - 1) / (nBlockWidth - 1) * (nLength - 1) / (nBlockLength - 1))
 {
 	//지형에 사용할 높이 맵의 가로, 세로의 크기이다.
 	m_nWidth = nWidth;
@@ -467,15 +411,11 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	long czBlocks = (m_nLength - 1) / czQuadsPerBlock;
 
 	//지형 전체를 표현하기 위한 격자 메쉬의 개수이다.
-	m_nMeshes = cxBlocks * czBlocks;
-
 	//지형 전체를 표현하기 위한 격자 메쉬에 대한 포인터 배열을 생성한다.
-	m_ppMeshes = new CMesh*[m_nMeshes];
 
-	for (int i = 0; i < m_nMeshes; i++)
-		m_ppMeshes[i] = NULL;
+	m_vpMeshes.reserve(cxBlocks * czBlocks);
 	
-	CHeightMapGridMesh* pHeightMapGridMesh = NULL;
+	std::shared_ptr<CHeightMapGridMesh> pHeightMapGridMesh = NULL;
 	btHeightfieldTerrainShape* pTerrainShape = NULL;
 	float* pfHeightmapData = new float[nLength * nWidth];
 	float fMinHeight = FLT_MAX;
@@ -489,8 +429,8 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 			xStart = x * (nBlockWidth - 1);
 			zStart = z * (nBlockLength - 1);
 			//지형의 일부분을 나타내는 격자 메쉬를 생성하여 지형 메쉬에 저장한다.
-			pHeightMapGridMesh = new CHeightMapGridMesh(pd3dDevice, pd3dCommandList, xStart, zStart, nBlockWidth, nBlockLength, pfHeightmapData, fMaxHeight, fMinHeight, xmf3Scale, m_pHeightMapImage);
-			SetMesh(x + (z * cxBlocks), pHeightMapGridMesh);
+			pHeightMapGridMesh = std::make_shared<CHeightMapGridMesh>(pd3dDevice, pd3dCommandList, xStart, zStart, nBlockWidth, nBlockLength, pfHeightmapData, fMaxHeight, fMinHeight, xmf3Scale, m_pHeightMapImage);
+			SetMesh(pHeightMapGridMesh);
 		}
 	}
 	pTerrainShape = new btHeightfieldTerrainShape(nWidth, nLength, pfHeightmapData, fMinHeight, fMaxHeight, 1, false);
@@ -529,23 +469,23 @@ CHeightMapTerrain::~CHeightMapTerrain(void)
 
 CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) : CGameObject(6)
 {
-	CTexturedRectMesh* pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, +10.0f);
-	SetMesh(0, pSkyBoxMesh); // 전
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, +5.0f);
+	SetMesh(pSkyBoxMesh); // 전
 
-	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, -10.0f);
-	SetMesh(1, pSkyBoxMesh); // 후
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, -5.0f);
+	SetMesh(pSkyBoxMesh); // 후
 
-	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, -10.0f, 0.0f, 0.0f);
-	SetMesh(2, pSkyBoxMesh); // 좌
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 10.0f, 10.0f, -5.0f, 0.0f, 0.0f);
+	SetMesh(pSkyBoxMesh); // 좌
 
-	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, +10.0f, 0.0f, 0.0f);
-	SetMesh(3, pSkyBoxMesh); // 우
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 10.0f, 10.0f, +5.0f, 0.0f, 0.0f);
+	SetMesh(pSkyBoxMesh); // 우
 
-	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, +10.0f, 0.0f);
-	SetMesh(4, pSkyBoxMesh); // 상
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 10.0f, 0.0f, 10.0f, 0.0f, +5.0f, 0.0f);
+	SetMesh(pSkyBoxMesh); // 상
 
-	pSkyBoxMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, -10.0f, 0.0f);
-	SetMesh(5, pSkyBoxMesh); // 하
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 10.0f, 0.0f, 10.0f, 0.0f, -5.0f, 0.0f);
+	SetMesh(pSkyBoxMesh); // 하
 }
 
 CSkyBox::~CSkyBox()
@@ -560,13 +500,10 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	UpdateShaderVariables(pd3dCommandList);
 
 	OnPrepareRender();
-	if (m_ppMeshes)
+	for (int i = 0; i < m_vpMeshes.size(); i++)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
-		{
-			pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &i, 2);
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
-		}
+		pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &i, 2);
+		if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList);
 	}
 }
 
@@ -574,12 +511,12 @@ CBullet::CBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 {
 	SetMaterial(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
 
-	CMeshFileRead* pMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Sphere.bin", false, {0.7f, 0.7f, 0.7f});
+	std::shared_ptr<CMeshFileRead> pMesh = std::make_shared<CMeshFileRead>(pd3dDevice, pd3dCommandList, (char*)"Models/Sphere.bin", false, XMFLOAT3{0.7f, 0.7f, 0.7f});
 
 	btScalar radius = pMesh->GetBoundingBox().Extents.x * 0.7f;
 
 	btCollisionShape* bulletShape = new btSphereShape(radius);
-	SetMesh(0, pMesh);
+	SetMesh(pMesh);
 
 	btTransform btBulletTransform;
 	btBulletTransform.setIdentity();
@@ -604,4 +541,30 @@ void CBullet::Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWor
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
 
 	m_fTimeRemain -= fTimeElapsed;
+}
+
+CAnimatedBillBoard::CAnimatedBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position , int nxDivided, int nyDivided, std::vector<float> vfFrameTime) : CGameObject(1)
+{
+	std::shared_ptr<CBillBoardMesh> pMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, &xmf3Position, 20, 20, 1);
+	SetMesh(pMesh);
+	m_nxDivided = nxDivided;
+	m_nyDivided = nyDivided;
+	m_vfFrameTime = vfFrameTime;
+}
+
+CAnimatedBillBoard::~CAnimatedBillBoard()
+{
+}
+
+void CAnimatedBillBoard::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapesd)
+{
+	m_vfFrameTime[0] -= fTimeElapesd;
+	if (m_vfFrameTime[0] < 0.f)
+	{
+		m_vfFrameTime.erase(m_vfFrameTime.begin());
+		m_nCurrentFrame++;
+
+		m_nx = m_nCurrentFrame % m_nxDivided;
+		m_ny = m_nCurrentFrame / m_nxDivided;
+	}
 }

@@ -128,7 +128,8 @@
     <FxCompile Include="ShadowInstancing.hlsl" />
     <FxCompile Include="Terrain.hlsl" />
     <FxCompile Include="Skybox.hlsl" />
-    <FxCompile Include="BillBoard.hlsl" />
+    <FxCompile Include="BillBoardTree.hlsl" />
+    <FxCompile Include="AnimatedBillBoard.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

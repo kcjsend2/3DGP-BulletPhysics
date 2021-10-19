@@ -57,6 +57,10 @@ public:
         return (byteSize + 255) & ~255;
     }
 
+    UINT GetElementSize()
+    {
+        return m_nElementByteSize;
+    }
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Resource> m_pUploadBuffer;

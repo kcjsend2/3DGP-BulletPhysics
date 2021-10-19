@@ -18,6 +18,21 @@ struct MATERIAL //머티리얼 정보
 	float Shininess;
 };
 
+struct CB_ANIMATEDBILLBOARD
+{
+	CB_ANIMATEDBILLBOARD(int nx, int ny, int nxDivided, int nyDivided)
+	{
+		m_nx = nx;
+		m_ny = ny;
+		m_nxDivided = nxDivided;
+		m_nyDivided = nyDivided;
+	}
+	int m_nx;
+	int m_ny;
+	int m_nxDivided;
+	int m_nyDivided;
+};
+
 class CTexture
 {
 public:
@@ -87,8 +102,7 @@ public:
 	virtual ~CGameObject();
 public:
 	int m_nReferences = 0;
-	CMesh** m_ppMeshes = NULL;
-	int m_nMeshes = 0;
+	std::vector<std::shared_ptr<CMesh>> m_vpMeshes;
 	MATERIAL m_material = { XMFLOAT4{}, XMFLOAT4{}, XMFLOAT3{}, 0};
 
 public:
@@ -99,12 +113,15 @@ protected:
 	CShader* m_pShader = NULL;
 	btRigidBody* m_pbtRigidBody = NULL;
 	int m_nInstance = 1;
+	int m_nTextureIndex = 0;
 
 public:
 	void ReleaseUploadBuffers();
-	void SetMesh(int nIndex, CMesh* pMesh);
-	void SetMesh(int nIndex, CCubeMesh* pMesh);
-	CMesh* GetMesh(int nIndex) { return m_ppMeshes[nIndex]; }
+	void SetMesh(std::shared_ptr<CMesh> pMesh);
+	void SetMesh(std::shared_ptr<CCubeMesh> pMesh);
+	std::shared_ptr<CMesh> GetMesh(int nIndex) { return m_vpMeshes[nIndex]; }
+	int GetTextureIndex() { return m_nTextureIndex; }
+	void SetTextureIndex(int nIndex) { m_nTextureIndex = nIndex; }
 
 	//게임 객체를 회전(x-축, y-축, z-축)한다.
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
@@ -125,8 +142,8 @@ public:
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	//상수 버퍼의 내용을 갱신한다.
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapesd) {};
 	virtual void ReleaseShaderVariables();
-	bool IsVisible(CCamera* pCamera = NULL);
 	void SetInstanceNum(int nInstance) { m_nInstance = nInstance; }
 
 	//게임 객체의 월드 변환 행렬에서 위치 벡터와 방향(x-축, y-축, z-축) 벡터를 반환한다.
@@ -214,8 +231,34 @@ public:
 	CBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, btVector3 btf3Forward, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	virtual ~CBullet();
 	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
-	float GetTimeRemain() { return m_fTimeRemain; };
+	float GetTimeRemain() { return m_fTimeRemain; }
 
 private:
-	float m_fTimeRemain = 2.0f;
+	float m_fTimeRemain = 1.0f;
+};
+
+class CAnimatedBillBoard : public CGameObject
+{
+public:
+	CAnimatedBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, int nxDivided, int nyDivided, std::vector<float> pfFrameTime);
+	virtual ~CAnimatedBillBoard();
+	CB_ANIMATEDBILLBOARD GetBillBoardInfo() { return CB_ANIMATEDBILLBOARD(m_nx, m_ny, m_nxDivided, m_nyDivided); }
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapesd);
+	bool isEnd()
+	{
+		if (m_vfFrameTime.size() == 0)
+			return true;
+
+		return false;
+	}
+
+private:
+	int m_nCurrentFrame = 0;
+	int m_nxDivided;
+	int m_nyDivided;
+
+	int m_nx = 0;
+	int m_ny = 0;
+
+	std::vector<float> m_vfFrameTime;
 };

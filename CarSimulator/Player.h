@@ -126,7 +126,7 @@ private:
 	class CWheel : public CGameObject
 	{
 	public:
-		CWheel(CMeshFileRead* pWheelMesh);
+		CWheel(std::shared_ptr<CMeshFileRead> pWheelMesh);
 		~CWheel();
 		virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 		virtual void Update(float fTimeElapsed, btRaycastVehicle* pbtVehicle, int index);
@@ -137,7 +137,6 @@ public:
 	virtual ~CVehiclePlayer();
 	std::shared_ptr<CBullet> GetBullet() { return m_pBullet; };
 	virtual void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);
-	virtual void SetMesh(int nIndex, CMeshFileRead* pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	void FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld);
@@ -159,12 +158,12 @@ private:
 	float m_defaultBreakingForce = 10.f;
 	float m_gBreakingForce = 0.f;
 
-	float m_maxEngineForce = 3000.f;
+	float m_maxEngineForce = 4000.f;
 	float m_EngineForceIncrement = 5.0f;
 
 	float m_gVehicleSteering = 0.f;
 	float m_steeringIncrement = 0.01f;
-	float m_steeringClamp = 0.3f;
+	float m_steeringClamp = 0.1f;
 	float m_wheelRadius = 0.5f;
 	float m_wheelWidth = 0.4f;
 };

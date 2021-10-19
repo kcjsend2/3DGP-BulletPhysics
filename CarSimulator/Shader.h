@@ -55,6 +55,7 @@ public:
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed) {};
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -223,11 +224,11 @@ protected:
 	std::unique_ptr<CSkyBox> m_pSkybox;
 };
 
-class CBillBoardShader : public CShader
+class CTreeBillBoardShader : public CShader
 {
 public:
-	CBillBoardShader();
-	virtual ~CBillBoardShader();
+	CTreeBillBoardShader();
+	virtual ~CTreeBillBoardShader();
 
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
@@ -241,4 +242,23 @@ public:
 protected:
 	int m_nBillBoard;
 	CGameObject* m_pBillBoard;
+};
+
+class CAnimatedBillBoardShader : public CTreeBillBoardShader
+{
+public:
+	CAnimatedBillBoardShader();
+	virtual ~CAnimatedBillBoardShader();
+
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreateGeometryShader(ID3DBlob** ppd3dShaderBlob);
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, int nTotalFrame, int nxDivided, int nyDivided, std::vector<float> vfFrameTime);
+
+protected:
+	std::vector<CAnimatedBillBoard> m_vpAnimatedBillBoard;
+	UploadBuffer<CB_ANIMATEDBILLBOARD>* m_ubAnimatedBillBoard;
 };

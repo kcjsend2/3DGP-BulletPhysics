@@ -324,19 +324,19 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes) : CPlayer(nMeshes)
 {
 	int SteeringIndex = 5;
-	CMeshFileRead* pVehicleMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/FlyerPlayership.bin", false);
-	CMeshFileRead* pWheelMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Tire.bin", false, { 10.0f, 10.0f, 10.0f }, {0.0f, 0.0f, 90.0f});
+	std::shared_ptr<CMeshFileRead> pVehicleMesh = std::make_shared<CMeshFileRead>(pd3dDevice, pd3dCommandList, (char*)"Models/FlyerPlayership.bin", false);
+	std::shared_ptr<CMeshFileRead> pWheelMesh = std::make_shared<CMeshFileRead>(pd3dDevice, pd3dCommandList, (char*)"Models/Tire.bin", false, XMFLOAT3{ 10.0f, 10.0f, 10.0f }, XMFLOAT3{0.0f, 0.0f, 90.0f});
 
-	SetMesh(0, pVehicleMesh);
+	SetMesh(pVehicleMesh);
 
 	SetMaterial(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.8f);
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(100.0f, 5.0f, 100.0f));
+	SetPosition(XMFLOAT3(50.0f, 5.0f, 50.0f));
 
-	auto vehicleExtents = pVehicleMesh[0].GetBoundingBox().Extents;
-	auto wheelExtents = pWheelMesh[0].GetBoundingBox().Extents;
+	auto vehicleExtents = pVehicleMesh.get()[0].GetBoundingBox().Extents;
+	auto wheelExtents = pWheelMesh.get()[0].GetBoundingBox().Extents;
 
 	btCollisionShape* chassisShape = new btBoxShape(btVector3(vehicleExtents.x, vehicleExtents.y, vehicleExtents.z));
 	btCollisionShapes.push_back(chassisShape);
@@ -367,7 +367,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	float wheelWidth = wheelExtents.x;
 	float wheelRadius = wheelExtents.z;
-	float wheelFriction = 5000;  //BT_LARGE_FLOAT;
+	float wheelFriction = 500;  //BT_LARGE_FLOAT;
 	float suspensionStiffness = 20.f;
 	float suspensionDamping = 2.3f;
 	float suspensionCompression = 4.4f;
@@ -474,7 +474,17 @@ void CVehiclePlayer::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	if (dwBehave & KEY_SHIFT)
 	{
-		m_gBreakingForce = 30.f;
+		m_gBreakingForce = 20.0f;
+
+		m_vehicle->getWheelInfo(2).m_frictionSlip = 20;
+		m_vehicle->getWheelInfo(3).m_frictionSlip = 20;
+	}
+	else
+	{
+		m_gBreakingForce = 0.0f;
+
+		for(int i = 0; i < 4; ++i)
+			m_vehicle->getWheelInfo(i).m_frictionSlip = 500;
 	}
 	
 	if (dwBehave & KEY_X)
@@ -529,20 +539,6 @@ void CVehiclePlayer::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	//카메라의 카메라 변환 행렬을 다시 생성한다.
 	m_pCamera->RegenerateViewMatrix();
-}
-
-void CVehiclePlayer::SetMesh(int nIndex, CMeshFileRead* pMesh)
-{
-	if (m_ppMeshes)
-	{
-		if (m_ppMeshes[nIndex])
-			m_ppMeshes[nIndex]->Release();
-
-		m_ppMeshes[nIndex] = pMesh;
-
-		if (pMesh)
-			pMesh->AddRef();
-	}
 }
 
 void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -628,10 +624,10 @@ void CVehiclePlayer::FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_pBullet = std::make_shared<CBullet>(pd3dDevice, pd3dCommandList, m_xmf3Position, m_vehicle->getForwardVector(), pbtDynamicsWorld);
 }
 
-CVehiclePlayer::CWheel::CWheel(CMeshFileRead* pWheelMesh)
+CVehiclePlayer::CWheel::CWheel(std::shared_ptr<CMeshFileRead> pWheelMesh)
 {
 	SetMaterial(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.3f, 0.3f, 0.3f), 0.0f);
-	SetMesh(0, pWheelMesh);
+	SetMesh(pWheelMesh);
 }
 
 CVehiclePlayer::CWheel::~CWheel()
@@ -644,13 +640,9 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	UpdateShaderVariables(pd3dCommandList);
 
 	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
-	if (m_ppMeshes)
+	for (int i = 0; i < m_vpMeshes.size(); i++)
 	{
-		for (int i = 0; i < m_nMeshes; i++)
-		{
-			if (m_ppMeshes[i])
-				m_ppMeshes[i]->Render(pd3dCommandList);
-		}
+		m_vpMeshes[i]->Render(pd3dCommandList);
 	}
 }
 

@@ -231,7 +231,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 19;
+	srvHeapDesc.NumDescriptors = 20;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -462,7 +462,7 @@ void CGameFramework::Update()
 	m_pShadowMap[0]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjectVector()[0]);
 
 	ProcessInput();
-	if (m_pScene) m_pScene->Update(m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), m_pPlayer);
+	if (m_pScene) m_pScene->Update(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_GameTimer.GetTimeElapsed(), m_pbtDynamicsWorld.get(), m_pPlayer);
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -534,7 +534,7 @@ void CGameFramework::FrameAdvance()
 
 	// ·»´õÅ¸°Ù ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap[0]->GetSrv());
+	m_pd3dCommandList->SetGraphicsRootDescriptorTable(7, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();

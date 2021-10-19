@@ -15,46 +15,14 @@ CLight::CLight(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 
 	SetMaterial(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
 
-	CMeshFileRead* pMesh = new CMeshFileRead(pd3dDevice, pd3dCommandList, "Models/Sphere.bin", false);
-	SetMesh(0, pMesh);
+	std::shared_ptr<CMeshFileRead> pMesh = std::make_shared<CMeshFileRead>(pd3dDevice, pd3dCommandList, (char*)"Models/Sphere.bin", false);
+	SetMesh(pMesh);
 }
 
 CLight::~CLight()
 {
 }
 
-void CLight::SetMesh(int nIndex, CMeshFileRead* pMesh)
-{
-	if (m_pMesh)
-		m_pMesh->Release();
-
-	m_pMesh = pMesh;
-
-	if (pMesh)
-		pMesh->AddRef();
-}
-
-void CLight::ReleaseUploadBuffers()
-{
-	if (m_pMesh)
-	{
-		m_pMesh->ReleaseUploadBuffers();
-	}
-}
-
-
-void CLight::Render(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	OnPrepareRender();
-	UpdateShaderVariables(pd3dCommandList);
-	if (m_pShader) m_pShader->Render(pd3dCommandList);
-
-	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
-	if (m_pMesh)
-	{
-		m_pMesh->Render(pd3dCommandList);
-	}
-}
 
 void CLight::Update(float fTimeElapsed, XMFLOAT3 xmf3PlayerPosition)
 {

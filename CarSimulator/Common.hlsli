@@ -21,11 +21,20 @@ cbuffer cbShadowInfo : register(b3)
     float3 ShadowCameraPos;
 }
 
+cbuffer cbAnimatedBillBoardInfo : register(b4)
+{
+    int nx : packoffset(c0.x);
+    int ny : packoffset(c0.y);
+    int nxDivided : packoffset(c0.z);
+    int nyDivided : packoffset(c0.w);
+}
+
 Texture2D gShadowMap[3] : register(t0);
 Texture2D gTextureMaps[6] : register(t3);
 Texture2D gtxtTerrain[2] : register(t9);
 Texture2D gtxtSkybox[6] : register(t11);
-Texture2DArray gtxtBillBoard[2] : register(t17);
+Texture2DArray gtxtTreeBillBoard[2] : register(t17);
+Texture2D gtxtExplosionBillBoard : register(t19);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {

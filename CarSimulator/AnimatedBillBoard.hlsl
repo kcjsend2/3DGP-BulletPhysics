@@ -51,12 +51,18 @@ void GS_BillBoard(point GS_BILLBOARD_INPUT input[1], uint p_id : SV_PrimitiveID,
     vertex[2] = float4(input[0].position_w - h_width * right - h_height * up, 1.0f);
     vertex[3] = float4(input[0].position_w - h_width * right + h_height * up, 1.0f);
     
+    float fnx = float(nx);
+    float fnxDivided = float(nxDivided);
+    float fny = float(ny);
+    float fnyDivided = float(nyDivided);
+    
     float2 uv[4] =
     {
-        float2(0.0f, 1.0f),
-        float2(0.0f, 0.0f),
-        float2(1.0f, 1.0f),
-        float2(1.0f, 0.0f)
+        float2(fnx / fnxDivided, (fny + 1) / fnyDivided),
+        float2(fnx / fnxDivided, fny / fnyDivided),
+        float2((fnx + 1) / fnxDivided, (fny + 1) / fnyDivided),
+        float2((fnx + 1) / fnxDivided, fny / fnyDivided)
+
     };
     
     GS_BILLBOARD_OUTPUT output;
@@ -70,7 +76,6 @@ void GS_BillBoard(point GS_BILLBOARD_INPUT input[1], uint p_id : SV_PrimitiveID,
         
         if (h_height >= 10.0f)
             output.textureIndex = 0;
-        
         else
             output.textureIndex = 1;
         
@@ -81,8 +86,7 @@ void GS_BillBoard(point GS_BILLBOARD_INPUT input[1], uint p_id : SV_PrimitiveID,
 
 float4 PS_BillBoard(GS_BILLBOARD_OUTPUT input) : SV_TARGET
 {
-    float3 uvw = float3(input.uv, int(input.p_id % 4));
-    float4 cColor = gtxtBillBoard[input.textureIndex].Sample(gsamLinearClamp, uvw);
+    float4 cColor = gtxtExplosionBillBoard.Sample(gsamLinearClamp, input.uv);
     
     clip(cColor.a - 0.5f);
     

@@ -80,8 +80,8 @@ float4 PS_Terrain(VS_Terrain_OUTPUT input) : SV_TARGET
     
     // cColor *= debugColor;
     
-    float4 cBaseTexColor = gtxtTerrain[0].Sample(gsamLinearWrap, input.uv0);
-    float4 cDetailTexColor = gtxtTerrain[1].Sample(gsamLinearWrap, input.uv1);
+    float4 cBaseTexColor = gtxtTerrain[0].Sample(gsamAnisotropicWrap, input.uv0);
+    float4 cDetailTexColor = gtxtTerrain[1].Sample(gsamAnisotropicWrap, input.uv1);
     
     cColor *= saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
     

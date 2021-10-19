@@ -402,11 +402,11 @@ void CInstancingShader::ReleaseUploadBuffers()
 void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pTexture->UpdateShaderVariables(pd3dCommandList);
-	pd3dCommandList->SetGraphicsRootShaderResourceView(4, m_pd3dcbGameObjects->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRootShaderResourceView(5, m_pd3dcbGameObjects->GetGPUVirtualAddress());
 	for (int i = 0; i < m_vpObjects.size(); i++)
 	{
 		XMStoreFloat4x4(&m_pcbMappedGameObjects[i].m_xmf4x4Transform, XMMatrixTranspose(XMLoadFloat4x4(&m_vpObjects[i]->GetWorldTransformMatrix())));
-		m_pcbMappedGameObjects[i].m_nTextrueIndex = i % 6;
+		m_pcbMappedGameObjects[i].m_nTextrueIndex = m_vpObjects[i]->GetTextureIndex();
 		m_vpObjects[i]->UpdateShaderVariables(pd3dCommandList);
 	}
 }
@@ -429,7 +429,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 8);
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
@@ -437,14 +437,13 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	float fTerrainWidth = pTerrain->GetWidth(), fTerrainLength = pTerrain->GetLength();
-	float fxPitch = 500.0f * 3.5f;
-	float fyPitch = 500.0f * 3.5f;
-	float fzPitch = 500.0f * 3.5f;
+
 	//직육면체를 지형 표면에 그리고 지형보다 높은 위치에 일정한 간격으로 배치한다.
-	int xObjects = int(fTerrainWidth / fxPitch), yObjects = 1, zObjects = int(fTerrainLength / fzPitch);
+	int xObjects = 3, yObjects = 1, zObjects = 3;
 	m_nObjects = xObjects * yObjects * zObjects;
+
 	m_vpObjects.reserve(m_nObjects);
-	XMFLOAT3 xmf3RotateAxis, xmf3SurfaceNormal;
+
 	std::shared_ptr<CRotatingObject> pRotatingObject = NULL;
 	for (int i = 0, x = 0; x < xObjects; x++)
 	{
@@ -454,14 +453,13 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 			{
 				pRotatingObject = std::make_shared<CRotatingObject>();
 
-				float xPosition = x * fxPitch;
-				float zPosition = z * fzPitch;
-				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
+				float xPosition = 100 + x * 10;
+				float zPosition = 100 + z * 10;
 
 				btTransform btCubeTransform;
 				btCubeTransform.setIdentity();
 
-				btScalar mass(1.0f);
+				btScalar mass(100.0f);
 
 				//rigidbody is dynamic if and only if mass is non zero, otherwise static
 				bool isDynamic = (mass != 0.f);
@@ -470,26 +468,10 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 				if (isDynamic)
 					CubeShape->calculateLocalInertia(mass, localInertia);
 
-
-				if (y == 0)
-				{
-					/*지형의 표면에 위치하는 직육면체는 지형의 기울기에 따라 방향이 다르게 배치한다. 직육면체가 위치할 지형의 법선
-					벡터 방향과 직육면체의 y-축이 일치하도록 한다.*/
-					xmf3SurfaceNormal = pTerrain->GetNormal(xPosition, zPosition);
-					xmf3RotateAxis = Vector3::CrossProduct(XMFLOAT3(0.0f, 1.0f, 0.0f), xmf3SurfaceNormal);
-
-					if (Vector3::IsZero(xmf3RotateAxis))
-						xmf3RotateAxis = XMFLOAT3(0.0f, 1.0f, 0.0f);
-
-					float fAngle = acos(Vector3::DotProduct(XMFLOAT3(0.0f, 1.0f, 0.0f), xmf3SurfaceNormal));
-					pRotatingObject->Rotate(&xmf3RotateAxis, XMConvertToDegrees(fAngle));
-					btCubeTransform.setRotation(btQuaternion(btVector3(xmf3RotateAxis.x, xmf3RotateAxis.y, xmf3RotateAxis.z), XMConvertToDegrees(fAngle)));
-				}
-				pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-				pRotatingObject->SetRotationSpeed(0.0f);
-
 				pRotatingObject->SetMaterial(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
-				pRotatingObject->SetPosition(xPosition, fHeight + (y * 100.0f * fyPitch) + 1000.0f, zPosition);
+				pRotatingObject->SetPosition(xPosition, 50.0f, zPosition);
+
+				pRotatingObject->SetTextureIndex(z % 6);
 
 				XMFLOAT3 xmf3ObjPosition = pRotatingObject->GetPosition();
 				btCubeTransform.setOrigin(btVector3(xmf3ObjPosition.x, xmf3ObjPosition.y, xmf3ObjPosition.z));
@@ -510,8 +492,8 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	
 	
 	//인스턴싱을 사용하여 렌더링하기 위하여 하나의 게임 객체만 메쉬를 가진다.
-	CCubeMesh* pCubeMesh = new CCubeMesh(pd3dDevice, pd3dCommandList, fLength, fHeight, fDepth);
-	m_vpObjects[0]->SetMesh(0, pCubeMesh);
+	std::shared_ptr<CCubeMesh> pCubeMesh = std::make_shared<CCubeMesh>(pd3dDevice, pd3dCommandList, fLength, fHeight, fDepth);
+	m_vpObjects[0]->SetMesh(pCubeMesh);
 
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -576,7 +558,7 @@ void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Base_Texture.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 9, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 9, 9);
 }
 
 void CTerrainShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -688,7 +670,7 @@ void CLightsShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	}
 	
 	size_t vSize = m_vLight.size();
-	pd3dCommandList->SetGraphicsRootShaderResourceView(5, m_pd3dcbLight->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRootShaderResourceView(6, m_pd3dcbLight->GetGPUVirtualAddress());
 	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &vSize, 0);
 }
 
@@ -922,7 +904,7 @@ void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 11, 9);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 11, 10);
 
 	m_pSkybox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList);
 }
@@ -936,31 +918,31 @@ void CSkyBoxShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	m_pSkybox->Render(pd3dCommandList, pCamera);
 }
 
-CBillBoardShader::CBillBoardShader()
+CTreeBillBoardShader::CTreeBillBoardShader()
 {
 
 }
 
-CBillBoardShader::~CBillBoardShader()
+CTreeBillBoardShader::~CTreeBillBoardShader()
 {
 }
 
-D3D12_SHADER_BYTECODE CBillBoardShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CTreeBillBoardShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"BillBoard.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
 }
 
-D3D12_SHADER_BYTECODE CBillBoardShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CTreeBillBoardShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"BillBoard.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
 }
 
-D3D12_SHADER_BYTECODE CBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CTreeBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"BillBoard.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
 }
 
-void CBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+void CTreeBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL;
 
@@ -996,7 +978,7 @@ void CBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignatur
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
-D3D12_INPUT_LAYOUT_DESC CBillBoardShader::CreateInputLayout()
+D3D12_INPUT_LAYOUT_DESC CTreeBillBoardShader::CreateInputLayout()
 {
 	UINT nInputElementDescs = 2;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
@@ -1010,7 +992,7 @@ D3D12_INPUT_LAYOUT_DESC CBillBoardShader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 
-void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
 {
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -1020,7 +1002,7 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/treearray.dds", RESOURCE_TEXTURE2DARRAY, 0);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/grassarray.dds", RESOURCE_TEXTURE2DARRAY, 1);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 17, 10);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 17, 11);
 
 	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[10000];
 
@@ -1032,7 +1014,7 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 		}
 	}
 
-	CBillBoardMesh* pGrassMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 10000);
+	std::shared_ptr<CBillBoardMesh> pGrassMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 10000);
 
 	XMFLOAT3* pxmf3TreePosition = new XMFLOAT3[2500];
 
@@ -1044,21 +1026,97 @@ void CBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 		}
 	}
 
-	CBillBoardMesh* pTreeMesh = new CBillBoardMesh(pd3dDevice, pd3dCommandList, pxmf3TreePosition, 20, 20, 2500);
+	std::shared_ptr<CBillBoardMesh> pTreeMesh = std::make_shared <CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3TreePosition, 20, 20, 2500);
 
 	m_pBillBoard = new CGameObject(2);
-	m_pBillBoard->SetMesh(0, pGrassMesh);
-	m_pBillBoard->SetMesh(1, pTreeMesh);
+	m_pBillBoard->SetMesh(pGrassMesh);
+	m_pBillBoard->SetMesh(pTreeMesh);
 }
 
-void CBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void CTreeBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
-void CBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+void CTreeBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CShader::Render(pd3dCommandList);
 	UpdateShaderVariables(pd3dCommandList);
 	m_pBillBoard->Render(pd3dCommandList);
+}
+
+CAnimatedBillBoardShader::CAnimatedBillBoardShader()
+{
+}
+
+CAnimatedBillBoardShader::~CAnimatedBillBoardShader()
+{
+}
+
+
+D3D12_SHADER_BYTECODE CAnimatedBillBoardShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CAnimatedBillBoardShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CAnimatedBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
+}
+
+void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+{
+	m_vpAnimatedBillBoard.reserve(50);
+
+	m_ubAnimatedBillBoard = new UploadBuffer<CB_ANIMATEDBILLBOARD>(pd3dDevice, 50, true);
+
+	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Explosion_Effect.dds", RESOURCE_TEXTURE2D, 0);
+
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 12);
+}
+
+void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
+{
+	m_pTexture->UpdateShaderVariables(pd3dCommandList);
+
+	for (auto i = m_vpAnimatedBillBoard.begin(); i < m_vpAnimatedBillBoard.end();)
+	{
+		i->UpdateShaderVariables(pd3dCommandList, fTimeElapsed);
+		if (i->isEnd())
+		{
+			i = m_vpAnimatedBillBoard.erase(i);
+		}
+		else
+		{
+			i++;
+		}
+	}
+}
+
+void CAnimatedBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CShader::Render(pd3dCommandList);
+	int CBIndex = 0;
+	for (auto i = m_vpAnimatedBillBoard.begin(); i < m_vpAnimatedBillBoard.end(); ++i)
+	{
+		m_ubAnimatedBillBoard->CopyData(CBIndex, i->GetBillBoardInfo());
+		pd3dCommandList->SetGraphicsRootConstantBufferView(4, m_ubAnimatedBillBoard->Resource()->GetGPUVirtualAddress() + CBIndex * m_ubAnimatedBillBoard->GetElementSize());
+		CBIndex++;
+		i->Render(pd3dCommandList);
+	} 
+}
+
+void CAnimatedBillBoardShader::AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, int nTotalFrame, int nxDivided, int nyDivided, std::vector<float> vfFrameTime)
+{
+	m_vpAnimatedBillBoard.emplace_back(pd3dDevice, pd3dCommandList, xmf3Position, nxDivided, nyDivided, vfFrameTime);
 }
