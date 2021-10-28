@@ -553,10 +553,11 @@ void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-	m_pTexture = std::make_shared<CTexture>(2, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+	m_pTexture = std::make_shared<CTexture>(3, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Base_Texture.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Terrain_Road.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 9, 9);
 }
@@ -904,7 +905,7 @@ void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 11, 10);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 12, 10);
 
 	m_pSkybox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList);
 }
@@ -1002,19 +1003,22 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/treearray.dds", RESOURCE_TEXTURE2DARRAY, 0);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/grassarray.dds", RESOURCE_TEXTURE2DARRAY, 1);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 17, 11);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 18, 11);
 
-	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[10000];
+	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[90000];
 
-	for (int i = 0; i < 100; ++i)
+	// 5120 x 5120 크기의 맵
+
+	// 1만개, (20, 20) 간격
+	for (int i = 0; i < 200; ++i)
 	{
-		for (int j = 0; j < 100; ++j)
+		for (int j = 0; j < 200; ++j)
 		{
-			pxmf3GrassPosition[(i * 100) + j] = XMFLOAT3{float(i * 20), 0.0f, float(j * 20) };
+			pxmf3GrassPosition[(i * 200) + j] = XMFLOAT3{float(i * 20), 0.0f, float(j * 20) };
 		}
 	}
 
-	std::shared_ptr<CBillBoardMesh> pGrassMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 10000);
+	std::shared_ptr<CBillBoardMesh> pGrassMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 40000);
 
 	XMFLOAT3* pxmf3TreePosition = new XMFLOAT3[2500];
 
@@ -1082,7 +1086,7 @@ void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Explosion_Effect.dds", RESOURCE_TEXTURE2D, 0);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 12);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 20, 12);
 }
 
 void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)

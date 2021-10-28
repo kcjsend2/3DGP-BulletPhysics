@@ -82,8 +82,16 @@ float4 PS_Terrain(VS_Terrain_OUTPUT input) : SV_TARGET
     
     float4 cBaseTexColor = gtxtTerrain[0].Sample(gsamAnisotropicWrap, input.uv0);
     float4 cDetailTexColor = gtxtTerrain[1].Sample(gsamAnisotropicWrap, input.uv1);
+    float4 cRoadTexColor = gtxtTerrain[2].Sample(gsamAnisotropicWrap, input.uv0);
     
-    cColor *= saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+    if (cRoadTexColor.a > 0.0f)
+    {
+        cColor *= saturate((cBaseTexColor * (0.5f - cRoadTexColor.a * 0.5f)) + (cDetailTexColor * (0.5f - cRoadTexColor.a * 0.5f)) + (cRoadTexColor * cRoadTexColor.a));
+    }
+    else
+    {
+        cColor *= saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+    }
     
     return (cColor);
 }
