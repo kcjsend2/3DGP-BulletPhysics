@@ -62,6 +62,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Update(float fTimeElapsed);
 	virtual void CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
+	virtual void SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
 
 protected:
 	ID3D12PipelineState* m_pd3dPipelineState = NULL;
@@ -121,6 +122,16 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 	virtual void Update(float fTimeElapsed);
+};
+
+class CVehiclePlayerShader : public CShader
+{
+public:
+	CVehiclePlayerShader();
+	virtual ~CVehiclePlayerShader();
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 };
 
 

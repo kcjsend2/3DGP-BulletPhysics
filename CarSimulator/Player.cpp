@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "Scene.h"
 #include "Shader.h"
 
 CPlayer::CPlayer(int nMeshes) : CGameObject(nMeshes)
@@ -321,7 +322,8 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	}
 }
 
-CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes) : CPlayer(nMeshes)
+CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, CShader* pShader, int nMeshes) :
+	CCubeMappingPlayer(pd3dDevice, pd3dCommandList, 256, pShader, nMeshes)
 {
 	int SteeringIndex = 5;
 	std::shared_ptr<CMeshFileRead> pVehicleMesh = std::make_shared<CMeshFileRead>(pd3dDevice, pd3dCommandList, (char*)"Models/FlyerPlayership.bin", false);
@@ -401,7 +403,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		wheel.m_rollInfluence = rollInfluence;
 	}
 
-	CPlayerShader* pShader = new CPlayerShader();
 	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	SetShader(pShader);
 
@@ -541,6 +542,12 @@ void CVehiclePlayer::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_pCamera->RegenerateViewMatrix();
 }
 
+void CVehiclePlayer::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CGameObject::UpdateShaderVariables(pd3dCommandList);
+	m_pTexture->UpdateShaderVariables(pd3dCommandList);
+}
+
 void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
@@ -653,4 +660,108 @@ void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btRaycastVehicle* pbtVeh
 	btScalar m[16];
 	wheelTransform.getOpenGLMatrix(m);
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
+}
+
+CCubeMappingPlayer::CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CShader* pShader, int nMeshes) : CPlayer(nMeshes)
+{
+	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
+	d3dDescriptorHeapDesc.NumDescriptors = 1;
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	d3dDescriptorHeapDesc.NodeMask = 0;
+	HRESULT hResult = pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dDsvDescriptorHeap);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	d3dDescriptorHeapDesc.NumDescriptors = 6;
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dRtvDescriptorHeap);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_apCameras[i] = std::make_shared<CCamera>();
+		m_apCameras[i]->SetViewport(0, 0, nCubeMapSize, nCubeMapSize, 0.0f, 1.0f);
+		m_apCameras[i]->SetScissorRect(0, 0, nCubeMapSize, nCubeMapSize);
+		m_apCameras[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+		m_apCameras[i]->GenerateProjectionMatrix(0.1f, 5000.0f, 1.0f/*Aspect Ratio*/, 90.0f/*FOV*/);
+	}
+
+	//Depth Buffer & View
+	D3D12_CLEAR_VALUE d3dDsbClearValue = { DXGI_FORMAT_D24_UNORM_S8_UINT, { 1.0f, 0 } };
+	m_pd3dDepthStencilBuffer = ::CreateTexture2DResource(pd3dDevice, pd3dCommandList, nCubeMapSize, nCubeMapSize, 1, 1, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dDsbClearValue);
+
+	m_d3dDsvCPUDescriptorHandle = d3dDsvCPUDescriptorHandle;
+	pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer.Get(), NULL, m_d3dDsvCPUDescriptorHandle);
+
+	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE_CUBE, 0, 1);
+	D3D12_CLEAR_VALUE d3dRtvClearValue = { DXGI_FORMAT_R8G8B8A8_UNORM, { 0.0f, 0.0f, 0.0f, 1.0f } };
+	ID3D12Resource* pd3dResource = m_pTexture->CreateTexture(pd3dDevice, pd3dCommandList, nCubeMapSize, nCubeMapSize, 6, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ, &d3dRtvClearValue, RESOURCE_TEXTURE_CUBE, 0);
+
+	pShader->CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 7);
+
+	D3D12_RENDER_TARGET_VIEW_DESC d3dRTVDesc;
+	d3dRTVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	d3dRTVDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+	d3dRTVDesc.Texture2DArray.MipSlice = 0;
+	d3dRTVDesc.Texture2DArray.PlaneSlice = 0;
+	d3dRTVDesc.Texture2DArray.ArraySize = 1;
+
+	for (int j = 0; j < 6; j++)
+	{
+		m_pd3dRtvCPUDescriptorHandles[j] = d3dRtvCPUDescriptorHandle;
+		d3dRTVDesc.Texture2DArray.FirstArraySlice = j; //i-번째 렌더 타겟 뷰는 텍스쳐 큐브의 i-번째 버퍼에서 시작
+		pd3dDevice->CreateRenderTargetView(pd3dResource, &d3dRTVDesc, m_pd3dRtvCPUDescriptorHandles[j]);
+		d3dRtvCPUDescriptorHandle.ptr += pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	}
+
+	pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_pd3dCommandAllocator);
+	pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);
+	m_pd3dCommandList->Close();
+}
+
+CCubeMappingPlayer::~CCubeMappingPlayer()
+{
+}
+
+void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12CommandQueue> pd3dCommandQueue, ComPtr<ID3D12Fence> pd3dFence, HANDLE hFenceEvent, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps)
+{
+	m_pd3dCommandAllocator->Reset();
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
+
+	m_pd3dCommandList->SetDescriptorHeaps(nDescriptorHeaps, pDescriptorHeaps);
+
+	m_pd3dCommandList->SetGraphicsRootSignature(pScene->GetGraphicsRootSignature());
+
+	static XMFLOAT3 pxmf3LookAts[6] = { XMFLOAT3(+100.0f, 0.0f, 0.0f), XMFLOAT3(-100.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, +100.0f, 0.0f), XMFLOAT3(0.0f, -100.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, +100.0f), XMFLOAT3(0.0f, 0.0f, -100.0f) };
+	static XMFLOAT3 pxmf3Ups[6] = { XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, +1.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f) };
+
+	float pfClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+	XMFLOAT3 xmf3Position = GetPosition();
+	for (int i = 0; i < 6; i++)
+	{
+		m_apCameras[i]->SetPosition(xmf3Position);
+		m_apCameras[i]->GenerateViewMatrix(xmf3Position, Vector3::Add(xmf3Position, pxmf3LookAts[i]), pxmf3Ups[i]);
+
+		m_pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[i], pfClearColor, 0, NULL);
+		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+
+		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[i], TRUE, &m_d3dDsvCPUDescriptorHandle);
+
+		pScene->Render(m_pd3dCommandList.Get(), m_apCameras[i].get());
+	}
+
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
+
+	m_pd3dCommandList->Close();
+
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };
+	pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	UINT64 nFenceValue = pd3dFence->GetCompletedValue();
+	::WaitForGpuComplete(pd3dCommandQueue.Get(), pd3dFence.Get(), nFenceValue + 1, hFenceEvent);
 }

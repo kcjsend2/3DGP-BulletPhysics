@@ -229,6 +229,12 @@ void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_pt
 	for (int i = 0; i < nRootParameters; i++) pTexture->SetRootParameterIndex(i, nRootParameterStartIndex + i);
 }
 
+void CShader::SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+{
+	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+}
+
 CPlayerShader::CPlayerShader()
 {
 }
@@ -420,16 +426,14 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+	m_pTexture = std::make_shared<CTexture>(4, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Lava(Diffuse).dds", RESOURCE_TEXTURE2D_ARRAY, 0);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Lava(Emissive).dds", RESOURCE_TEXTURE2D_ARRAY, 5);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
@@ -471,7 +475,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 				pRotatingObject->SetMaterial(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.3f);
 				pRotatingObject->SetPosition(xPosition, 50.0f, zPosition);
 
-				pRotatingObject->SetTextureIndex(z % 6);
+				pRotatingObject->SetTextureIndex(z % 4);
 
 				XMFLOAT3 xmf3ObjPosition = pRotatingObject->GetPosition();
 				btCubeTransform.setOrigin(btVector3(xmf3ObjPosition.x, xmf3ObjPosition.y, xmf3ObjPosition.z));
@@ -559,7 +563,7 @@ void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Terrain_Road.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 9, 9);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 7, 7);
 }
 
 void CTerrainShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -896,16 +900,16 @@ void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D, 0, 1);
+	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D, 0);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Back_0.dds", RESOURCE_TEXTURE2D, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Left_0.dds", RESOURCE_TEXTURE2D, 2);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Right_0.dds", RESOURCE_TEXTURE2D, 3);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Back_0.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Left_0.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Right_0.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 12, 10);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 10, 7);
 
 	m_pSkybox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList);
 }
@@ -1003,7 +1007,7 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/treearray.dds", RESOURCE_TEXTURE2DARRAY, 0);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/grassarray.dds", RESOURCE_TEXTURE2DARRAY, 1);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 18, 11);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 16, 7);
 
 	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[90000];
 
@@ -1086,7 +1090,7 @@ void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Explosion_Effect.dds", RESOURCE_TEXTURE2D, 0);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 20, 12);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 18, 7);
 }
 
 void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
@@ -1123,4 +1127,27 @@ void CAnimatedBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList
 void CAnimatedBillBoardShader::AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, int nTotalFrame, int nxDivided, int nyDivided, std::vector<float> vfFrameTime)
 {
 	m_vpAnimatedBillBoard.emplace_back(pd3dDevice, pd3dCommandList, xmf3Position, nxDivided, nyDivided, vfFrameTime);
+}
+
+CVehiclePlayerShader::CVehiclePlayerShader()
+{
+}
+
+CVehiclePlayerShader::~CVehiclePlayerShader()
+{
+}
+
+D3D12_INPUT_LAYOUT_DESC CVehiclePlayerShader::CreateInputLayout()
+{
+	return D3D12_INPUT_LAYOUT_DESC();
+}
+
+D3D12_SHADER_BYTECODE CVehiclePlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return D3D12_SHADER_BYTECODE();
+}
+
+D3D12_SHADER_BYTECODE CVehiclePlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return D3D12_SHADER_BYTECODE();
 }

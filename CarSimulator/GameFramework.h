@@ -74,7 +74,7 @@ private:
 	btAlignedObjectArray<btCollisionShape*> m_btCollisionShapes;
 
 	UINT64 m_nFenceValues[m_nSwapChainBuffers];
-	std::unique_ptr<CScene> m_pScene;
+	std::shared_ptr<CScene> m_pScene;
 
 	std::unique_ptr<CShadowMap> m_pShadowMap[3];
 

@@ -3,6 +3,7 @@
 
 class CCamera;
 class CShader;
+class CScene;
 
 #define RESOURCE_TEXTURE2D			0x01
 #define RESOURCE_TEXTURE2D_ARRAY	0x02	//[]
@@ -80,6 +81,7 @@ public:
 	int GetRootParameters() { return(m_nRootParameters); }
 	int GetTextures() { return(m_nTextures); }
 	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
+	ID3D12Resource* CreateTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nWidth, UINT nHeight, UINT nElements, UINT nMipLevels, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE* pd3dClearValue, UINT nResourceType, UINT nIndex);
 	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
 	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }
@@ -137,6 +139,8 @@ public:
 	virtual void SetRigidBody(btRigidBody* pbtRigidBody) { m_pbtRigidBody = pbtRigidBody; }
 	virtual void SetMatrix(XMFLOAT4X4 xmf4x4Matrix) { m_xmf4x4World = xmf4x4Matrix; }
 	virtual BoundingOrientedBox GetBoudingBox(int index);
+	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CScene* pScene) { }
+
 public:
 	//상수 버퍼를 생성한다.
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);

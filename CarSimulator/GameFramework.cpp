@@ -5,23 +5,10 @@ using namespace std;
 
 CGameFramework::CGameFramework()
 {
-	/*m_pdxgiFactory = NULL;
-	m_pdxgiSwapChain = NULL;
-	m_pd3dDevice = NULL;
-	m_pd3dCommandAllocator = NULL;
-	m_pd3dCommandQueue = NULL;
-	m_pd3dPipelineState = NULL;
-	m_pd3dCommandList = NULL;*/
-	/*for (int i = 0; i < m_nSwapChainBuffers; i++)
-		m_ppd3dRenderTargetBuffers[i] = NULL;
-	m_pd3dRtvDescriptorHeap = NULL;*/
 	m_nRtvDescriptorIncrementSize = 0;
-	//m_pd3dDepthStencilBuffer = NULL;
-	//m_pd3dDsvDescriptorHeap = NULL;
 	m_nDsvDescriptorIncrementSize = 0;
 	m_nSwapChainBufferIndex = 0;
 	m_hFenceEvent = NULL;
-	//m_pd3dFence = NULL;
 	m_nFenceValue = 0;
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
@@ -231,7 +218,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 2;
+	srvHeapDesc.NumDescriptors = 20;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -320,7 +307,7 @@ void CGameFramework::BuildObjects()
 
 	BuildDescriptorHeaps();
 
-	m_pScene = make_unique<CScene>();
+	m_pScene = make_shared<CScene>();
 
 	if (m_pScene)
 		m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_btCollisionShapes, m_pbtDynamicsWorld.get(), m_pd3dSrvDescriptorHeap);
@@ -333,7 +320,9 @@ void CGameFramework::BuildObjects()
 		m_pShadowMap[i]->GetShader()->SetLight(m_pScene->GetLightShader()[0].GetDirectionalLight());
 	}
 
-	m_pPlayer = make_unique<CVehiclePlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_btCollisionShapes, m_pbtDynamicsWorld.get(), 1);
+	CPlayerShader* pShader = new CPlayerShader();
+	pShader->SetSrvDescriptorHeapHandle(m_pd3dSrvDescriptorHeap);
+	m_pPlayer = make_unique<CVehiclePlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_btCollisionShapes, m_pbtDynamicsWorld.get(), pShader);
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };
@@ -493,6 +482,9 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(0.0f);
 	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed(), 1);
 
+	//if(m_pPlayer)
+	//	m_pPlayer->OnPreRender(m_pd3dCommandQueue, m_pd3dFence, m_hFenceEvent, m_pScene, descriptorHeaps, _countof(descriptorHeaps));
+
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
@@ -557,9 +549,10 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	#endif
 
-	//3인칭 카메라일 때 플레이어를 렌더링한다.
 	if (m_pPlayer)
+	{
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
+	}
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -30,11 +30,12 @@ cbuffer cbAnimatedBillBoardInfo : register(b4)
 }
 
 Texture2D gShadowMap[3] : register(t0);
-Texture2D gTextureMaps[6] : register(t3);
-Texture2D gtxtTerrain[3] : register(t9);
-Texture2D gtxtSkybox[6] : register(t12);
-Texture2DArray gtxtTreeBillBoard[2] : register(t18);
-Texture2D gtxtExplosionBillBoard : register(t20);
+Texture2D gTextureMaps[4] : register(t3);
+Texture2D gtxtTerrain[3] : register(t7);
+Texture2D gtxtSkybox[6] : register(t10);
+Texture2DArray gtxtTreeBillBoard[2] : register(t16);
+Texture2D gtxtExplosionBillBoard : register(t18);
+TextureCube gtxtCubeMap : register(t19);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {

@@ -13,6 +13,7 @@
 #include "GameObject.h"
 #include "Camera.h"
 
+
 class CPlayer : public CGameObject
 {
 protected:
@@ -84,13 +85,11 @@ public:
 	void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 
 	//플레이어를 이동하는 함수이다.
-	void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
 	void Move(XMFLOAT3& xmf3Shift, bool bVelocity = false);
-	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f);
+	void Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity);
 
 	//플레이어를 회전하는 함수이다.
 	void Rotate(float x, float y, float z);
-	void Rotate(DWORD dwDirection);
 
 	//플레이어의 위치와 회전 정보를 경과 시간에 따라 갱신하는 함수이다.
 	void Update(float fTimeElapsed);
@@ -120,7 +119,30 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 };
 
-class CVehiclePlayer : public CPlayer
+class CCubeMappingPlayer : public CPlayer
+{
+public:
+	CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CShader* pShader, int nMeshes);
+	~CCubeMappingPlayer();
+
+	virtual void OnPreRender(ComPtr<ID3D12CommandQueue> pd3dCommandQueue, ComPtr<ID3D12Fence> pd3dFence, HANDLE hFenceEvent, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps);
+	std::array<std::shared_ptr<CCamera>, 6> m_apCameras;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE m_pd3dRtvCPUDescriptorHandles[6];
+
+	ComPtr<ID3D12Resource> m_pd3dDepthStencilBuffer = NULL;
+	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dDsvCPUDescriptorHandle;
+
+	std::shared_ptr<CTexture> m_pTexture;
+
+	ComPtr<ID3D12CommandAllocator> m_pd3dCommandAllocator = NULL;
+	ComPtr<ID3D12GraphicsCommandList> m_pd3dCommandList = NULL;
+
+	ComPtr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap = NULL;
+	ComPtr<ID3D12DescriptorHeap> m_pd3dDsvDescriptorHeap = NULL;
+};
+
+class CVehiclePlayer : public CCubeMappingPlayer
 {
 private:
 	class CWheel : public CGameObject
@@ -133,10 +155,11 @@ private:
 	};
 
 public:
-	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, int nMeshes = 5);
+	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, CShader* pShader,int nMeshes = 5);
 	virtual ~CVehiclePlayer();
 	std::shared_ptr<CBullet> GetBullet() { return m_pBullet; };
 	virtual void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	void FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld);
