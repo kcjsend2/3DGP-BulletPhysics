@@ -329,7 +329,6 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 	WaitForGpuComplete();
 
-	Update();
 	// 쉐도우맵은 모든 오브젝트를 그려야한다.
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer);
