@@ -231,7 +231,7 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[13];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[8];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -254,17 +254,17 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE AnimatedBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 18, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 18
 	CD3DX12_DESCRIPTOR_RANGE CubeMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 19, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 19
 
-	/*CD3DX12_DESCRIPTOR_RANGE descriptorRanges[7] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange};
+	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[7] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange};
 
-	pd3dRootParameters[7].InitAsDescriptorTable(7, descriptorRanges);*/
+	pd3dRootParameters[7].InitAsDescriptorTable(7, descriptorRanges);
 
-	//디스크립터 테이블 이용하여 업로드
-	pd3dRootParameters[7].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
-	pd3dRootParameters[8].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
-	pd3dRootParameters[9].InitAsDescriptorTable(1, &TerrainRange); // 베이스 텍스쳐 + 디테일 텍스쳐
-	pd3dRootParameters[10].InitAsDescriptorTable(1, &SkyboxRange); // 스카이박스 텍스쳐
-	pd3dRootParameters[11].InitAsDescriptorTable(1, &TreeBillboardRange); // 빌보드 텍스쳐
-	pd3dRootParameters[12].InitAsDescriptorTable(1, &AnimatedBillboardRange); // 애니메이션 빌보드 텍스쳐
+	////디스크립터 테이블 이용하여 업로드
+	//pd3dRootParameters[7].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
+	//pd3dRootParameters[8].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
+	//pd3dRootParameters[9].InitAsDescriptorTable(1, &TerrainRange); // 베이스 텍스쳐 + 디테일 텍스쳐
+	//pd3dRootParameters[10].InitAsDescriptorTable(1, &SkyboxRange); // 스카이박스 텍스쳐
+	//pd3dRootParameters[11].InitAsDescriptorTable(1, &TreeBillboardRange); // 빌보드 텍스쳐
+	//pd3dRootParameters[12].InitAsDescriptorTable(1, &AnimatedBillboardRange); // 애니메이션 빌보드 텍스쳐
 	//pd3dRootParameters[13].InitAsDescriptorTable(1, &CubeMapRange); // 큐브 맵 텍스쳐
 
 	auto staticSamplers = GetStaticSamplers();

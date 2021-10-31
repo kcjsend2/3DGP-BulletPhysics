@@ -55,7 +55,7 @@ float4 PS_Default(VS_DEFAULT_OUTPUT input) : SV_TARGET
     
     for (int i = 0; i < nLights; i++)
     {
-        if (position_shadow.x <= 0.0f || position_shadow.x >= 1.0f || position_shadow.z <= 0.0f || position_shadow.z >= 1.0f || position_shadow.y <= 0.0f || position_shadow.y >= 1.0f)
+        if (position_shadow.x < 0.0f || position_shadow.x > 1.0f || position_shadow.z < 0.0f || position_shadow.z > 1.0f || position_shadow.y < 0.0f || position_shadow.y > 1.0f)
             cColor += ComputeLighting(light[i], input.position_w, input.normal, toEyeW, 1.0f);
         else
             cColor += ComputeLighting(light[i], input.position_w, input.normal, toEyeW, shadowFactor[0]);
