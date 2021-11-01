@@ -72,7 +72,7 @@ float4 PS_CMPlayer(VS_CMPlayer_OUTPUT input) : SV_TARGET
     float3 reflected = normalize(reflect(fromCamera, input.normal_w));
     float4 CubeTextureColor = gtxtCubeMap.Sample(gsamLinearWrap, reflected);
     
-    cColor *= CubeTextureColor;
+    cColor = saturate((CubeTextureColor * 0.5f) + (cColor * 0.5f));
     
     cColor.a = material.DiffuseAlbedo.a;
     
