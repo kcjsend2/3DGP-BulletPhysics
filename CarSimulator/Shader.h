@@ -121,19 +121,7 @@ public:
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
-	virtual void Update(float fTimeElapsed);
 };
-
-class CVehiclePlayerShader : public CShader
-{
-public:
-	CVehiclePlayerShader();
-	virtual ~CVehiclePlayerShader();
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
-};
-
 
 //“CObjectsShader” 클래스는 게임 객체들을 포함하는 셰이더 객체이다.
 class CObjectsShader : public CShader

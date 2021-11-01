@@ -256,7 +256,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[7] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange};
 
-	pd3dRootParameters[7].InitAsDescriptorTable(7, descriptorRanges);
+	pd3dRootParameters[7].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
 
 	////디스크립터 테이블 이용하여 업로드
 	//pd3dRootParameters[7].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵

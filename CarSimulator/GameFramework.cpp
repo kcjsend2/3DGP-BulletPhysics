@@ -481,13 +481,12 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(0.0f);
 	m_pbtDynamicsWorld->stepSimulation(m_GameTimer.GetTimeElapsed(), 1);
 
-	//if(m_pPlayer)
-	//	m_pPlayer->OnPreRender(m_pd3dCommandQueue, m_pd3dFence, m_hFenceEvent, m_pScene, descriptorHeaps, _countof(descriptorHeaps));
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_pd3dSrvDescriptorHeap.Get() };
+
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_pd3dSrvDescriptorHeap.Get() };
 	m_pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	m_pd3dCommandList->SetGraphicsRootSignature(m_pScene->GetGraphicsRootSignature());
@@ -522,6 +521,12 @@ void CGameFramework::FrameAdvance()
 		m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pShadowMap[i]->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
 	}
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// Å¥ºê ¸Ê ·»´õ
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	if (m_pPlayer)
+		m_pPlayer->OnPreRender(m_pd3dCommandList, m_pd3dCommandQueue, m_pScene, descriptorHeaps, _countof(descriptorHeaps), m_pShadowMap[0]->GetSrv());
 
 	// ·»´õÅ¸°Ù ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

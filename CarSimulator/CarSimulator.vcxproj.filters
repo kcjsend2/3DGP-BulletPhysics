@@ -130,6 +130,7 @@
     <FxCompile Include="Skybox.hlsl" />
     <FxCompile Include="BillBoardTree.hlsl" />
     <FxCompile Include="AnimatedBillBoard.hlsl" />
+    <FxCompile Include="CubemapPlayer.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

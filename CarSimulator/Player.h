@@ -125,7 +125,7 @@ public:
 	CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CShader* pShader, int nMeshes);
 	~CCubeMappingPlayer();
 
-	virtual void OnPreRender(ComPtr<ID3D12CommandQueue> pd3dCommandQueue, ComPtr<ID3D12Fence> pd3dFence, HANDLE hFenceEvent, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps);
+	virtual void OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dCommandList, ComPtr<ID3D12CommandQueue> pd3dCommandQueue, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps, D3D12_GPU_DESCRIPTOR_HANDLE hDescriptorStart);
 	std::array<std::shared_ptr<CCamera>, 6> m_apCameras;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE m_pd3dRtvCPUDescriptorHandles[6];
@@ -134,9 +134,6 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dDsvCPUDescriptorHandle;
 
 	std::shared_ptr<CTexture> m_pTexture;
-
-	ComPtr<ID3D12CommandAllocator> m_pd3dCommandAllocator = NULL;
-	ComPtr<ID3D12GraphicsCommandList> m_pd3dCommandList = NULL;
 
 	ComPtr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap = NULL;
 	ComPtr<ID3D12DescriptorHeap> m_pd3dDsvDescriptorHeap = NULL;

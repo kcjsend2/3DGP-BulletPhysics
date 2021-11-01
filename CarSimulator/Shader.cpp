@@ -261,15 +261,11 @@ D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CPlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"CubemapPlayer.hlsl", "VS_CMPlayer", "vs_5_1", ppd3dShaderBlob));
 }
 D3D12_SHADER_BYTECODE CPlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
-}
-
-void CPlayerShader::Update(float fTimeElapsed)
-{
+	return(CShader::CompileShaderFromFile(L"CubemapPlayer.hlsl", "PS_CMPlayer", "ps_5_1", ppd3dShaderBlob));
 }
 
 CObjectsShader::CObjectsShader()
@@ -407,7 +403,6 @@ void CInstancingShader::ReleaseUploadBuffers()
 //인스턴싱 정보(객체의 월드 변환 행렬과 색상)를 정점 버퍼에 복사한다.
 void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootShaderResourceView(5, m_pd3dcbGameObjects->GetGPUVirtualAddress());
 	for (int i = 0; i < m_vpObjects.size(); i++)
 	{
@@ -549,7 +544,6 @@ D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob** ppd3dShaderBl
 
 void CTerrainShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
@@ -878,7 +872,6 @@ D3D12_SHADER_BYTECODE CSkyBoxShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlo
 
 void CSkyBoxShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 D3D12_INPUT_LAYOUT_DESC CSkyBoxShader::CreateInputLayout()
@@ -1043,7 +1036,6 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 
 void CTreeBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CTreeBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1095,7 +1087,6 @@ void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Grap
 
 void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
 {
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 
 	for (auto i = m_vpAnimatedBillBoard.begin(); i < m_vpAnimatedBillBoard.end();)
 	{
@@ -1127,27 +1118,4 @@ void CAnimatedBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList
 void CAnimatedBillBoardShader::AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, int nTotalFrame, int nxDivided, int nyDivided, std::vector<float> vfFrameTime)
 {
 	m_vpAnimatedBillBoard.emplace_back(pd3dDevice, pd3dCommandList, xmf3Position, nxDivided, nyDivided, vfFrameTime);
-}
-
-CVehiclePlayerShader::CVehiclePlayerShader()
-{
-}
-
-CVehiclePlayerShader::~CVehiclePlayerShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC CVehiclePlayerShader::CreateInputLayout()
-{
-	return D3D12_INPUT_LAYOUT_DESC();
-}
-
-D3D12_SHADER_BYTECODE CVehiclePlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return D3D12_SHADER_BYTECODE();
-}
-
-D3D12_SHADER_BYTECODE CVehiclePlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return D3D12_SHADER_BYTECODE();
 }

@@ -545,7 +545,6 @@ void CVehiclePlayer::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 void CVehiclePlayer::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CGameObject::UpdateShaderVariables(pd3dCommandList);
-	m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -716,30 +715,23 @@ CCubeMappingPlayer::CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		pd3dDevice->CreateRenderTargetView(pd3dResource, &d3dRTVDesc, m_pd3dRtvCPUDescriptorHandles[j]);
 		d3dRtvCPUDescriptorHandle.ptr += pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
-
-	pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_pd3dCommandAllocator);
-	pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);
-	m_pd3dCommandList->Close();
 }
 
 CCubeMappingPlayer::~CCubeMappingPlayer()
 {
 }
 
-void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12CommandQueue> pd3dCommandQueue, ComPtr<ID3D12Fence> pd3dFence, HANDLE hFenceEvent, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps)
+void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dCommandList, ComPtr<ID3D12CommandQueue> pd3dCommandQueue, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps, D3D12_GPU_DESCRIPTOR_HANDLE hDescriptorStart)
 {
-	m_pd3dCommandAllocator->Reset();
-	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
-
-	m_pd3dCommandList->SetDescriptorHeaps(nDescriptorHeaps, pDescriptorHeaps);
-
-	m_pd3dCommandList->SetGraphicsRootSignature(pScene->GetGraphicsRootSignature());
+	pd3dCommandList->SetDescriptorHeaps(nDescriptorHeaps, pDescriptorHeaps);
+	pd3dCommandList->SetGraphicsRootSignature(pScene->GetGraphicsRootSignature());
+	pd3dCommandList->SetGraphicsRootDescriptorTable(7, hDescriptorStart);
 
 	static XMFLOAT3 pxmf3LookAts[6] = { XMFLOAT3(+100.0f, 0.0f, 0.0f), XMFLOAT3(-100.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, +100.0f, 0.0f), XMFLOAT3(0.0f, -100.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, +100.0f), XMFLOAT3(0.0f, 0.0f, -100.0f) };
 	static XMFLOAT3 pxmf3Ups[6] = { XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, +1.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f) };
 
 	float pfClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	XMFLOAT3 xmf3Position = GetPosition();
 	for (int i = 0; i < 6; i++)
@@ -747,21 +739,13 @@ void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12CommandQueue> pd3dCommandQueue
 		m_apCameras[i]->SetPosition(xmf3Position);
 		m_apCameras[i]->GenerateViewMatrix(xmf3Position, Vector3::Add(xmf3Position, pxmf3LookAts[i]), pxmf3Ups[i]);
 
-		m_pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[i], pfClearColor, 0, NULL);
-		m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[i], pfClearColor, 0, NULL);
+		pd3dCommandList->ClearDepthStencilView(m_d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 
-		m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[i], TRUE, &m_d3dDsvCPUDescriptorHandle);
+		pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[i], TRUE, &m_d3dDsvCPUDescriptorHandle);
 
-		pScene->Render(m_pd3dCommandList.Get(), m_apCameras[i].get());
+		pScene->Render(pd3dCommandList.Get(), m_apCameras[i].get());
 	}
 
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
-
-	m_pd3dCommandList->Close();
-
-	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };
-	pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
-	UINT64 nFenceValue = pd3dFence->GetCompletedValue();
-	::WaitForGpuComplete(pd3dCommandQueue.Get(), pd3dFence.Get(), nFenceValue + 1, hFenceEvent);
+	pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
 }
