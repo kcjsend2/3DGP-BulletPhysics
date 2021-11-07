@@ -78,7 +78,7 @@ HS_TERRAIN_TESSELLATION_OUTPUT HSTerrainTessellation(InputPatch<VS_Terrain_OUTPU
 float CalculateTessFactor(float3 f3Position)
 {
     float fDistToCamera = distance(f3Position, cameraPos);
-    float s = saturate((fDistToCamera - 10.0f) / (500.0f - 10.0f));
+    float s = saturate((fDistToCamera - 10.0f) / (500.0f - 10.0f) * 2);
 
     return (lerp(64.0f, 1.0f, s));
 	//	return(pow(2, lerp(20.0f, 4.0f, s)));

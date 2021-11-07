@@ -327,10 +327,19 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 			if (fHeight / m_xmf3Scale.y > fMaxHeight)
 				fMaxHeight = fHeight / m_xmf3Scale.y;
+		}
+	}
 
+	for (int i = 0, z = (zStart + nLength - 1); z >= zStart; z--)
+	{
+		for (int x = xStart; x < (xStart + nWidth); x++, i++)
+		{
+			fHeight = OnGetHeight(x, z, pContext);
 			pHeightmapData[z * nLength + x] = fHeight / m_xmf3Scale.y;
 		}
 	}
+
+
 
 	m_nVertexBufferViews = 4;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
