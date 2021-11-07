@@ -420,7 +420,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	//지형 전체를 표현하기 위한 격자 메쉬의 개수이다.
 	//지형 전체를 표현하기 위한 격자 메쉬에 대한 포인터 배열을 생성한다.
 
-	m_vpMeshes.reserve(cxBlocks * czBlocks);
+	m_vpMeshes.reserve(cxBlocks * czBlocks + 1);
 	
 	std::shared_ptr<CHeightMapGridMesh> pHeightMapGridMesh = NULL;
 	btHeightfieldTerrainShape* pTerrainShape = NULL;

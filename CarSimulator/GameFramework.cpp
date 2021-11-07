@@ -329,17 +329,6 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 	WaitForGpuComplete();
 
-	// 쉐도우맵은 모든 오브젝트를 그려야한다.
-	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
-	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer);
-
-	for (int j = 0; j< 4; ++j)
-	{
-		m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer->GetWheels()[j]);
-	}
-
-	auto pInstancingShader = m_pScene->GetInstancingShader();
-	m_pShadowMap[0]->GetShader()->GetInstancingObjectVector()->push_back(pInstancingShader->GetObjectVector()[0]);
 	m_GameTimer.Reset();
 }
 
@@ -437,7 +426,7 @@ void CGameFramework::ProcessInput()
 void CGameFramework::Update()
 {
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->clear();
-	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
+	//m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 
 	for (int j = 0; j < 4; ++j)
