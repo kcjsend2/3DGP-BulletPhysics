@@ -436,10 +436,21 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 			xStart = x * (nBlockWidth - 1);
 			zStart = z * (nBlockLength - 1);
 			//지형의 일부분을 나타내는 격자 메쉬를 생성하여 지형 메쉬에 저장한다.
-			pHeightMapGridMesh = std::make_shared<CHeightMapGridMesh>(pd3dDevice, pd3dCommandList, xStart, zStart, nBlockWidth, nBlockLength, pfHeightmapData, fMaxHeight, fMinHeight, xmf3Scale, m_pHeightMapImage);
+			pHeightMapGridMesh = std::make_shared<CHeightMapGridMesh>(pd3dDevice, pd3dCommandList, xStart, zStart, nBlockWidth, nBlockLength, fMaxHeight, fMinHeight, xmf3Scale, m_pHeightMapImage);
 			SetMesh(pHeightMapGridMesh);
 		}
 	}
+
+	BYTE* pHeightMapPixels = m_pHeightMapImage->GetHeightMapPixels();
+
+	for (int z = 0, zStart = 0; z < nLength; z++)
+	{
+		for (int x = 0, xStart = 0; x < nWidth; x++)
+		{
+			pfHeightmapData[z * nLength + x] = pHeightMapPixels[z * nLength + x];
+		}
+	}
+
 	pTerrainShape = new btHeightfieldTerrainShape(nWidth, nLength, pfHeightmapData, fMinHeight, fMaxHeight, 1, false);
 	pTerrainShape->setLocalScaling(btVector3(xmf3Scale.x, xmf3Scale.y, xmf3Scale.z)); 
 	

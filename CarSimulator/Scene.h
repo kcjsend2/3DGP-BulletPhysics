@@ -14,7 +14,7 @@ public:
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, std::shared_ptr<CVehiclePlayer> pPlayer);
-	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bRenderTerrain);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 	void ReleaseUploadBuffers();
 	//그래픽 루트 시그너쳐를 생성한다.

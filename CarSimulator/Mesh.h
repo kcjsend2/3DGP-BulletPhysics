@@ -1,5 +1,7 @@
 #pragma once
 
+class CCamera;
+
 //정점을 표현하기 위한 클래스를 선언한다.
 class CVertex
 {
@@ -195,7 +197,7 @@ protected:
 	ID3D12Resource* m_pd3dDetailTextureUploadBuffer = NULL;
 
 public:
-	CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength, float* pHeightmapData, float& fMaxHeight, float& fMinHeight, XMFLOAT3 xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f), void* pContext = NULL);
+	CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength, float& fMaxHeight, float& fMinHeight, XMFLOAT3 xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f), void* pContext = NULL);
 	virtual ~CHeightMapGridMesh();
 	XMFLOAT3 GetScale() { return(m_xmf3Scale); }
 	int GetWidth() { return(m_nWidth); }
@@ -208,6 +210,7 @@ public:
 
 	//격자의 좌표가 (x, z)일 때 교점(정점)의 색상을 반환하는 함수이다.
 	virtual XMFLOAT4 OnGetColor(int x, int z, void *pContext);
+
 };
 
 class CMeshFileRead : public CMesh

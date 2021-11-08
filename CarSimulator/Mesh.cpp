@@ -285,7 +285,7 @@ float CHeightMapImage::GetHeight(float fx, float fz)
 	return(fHeight);
 }
 
-CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength, float* pHeightmapData, float& fMaxHeight, float& fMinHeight, XMFLOAT3 xmf3Scale, void* pContext) : CMesh(pd3dDevice, pd3dCommandList)
+CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart, int nWidth, int nLength, float& fMaxHeight, float& fMinHeight, XMFLOAT3 xmf3Scale, void* pContext) : CMesh(pd3dDevice, pd3dCommandList)
 {
 	//격자의 교점(정점)의 개수는 (nWidth * nLength)이다.
 	m_nVertices = 25;
@@ -308,7 +308,7 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	/*xStart와 zStart는 격자의 시작 위치(x-좌표와 z-좌표)를 나타낸다. 커다란 지형은 격자들의 이차원 배열로 만들 필
 	요가 있기 때문에 전체 지형에서 각 격자의 시작 위치를 나타내는 정보가 필요하다.*/
 	float fHeight = 0.0f;
-	int nIncrease = 3; //(Block Size == 9) ? 2, (Block Size == 13) ? 3
+	int nIncrease = 5; //(Block Size == 9) ? 2, (Block Size == 13) ? 3
 	for (int i = 0, z = (zStart + nLength - 1); z >= zStart; z -= nIncrease)
 	{
 		for (int x = xStart; x < (xStart + nWidth); x += nIncrease, i++)
@@ -329,17 +329,6 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 				fMaxHeight = fHeight / m_xmf3Scale.y;
 		}
 	}
-
-	for (int i = 0, z = (zStart + nLength - 1); z >= zStart; z--)
-	{
-		for (int x = xStart; x < (xStart + nWidth); x++, i++)
-		{
-			fHeight = OnGetHeight(x, z, pContext);
-			pHeightmapData[z * nLength + x] = fHeight / m_xmf3Scale.y;
-		}
-	}
-
-
 
 	m_nVertexBufferViews = 4;
 	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
@@ -449,7 +438,6 @@ XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void* pContext)
 	XMFLOAT4 xmf4Color = Vector4::Multiply(fScale, xmf4IncidentLightColor);
 	return(xmf4Color);
 }
-
 
 CMeshFileRead::CMeshFileRead(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName, bool bTextFile, XMFLOAT3 xmf3Scale, XMFLOAT3 xmf3Rotation) : CMesh(pd3dDevice, pd3dCommandList)
 {
