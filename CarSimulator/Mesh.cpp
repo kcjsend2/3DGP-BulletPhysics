@@ -308,7 +308,7 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	/*xStart와 zStart는 격자의 시작 위치(x-좌표와 z-좌표)를 나타낸다. 커다란 지형은 격자들의 이차원 배열로 만들 필
 	요가 있기 때문에 전체 지형에서 각 격자의 시작 위치를 나타내는 정보가 필요하다.*/
 	float fHeight = 0.0f;
-	int nIncrease = 5; //(Block Size == 9) ? 2, (Block Size == 13) ? 3
+	int nIncrease = 8; //(Block Size == 9) ? 2, (Block Size == 13) ? 3
 	for (int i = 0, z = (zStart + nLength - 1); z >= zStart; z -= nIncrease)
 	{
 		for (int x = xStart; x < (xStart + nWidth); x += nIncrease, i++)
