@@ -592,9 +592,8 @@ void CVehiclePlayer::ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList,
 void CVehiclePlayer::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
 	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane); // XY 평면으로 반사
 
-	ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	XMMATRIX ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
 	
 	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
 	
@@ -697,13 +696,13 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 void CVehiclePlayer::CWheel::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
 	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane); // XY 평면으로 반사
 
-	ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	XMMATRIX ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
 
 	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
-
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR));
+;
+	
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR ));
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
@@ -814,7 +813,7 @@ void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dComma
 
 		pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[i], TRUE, &m_d3dDsvCPUDescriptorHandle);
 
-		pScene->Render(pd3dCommandList.Get(), m_apCameras[i].get(), false);
+		pScene->Render(pd3dCommandList.Get(), m_apCameras[i].get(), RENDER_LIGHT | RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_SKYBOX);
 	}
 
 	pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));

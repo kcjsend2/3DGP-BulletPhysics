@@ -533,29 +533,24 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	if (m_pScene)
-		m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, true);
+	m_pd3dCommandList->OMSetStencilRef(1);
 
-	//3인칭 카메라일 때 플레이어가 항상 보이도록 렌더링한다.
-	#ifdef _WITH_PLAYER_TOP
-	//렌더 타겟은 그대로 두고 깊이 버퍼를 1.0으로 지우고 플레이어를 렌더링하면 플레이어는 무조건 그려질 것이다.
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-	#endif
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT | RENDER_SKYBOX);
 
 	if (m_pPlayer)
 	{
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 	}
 
-	m_pd3dCommandList->OMSetStencilRef(1);
 	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
-	
+
 	if (m_pPlayer)
 	{
 		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
 	}
 
 	m_pScene->RenderMirror(m_pd3dCommandList.Get());
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN);
 
 	m_pd3dCommandList->OMSetStencilRef(0);
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));

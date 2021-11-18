@@ -2,6 +2,12 @@
 #include "Light.h"
 class CCamera;
 
+#define RENDER_SKYBOX 0b00001
+#define RENDER_LIGHT 0b00010
+#define RENDER_TERRAIN 0b00100
+#define RENDER_INSTANCING_OBJECT 0b01000
+#define RENDER_BILLBOARD 0b10000
+
 class CScene
 {
 public:
@@ -14,7 +20,7 @@ public:
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, std::shared_ptr<CVehiclePlayer> pPlayer);
-	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bRenderTerrain);
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nRenderMode);
 	float RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderMirror(ID3D12GraphicsCommandList* pd3dCommandList);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();

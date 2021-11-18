@@ -144,23 +144,28 @@ ID3D12RootSignature* CScene::GetGraphicsRootSignature()
 	return(m_pd3dGraphicsRootSignature);
 }
 
-void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bRenderTerrain)
+void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nRenderMode)
 {
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
-	m_pSkyboxShader->Render(pd3dCommandList, pCamera);
-	m_pLightShader->Render(pd3dCommandList);
+	if((nRenderMode & RENDER_SKYBOX) == RENDER_SKYBOX)
+		m_pSkyboxShader->Render(pd3dCommandList, pCamera);
 
+	if ((nRenderMode & RENDER_LIGHT) == RENDER_LIGHT)
+		m_pLightShader->Render(pd3dCommandList);
 
-	if (m_pTerrain && bRenderTerrain)
-	{
+	if (m_pTerrain && (nRenderMode & RENDER_TERRAIN) == RENDER_TERRAIN)
 		m_pTerrain->Render(pd3dCommandList);
-	}
 
-	m_pInstancingShader->Render(pd3dCommandList);
-	m_pBillBoardShader->Render(pd3dCommandList);
-	m_pAnimatedBillBoardShader->Render(pd3dCommandList);
+	if ((nRenderMode & RENDER_INSTANCING_OBJECT) == RENDER_INSTANCING_OBJECT)
+		m_pInstancingShader->Render(pd3dCommandList);
+
+	if ((nRenderMode & RENDER_BILLBOARD) == RENDER_BILLBOARD)
+	{
+		m_pBillBoardShader->Render(pd3dCommandList);
+		m_pAnimatedBillBoardShader->Render(pd3dCommandList);
+	}
 }
 
 float CScene::RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList)
