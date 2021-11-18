@@ -1291,11 +1291,31 @@ D3D12_INPUT_LAYOUT_DESC CMirrorShader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 
+D3D12_BLEND_DESC CMirrorShader::CreateBlendState()
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = TRUE;
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	return(d3dBlendDesc);
+}
+
 void CMirrorShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
 {
 	m_pMirror = std::make_unique<CGameObject>();
 
-	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 100, 100, 0, 0, 0, 5);
+	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 100, 100, 0, 0, 0, 0.01);
 	m_pMirror->SetPosition(2000, 50, 2160);
 	m_pMirror->SetMesh(pMesh);
 
@@ -1336,7 +1356,7 @@ void CMirrorShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.DS = CreateDomainShader(&pd3dGeometryShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
-	d3dPipelineStateDesc.BlendState = CreateBlendState();
+	d3dPipelineStateDesc.BlendState = CShader::CreateBlendState();
 	d3dPipelineStateDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = 0;
 
 	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();

@@ -555,7 +555,8 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
 	}
 
-	//m_pScene->RenderMirror(m_pd3dCommandList.Get());
+	m_pScene->RenderMirror(m_pd3dCommandList.Get());
+
 	m_pd3dCommandList->OMSetStencilRef(0);
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

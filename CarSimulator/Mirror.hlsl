@@ -28,5 +28,7 @@ float4 PS_Mirror(VS_TEXTURED_OUTPUT input) : SV_TARGET
 {
     float4 cColor = gtxtMirror.Sample(gsamLinearClamp, input.uv);
 
+    cColor.a = 0.6f;
+
     return (cColor);
 }
