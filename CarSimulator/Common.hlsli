@@ -36,6 +36,7 @@ Texture2D gtxtSkybox[6] : register(t10);
 Texture2DArray gtxtTreeBillBoard[2] : register(t16);
 Texture2D gtxtExplosionBillBoard : register(t18);
 TextureCube gtxtCubeMap : register(t19);
+Texture2D gtxtMirror : register(t20);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {

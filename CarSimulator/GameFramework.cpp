@@ -218,7 +218,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 20;
+	srvHeapDesc.NumDescriptors = 21;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -547,6 +547,16 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 	}
 
+	m_pd3dCommandList->OMSetStencilRef(1);
+	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
+	
+	if (m_pPlayer)
+	{
+		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
+	}
+
+	//m_pScene->RenderMirror(m_pd3dCommandList.Get());
+	m_pd3dCommandList->OMSetStencilRef(0);
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

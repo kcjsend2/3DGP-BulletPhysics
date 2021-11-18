@@ -119,6 +119,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pAnimatedBillBoardShader = new CAnimatedBillBoardShader;
 	m_pAnimatedBillBoardShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pAnimatedBillBoardShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
+
+	m_pMirrorShader = new CMirrorShader;
+	m_pMirrorShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pMirrorShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -153,9 +157,22 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		m_pTerrain->Render(pd3dCommandList);
 	}
+
 	m_pInstancingShader->Render(pd3dCommandList);
 	m_pBillBoardShader->Render(pd3dCommandList);
 	m_pAnimatedBillBoardShader->Render(pd3dCommandList);
+}
+
+float CScene::RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pMirrorShader->StencilRender(pd3dCommandList);
+
+	return m_pMirrorShader->GetMirrorZ();
+}
+
+void CScene::RenderMirror(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pMirrorShader->Render(pd3dCommandList);
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
@@ -253,8 +270,9 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE TreeBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 16, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 2개, 16 ~ 17
 	CD3DX12_DESCRIPTOR_RANGE AnimatedBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 18, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 18
 	CD3DX12_DESCRIPTOR_RANGE CubeMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 19, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 19
+	CD3DX12_DESCRIPTOR_RANGE MirrorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 20, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 20
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[7] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange};
+	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[8] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, MirrorRange };
 
 	pd3dRootParameters[7].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
 
@@ -275,10 +293,11 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	ID3DBlob* pd3dErrorBlob = NULL;
 	::D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pd3dSignatureBlob, &pd3dErrorBlob);
 
+	std::string p;
 	if (pd3dErrorBlob != NULL)
 	{
 		auto tmp = (char*)pd3dErrorBlob->GetBufferPointer();
-		std::string p = tmp;
+		p = tmp;
 		p.c_str();
 	}
 

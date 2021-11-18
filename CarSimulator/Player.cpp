@@ -335,7 +335,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(50.0f, 4.3f, 50.0f));
+	SetPosition(XMFLOAT3(2000.0f, 5.0f, 2050.0f));
 
 	auto vehicleExtents = pVehicleMesh.get()[0].GetBoundingBox().Extents;
 	auto wheelExtents = pWheelMesh.get()[0].GetBoundingBox().Extents;
@@ -566,6 +566,50 @@ void CVehiclePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	}
 }
 
+void CVehiclePlayer::ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
+{
+	OnPrepareRender();
+	UpdateReflectedShaderVariables(pd3dCommandList, mirrorZ);
+	if (m_pShader) m_pShader->ReflectedRender(pd3dCommandList);
+
+	for (int i = 0; i < m_vpMeshes.size(); i++)
+	{
+		if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList);
+	}
+
+	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
+	for (int i = 0; i < m_vpMeshes.size(); i++)
+	{
+		if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList);
+	}
+
+	for (int i = 0; i < 4; ++i)
+	{
+		m_pWheel[i]->ReflectedRender(pd3dCommandList, mirrorZ);
+	}
+}
+
+void CVehiclePlayer::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
+{
+	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane); // XY 평면으로 반사
+
+	XMVECTOR mirrorXPlane = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	XMMATRIX XR = XMMatrixReflect(mirrorXPlane); // YZ 평면으로 반사
+
+	XMVECTOR mirrorYPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMMATRIX YR = XMMatrixReflect(mirrorYPlane); // XZ 평면으로 반사
+
+
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(ZR * XMLoadFloat4x4(&m_xmf4x4World) * XMMatrixTranslationFromVector(XMVectorSet(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z), 0.0f))));
+
+
+	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 12, &m_material, 16);
+}
+
 CCamera* CVehiclePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 {
 	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
@@ -644,6 +688,37 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender();
 	UpdateShaderVariables(pd3dCommandList);
+
+	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
+	for (int i = 0; i < m_vpMeshes.size(); i++)
+	{
+		m_vpMeshes[i]->Render(pd3dCommandList);
+	}
+}
+
+void CVehiclePlayer::CWheel::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
+{
+	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane);
+
+	XMVECTOR mirrorXPlane = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	XMMATRIX XR = XMMatrixReflect(mirrorXPlane);
+
+	XMVECTOR mirrorYPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMMATRIX YR = XMMatrixReflect(mirrorYPlane);
+
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(ZR * XMLoadFloat4x4(&m_xmf4x4World) * XMMatrixTranslationFromVector(XMVectorSet(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z), 0.0f))));
+
+	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 12, &m_material, 16);
+}
+
+void CVehiclePlayer::CWheel::ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
+{
+	OnPrepareRender();
+	UpdateReflectedShaderVariables(pd3dCommandList, mirrorZ);
 
 	//게임 객체가 포함하는 모든 메쉬를 렌더링한다.
 	for (int i = 0; i < m_vpMeshes.size(); i++)

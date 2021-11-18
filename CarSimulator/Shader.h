@@ -62,6 +62,7 @@ public:
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList) {};
 	virtual void Update(float fTimeElapsed);
 	virtual void CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
 	virtual void SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
@@ -120,9 +121,14 @@ class CPlayerShader : public CShader
 public:
 	CPlayerShader();
 	virtual ~CPlayerShader();
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+
+protected:
+	ID3D12PipelineState* m_pd3dReflectedPipeline = NULL;
 };
 
 //“CObjectsShader” 클래스는 게임 객체들을 포함하는 셰이더 객체이다.
@@ -265,4 +271,23 @@ public:
 protected:
 	std::vector<CAnimatedBillBoard> m_vpAnimatedBillBoard;
 	UploadBuffer<CB_ANIMATEDBILLBOARD>* m_ubAnimatedBillBoard;
+};
+
+class CMirrorShader : public CShader
+{
+public:
+	CMirrorShader();
+	virtual ~CMirrorShader();
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void StencilRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	float GetMirrorZ() { return m_pMirror->GetPosition().z; }
+
+protected:
+	ID3D12PipelineState* m_pd3StencilPipeline = NULL;
+	std::unique_ptr<CGameObject> m_pMirror;
 };

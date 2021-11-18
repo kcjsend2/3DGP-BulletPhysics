@@ -15,6 +15,8 @@ public:
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, std::shared_ptr<CVehiclePlayer> pPlayer);
 	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bRenderTerrain);
+	float RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList);
+	void RenderMirror(ID3D12GraphicsCommandList* pd3dCommandList);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 	void ReleaseUploadBuffers();
 	//그래픽 루트 시그너쳐를 생성한다.
@@ -28,6 +30,7 @@ protected:
 	CSkyBoxShader* m_pSkyboxShader = NULL;
 	CTreeBillBoardShader* m_pBillBoardShader = NULL;
 	CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
+	CMirrorShader* m_pMirrorShader = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 

@@ -259,6 +259,71 @@ CPlayerShader::~CPlayerShader()
 {
 }
 
+void CPlayerShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
+	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
+	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.GS = CreateGeometryShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.HS = CreateHullShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.DS = CreateDomainShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+	d3dPipelineStateDesc.BlendState = CreateBlendState();
+	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
+	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
+	d3dPipelineStateDesc.SampleMask = UINT_MAX;
+	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	d3dPipelineStateDesc.NumRenderTargets = 1;
+	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dPipelineStateDesc.SampleDesc.Count = 1;
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+
+	d3dPipelineStateDesc.DepthStencilState.DepthEnable = TRUE;
+	d3dPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	d3dPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	d3dPipelineStateDesc.DepthStencilState.StencilEnable = TRUE;
+	d3dPipelineStateDesc.DepthStencilState.StencilReadMask = 0xff;
+	d3dPipelineStateDesc.DepthStencilState.StencilWriteMask = 0xff;
+
+	d3dPipelineStateDesc.DepthStencilState.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dPipelineStateDesc.DepthStencilState.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dPipelineStateDesc.DepthStencilState.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	d3dPipelineStateDesc.DepthStencilState.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;
+
+	d3dPipelineStateDesc.DepthStencilState.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dPipelineStateDesc.DepthStencilState.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dPipelineStateDesc.DepthStencilState.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	d3dPipelineStateDesc.DepthStencilState.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;
+
+	d3dPipelineStateDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+	d3dPipelineStateDesc.RasterizerState.FrontCounterClockwise = TRUE;
+
+	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dReflectedPipeline);
+
+	if (pd3dVertexShaderBlob)
+		pd3dVertexShaderBlob->Release();
+
+	if (pd3dPixelShaderBlob)
+		pd3dPixelShaderBlob->Release();
+
+	if (pd3dGeometryShaderBlob)
+		pd3dGeometryShaderBlob->Release();
+
+	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
+		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
+}
+
+void CPlayerShader::ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	pd3dCommandList->SetPipelineState(m_pd3dReflectedPipeline);
+}
+
 D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
 {
 	UINT nInputElementDescs = 3;
@@ -1076,32 +1141,32 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 16, 7);
 
-	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[90000];
+	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[10000];
 
 	// 5120 x 5120 크기의 맵
 
 	// 1만개, (20, 20) 간격
-	for (int i = 0; i < 200; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
-		for (int j = 0; j < 200; ++j)
+		for (int j = 0; j < 100; ++j)
 		{
-			pxmf3GrassPosition[(i * 200) + j] = XMFLOAT3{float(i * 20), 0.0f, float(j * 20) };
+			pxmf3GrassPosition[(i * 100) + j] = XMFLOAT3{float(i * 20), 0.0f, float(j * 20) };
 		}
 	}
 
-	std::shared_ptr<CBillBoardMesh> pGrassMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 40000);
+	std::shared_ptr<CBillBoardMesh> pGrassMesh = std::make_shared<CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3GrassPosition, 5, 5, 10000);
 
-	XMFLOAT3* pxmf3TreePosition = new XMFLOAT3[2500];
+	XMFLOAT3* pxmf3TreePosition = new XMFLOAT3[100];
 
-	for (int i = 0; i < 50; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
-		for (int j = 0; j < 50; ++j)
+		for (int j = 0; j < 10; ++j)
 		{
-			pxmf3TreePosition[(i * 50) + j] = XMFLOAT3{ float(i * 100) + 5.0f, 0.0f, float(j * 100) + 5.0f };
+			pxmf3TreePosition[(i * 10) + j] = XMFLOAT3{ float(i * 100) + 5.0f, 0.0f, float(j * 100) + 5.0f };
 		}
 	}
 
-	std::shared_ptr<CBillBoardMesh> pTreeMesh = std::make_shared <CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3TreePosition, 20, 20, 2500);
+	std::shared_ptr<CBillBoardMesh> pTreeMesh = std::make_shared <CBillBoardMesh>(pd3dDevice, pd3dCommandList, pxmf3TreePosition, 20, 20, 1000);
 
 	m_pBillBoard = new CGameObject(2);
 	m_pBillBoard->SetMesh(pGrassMesh);
@@ -1161,7 +1226,6 @@ void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Grap
 
 void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
 {
-
 	for (auto i = m_vpAnimatedBillBoard.begin(); i < m_vpAnimatedBillBoard.end();)
 	{
 		i->UpdateShaderVariables(pd3dCommandList, fTimeElapsed);
@@ -1192,4 +1256,121 @@ void CAnimatedBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList
 void CAnimatedBillBoardShader::AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, int nTotalFrame, int nxDivided, int nyDivided, std::vector<float> vfFrameTime)
 {
 	m_vpAnimatedBillBoard.emplace_back(pd3dDevice, pd3dCommandList, xmf3Position, nxDivided, nyDivided, vfFrameTime);
+}
+
+CMirrorShader::CMirrorShader()
+{
+}
+
+CMirrorShader::~CMirrorShader()
+{
+}
+
+D3D12_SHADER_BYTECODE CMirrorShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"Mirror.hlsl", "VS_Mirror", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CMirrorShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"Mirror.hlsl", "PS_Mirror", "ps_5_1", ppd3dShaderBlob));
+}
+
+
+D3D12_INPUT_LAYOUT_DESC CMirrorShader::CreateInputLayout()
+{
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+void CMirrorShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+{
+	m_pMirror = std::make_unique<CGameObject>();
+
+	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 100, 100, 0, 0, 0, 5);
+	m_pMirror->SetPosition(2000, 50, 2160);
+	m_pMirror->SetMesh(pMesh);
+
+	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/ice.dds", RESOURCE_TEXTURE2D, 0);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 20, 7);
+}
+
+
+void CMirrorShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CShader::Render(pd3dCommandList);
+	m_pMirror->Render(pd3dCommandList);
+}
+
+void CMirrorShader::StencilRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	pd3dCommandList->SetPipelineState(m_pd3StencilPipeline);
+	m_pMirror->Render(pd3dCommandList);
+}
+
+void CMirrorShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+
+	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
+	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
+	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.GS = CreateGeometryShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.HS = CreateHullShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.DS = CreateDomainShader(&pd3dGeometryShaderBlob);
+	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+
+	d3dPipelineStateDesc.BlendState = CreateBlendState();
+	d3dPipelineStateDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = 0;
+
+	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
+
+	d3dPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	d3dPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	d3dPipelineStateDesc.DepthStencilState.StencilEnable = true;
+	d3dPipelineStateDesc.DepthStencilState.StencilReadMask = 0xff;
+	d3dPipelineStateDesc.DepthStencilState.StencilWriteMask = 0xff;
+	d3dPipelineStateDesc.DepthStencilState.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+	d3dPipelineStateDesc.DepthStencilState.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	d3dPipelineStateDesc.DepthStencilState.BackFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+	d3dPipelineStateDesc.DepthStencilState.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
+	d3dPipelineStateDesc.SampleMask = UINT_MAX;
+	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	d3dPipelineStateDesc.NumRenderTargets = 1;
+	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dPipelineStateDesc.SampleDesc.Count = 1;
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3StencilPipeline);
+
+
+	if (pd3dVertexShaderBlob)
+		pd3dVertexShaderBlob->Release();
+
+	if (pd3dPixelShaderBlob)
+		pd3dPixelShaderBlob->Release();
+
+	if (pd3dGeometryShaderBlob)
+		pd3dGeometryShaderBlob->Release();
+
+	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
+		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }

@@ -131,6 +131,7 @@
     <FxCompile Include="BillBoardTree.hlsl" />
     <FxCompile Include="AnimatedBillBoard.hlsl" />
     <FxCompile Include="CubemapPlayer.hlsl" />
+    <FxCompile Include="Mirror.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

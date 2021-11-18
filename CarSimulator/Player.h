@@ -148,6 +148,8 @@ private:
 		CWheel(std::shared_ptr<CMeshFileRead> pWheelMesh);
 		~CWheel();
 		virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+		virtual void UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
+		virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
 		virtual void Update(float fTimeElapsed, btRaycastVehicle* pbtVehicle, int index);
 	};
 
@@ -158,6 +160,8 @@ public:
 	virtual void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
+	virtual void UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	void FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	void EraseBullet() { m_pBullet = NULL; }

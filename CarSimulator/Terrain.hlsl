@@ -64,7 +64,7 @@ VS_Terrain_OUTPUT VS_Terrain(VS_Terrain_INPUT input)
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(25)]
 [patchconstantfunc("HSTerrainTessellationConstant")]
-[maxtessfactor(32.0f)]
+[maxtessfactor(64.0f)]
 HS_TERRAIN_TESSELLATION_OUTPUT HSTerrainTessellation(InputPatch<VS_Terrain_OUTPUT, 25> input, uint i : SV_OutputControlPointID)
 {
     HS_TERRAIN_TESSELLATION_OUTPUT output;
@@ -82,7 +82,7 @@ float CalculateTessFactor(float3 f3Position)
     float fDistToCamera = distance(f3Position, cameraPos);
     float s = saturate((fDistToCamera - 10.0f) / (500.0f - 10.0f));
 
-    return (lerp(32.0f, 1.0f, s));
+    return (lerp(64.0f, 1.0f, s));
 	//	return(pow(2, lerp(20.0f, 4.0f, s)));
 }
 
