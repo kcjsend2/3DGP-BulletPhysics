@@ -594,15 +594,13 @@ void CVehiclePlayer::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* p
 	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane); // XY 평면으로 반사
 
-	XMVECTOR mirrorXPlane = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-	XMMATRIX XR = XMMatrixReflect(mirrorXPlane); // YZ 평면으로 반사
-
-	XMVECTOR mirrorYPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX YR = XMMatrixReflect(mirrorYPlane); // XZ 평면으로 반사
-
-
-	XMFLOAT4X4 xmf4x4World;
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(ZR * XMLoadFloat4x4(&m_xmf4x4World) * XMMatrixTranslationFromVector(XMVectorSet(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z), 0.0f))));
+	ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	
+	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
+	
+	xmf4x4World._33 = -m_xmf3Look.z;
+	
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR));
 
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
@@ -699,16 +697,13 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 void CVehiclePlayer::CWheel::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
 	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane);
+	XMMATRIX ZR = XMMatrixReflect(mirrorZPlane); // XY 평면으로 반사
 
-	XMVECTOR mirrorXPlane = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-	XMMATRIX XR = XMMatrixReflect(mirrorXPlane);
+	ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
 
-	XMVECTOR mirrorYPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX YR = XMMatrixReflect(mirrorYPlane);
+	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
 
-	XMFLOAT4X4 xmf4x4World;
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(ZR * XMLoadFloat4x4(&m_xmf4x4World) * XMMatrixTranslationFromVector(XMVectorSet(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z), 0.0f))));
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR));
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
