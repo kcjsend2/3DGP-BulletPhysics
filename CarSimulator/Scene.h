@@ -37,6 +37,7 @@ protected:
 	CTreeBillBoardShader* m_pBillBoardShader = NULL;
 	CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
 	CMirrorShader* m_pMirrorShader = NULL;
+	CRoomShader* m_pRoomShader = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 

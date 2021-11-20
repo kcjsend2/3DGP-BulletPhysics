@@ -359,11 +359,10 @@ CObjectsShader::~CObjectsShader()
 
 D3D12_INPUT_LAYOUT_DESC CObjectsShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 3;
+	UINT nInputElementDescs = 2;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
@@ -1327,8 +1326,8 @@ void CMirrorShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 {
 	m_pMirror = std::make_unique<CGameObject>();
 
-	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 100, 100, 0, 0, 0, 0.0);
-	m_pMirror->SetPosition(2000, 50, 2160);
+	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 500, 500, 0, 0, 0, 0.0);
+	m_pMirror->SetPosition(2000, 250, 2160);
 	m_pMirror->SetMesh(pMesh);
 
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -1405,4 +1404,52 @@ void CMirrorShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 
 	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
+}
+
+D3D12_SHADER_BYTECODE CRoomShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"Default_No_Light.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CRoomShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"Default_No_Light.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+}
+
+D3D12_INPUT_LAYOUT_DESC CRoomShader::CreateInputLayout()
+{
+	UINT nInputElementDescs = 1;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+void CRoomShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	std::shared_ptr<CGameObject> pObject = std::make_shared<CGameObject>(4);
+
+	std::shared_ptr<CRectMesh> pMesh = std::make_shared<CRectMesh>(pd3dDevice, pd3dCommandList, 500.0f, 500.0f, 0.0f, 0.0f, 0.0f, -250.0f);
+	pObject->SetMesh(pMesh); // ÈÄ
+
+	pMesh = std::make_shared<CRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 500.0f, 500.0f, -250.0f, 0.0f, 0.0f);
+	pObject->SetMesh(pMesh); // ÁÂ
+
+	pMesh = std::make_shared<CRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 500.0f, 500.0f, +250.0f, 0.0f, 0.0f);
+	pObject->SetMesh(pMesh); // ¿ì
+
+	pMesh = std::make_shared<CRectMesh>(pd3dDevice, pd3dCommandList, 500.0f, 0.0f, 500.0f, 0.0f, +250.0f, 0.0f);
+	pObject->SetMesh(pMesh); // »ó
+
+	pMesh = std::make_shared<CRectMesh>(pd3dDevice, pd3dCommandList, 500.0f, 0.0f, 500.0f, 0.0f, -249.99f, 0.0f);
+	pObject->SetMesh(pMesh); // ÇÏ
+
+	pObject->SetPosition(XMFLOAT3{ 2000, 250, 1910 });
+	pObject->SetMaterial(XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.8f);
+
+	m_vpObjects.push_back(pObject);
 }

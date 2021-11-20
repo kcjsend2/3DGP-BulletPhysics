@@ -123,6 +123,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pMirrorShader = new CMirrorShader;
 	m_pMirrorShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pMirrorShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
+
+	m_pRoomShader = new CRoomShader;
+	m_pRoomShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pRoomShader->BuildObjects(pd3dDevice, pd3dCommandList);
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -166,6 +170,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pBillBoardShader->Render(pd3dCommandList);
 		m_pAnimatedBillBoardShader->Render(pd3dCommandList);
 	}
+
+	m_pRoomShader->Render(pd3dCommandList);
 }
 
 float CScene::RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList)
