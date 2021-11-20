@@ -686,7 +686,7 @@ CTexturedRectMesh::CTexturedRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	}
 	else if (fDepth == 0.0f)
 	{
-		if (fzPosition > 0.0f)
+		if (fzPosition >= 0.0f)
 		{
 			pVertices[0] = CTexturedVertex(XMFLOAT3(+fx, +fy, fz), XMFLOAT2(1.0f, 0.0f));
 			pVertices[1] = CTexturedVertex(XMFLOAT3(+fx, -fy, fz), XMFLOAT2(1.0f, 1.0f));

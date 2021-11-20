@@ -140,6 +140,7 @@ public:
 	virtual void SetMatrix(XMFLOAT4X4 xmf4x4Matrix) { m_xmf4x4World = xmf4x4Matrix; }
 	virtual BoundingOrientedBox GetBoudingBox(int index);
 	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CScene* pScene) { }
+	virtual CShader* GetShader() { return m_pShader; }
 
 public:
 	//상수 버퍼를 생성한다.

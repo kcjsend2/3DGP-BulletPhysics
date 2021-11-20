@@ -417,6 +417,7 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= KEY_DOWN;
 		if (pKeyBuffer[VK_LSHIFT] & 0xF0) dwBehave |= KEY_SHIFT;
 		if (pKeyBuffer[0x58] & 0xF0) dwBehave |= KEY_X;
+		if (pKeyBuffer[0x46] & 0xF0) m_pScene->GetTerrain()->GetShader()->ChangeRendermode();
 	}
 
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.

@@ -66,6 +66,7 @@ public:
 	virtual void Update(float fTimeElapsed);
 	virtual void CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
 	virtual void SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
+	virtual void ChangeRendermode() {}
 
 protected:
 	ID3D12PipelineState* m_pd3dPipelineState = NULL;
@@ -190,6 +191,11 @@ public:
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ChangeRendermode(); // false : 일반적인 렌더, true : 와이어프레임 렌더
+
+protected:
+	bool m_bRenderMode = FALSE;
+	ID3D12PipelineState* m_pd3dWireframePipeline = NULL;
 };
 
 class CLightsShader : public CShader

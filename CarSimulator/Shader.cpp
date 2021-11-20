@@ -619,7 +619,10 @@ void CTerrainShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature*
 	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	d3dPipelineStateDesc.SampleDesc.Count = 1;
 	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dWireframePipeline);
+
+	d3dPipelineStateDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
 
 	if (pd3dVertexShaderBlob)
 		pd3dVertexShaderBlob->Release();
@@ -706,8 +709,17 @@ D3D12_RASTERIZER_DESC CTerrainShader::CreateRasterizerState()
 
 void CTerrainShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	if(m_bRenderMode)
+		CShader::Render(pd3dCommandList);
+	else
+		pd3dCommandList->SetPipelineState(m_pd3dWireframePipeline);
+
 	UpdateShaderVariables(pd3dCommandList);
+}
+
+void CTerrainShader::ChangeRendermode()
+{
+	m_bRenderMode = 1 - m_bRenderMode;
 }
 
 CLightsShader::CLightsShader()
@@ -1315,7 +1327,7 @@ void CMirrorShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 {
 	m_pMirror = std::make_unique<CGameObject>();
 
-	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 100, 100, 0, 0, 0, 0.00001f);
+	std::shared_ptr<CTexturedRectMesh> pMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 100, 100, 0, 0, 0, 0.0);
 	m_pMirror->SetPosition(2000, 50, 2160);
 	m_pMirror->SetMesh(pMesh);
 
