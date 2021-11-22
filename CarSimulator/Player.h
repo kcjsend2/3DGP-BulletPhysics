@@ -165,6 +165,7 @@ public:
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	void FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	void EraseBullet() { m_pBullet = NULL; }
+	void SetRigidBodyPosition(XMFLOAT3 xmf3Position);
 
 	std::shared_ptr<CWheel>* GetWheels() { return m_pWheel; }
 

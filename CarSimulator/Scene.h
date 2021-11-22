@@ -38,6 +38,7 @@ protected:
 	CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
 	CMirrorShader* m_pMirrorShader = NULL;
 	CRoomShader* m_pRoomShader = NULL;
+	CPaticleBillBoardShader* m_pParticleShader = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 
@@ -49,4 +50,5 @@ public:
 	std::shared_ptr<CHeightMapTerrain> GetTerrain() { return(m_pTerrain); }
 	CInstancingShader* GetInstancingShader() { return m_pInstancingShader; }
 	CLightsShader* GetLightShader() { return m_pLightShader; }
+	CPaticleBillBoardShader* GetParticleShader() { return m_pParticleShader; }
 };

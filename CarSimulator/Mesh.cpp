@@ -845,3 +845,33 @@ CRectMesh::CRectMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 CRectMesh::~CRectMesh()
 {
 }
+
+CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	m_nSlot = 0;
+	m_nVertices = 1;
+
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+
+	std::unique_ptr<XMFLOAT2[]> pfSize = std::make_unique<XMFLOAT2[]>(m_nVertices);
+
+	for (int i = 0; i < m_nVertices; ++i)
+	{
+		pfSize[i] = { fWidth, fHeight };
+	}
+
+	m_pd3dSizeBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pfSize.get(), sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dSizeUploadBuffer);
+
+	m_nVertexBufferViews = 1;
+	m_pd3dVertexBufferViews = new D3D12_VERTEX_BUFFER_VIEW[m_nVertexBufferViews];
+
+	m_pd3dVertexBufferViews[0].BufferLocation = m_pd3dSizeBuffer->GetGPUVirtualAddress();
+	m_pd3dVertexBufferViews[0].StrideInBytes = sizeof(XMFLOAT2);
+	m_pd3dVertexBufferViews[0].SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+}
+
+CParticleMesh::~CParticleMesh()
+{
+	if (m_pd3dSizeBuffer)
+		m_pd3dSizeBuffer->Release();
+}
