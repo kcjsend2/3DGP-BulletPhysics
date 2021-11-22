@@ -586,15 +586,12 @@ void CVehiclePlayer::ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList,
 
 void CVehiclePlayer::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
-	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-	XMMATRIX ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, -1.0f, mirrorZ);
 	
 	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
 	
-	xmf4x4World._33 = -m_xmf3Look.z;
-	
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR));
+	//xmf4x4World._33 = -m_xmf3Look.z;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * XMMatrixReflect(mirrorZPlane)));
 
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
@@ -698,14 +695,12 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void CVehiclePlayer::CWheel::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
-	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-	XMMATRIX ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, -1.0f, mirrorZ);
 
 	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
-;
-	
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR ));
+
+	//xmf4x4World._33 = -m_xmf3Look.z;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * XMMatrixReflect(mirrorZPlane)));
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
@@ -731,6 +726,8 @@ void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btRaycastVehicle* pbtVeh
 	btScalar m[16];
 	wheelTransform.getOpenGLMatrix(m);
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
+
+	m_xmf3Look = XMFLOAT3(m_xmf4x4World._31, m_xmf4x4World._32, m_xmf4x4World._33);
 }
 
 CCubeMappingPlayer::CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CShader* pShader, int nMeshes) : CPlayer(nMeshes)

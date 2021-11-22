@@ -334,6 +334,7 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_BLEND_DESC CreateBlendState();
+	D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(); 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void StencilRender(ID3D12GraphicsCommandList* pd3dCommandList);

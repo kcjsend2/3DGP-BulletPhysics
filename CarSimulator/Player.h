@@ -151,6 +151,8 @@ private:
 		virtual void UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
 		virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
 		virtual void Update(float fTimeElapsed, btRaycastVehicle* pbtVehicle, int index);
+	private:
+		XMFLOAT3 m_xmf3Look;
 	};
 
 public:
