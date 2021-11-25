@@ -1000,7 +1000,7 @@ D3D12_DEPTH_STENCIL_DESC CSkyBoxShader::CreateDepthStencilState()
 	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
 	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
 	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_GREATER;
 	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
 	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
 	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
@@ -1307,11 +1307,11 @@ D3D12_BLEND_DESC CMirrorShader::CreateBlendState()
 	d3dBlendDesc.IndependentBlendEnable = FALSE;
 	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
 	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_COLOR;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_COLOR;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
 	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
 	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;

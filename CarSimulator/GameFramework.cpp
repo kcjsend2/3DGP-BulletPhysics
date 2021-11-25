@@ -544,23 +544,23 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetStencilRef(1);
 
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT | RENDER_SKYBOX);
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT);
+
+	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
+
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_SKYBOX);
+	if (m_pPlayer)
+	{
+		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
+	}
+	m_pScene->RenderMirror(m_pd3dCommandList.Get());
 
 	if (m_pPlayer)
 	{
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 	}
 
-	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
-
-	if (m_pPlayer)
-	{
-		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
-	}
-
-	m_pScene->RenderMirror(m_pd3dCommandList.Get());
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN);
-
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN | RENDER_ROOM | RENDER_PARTICLE);
 	m_pd3dCommandList->OMSetStencilRef(0);
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
