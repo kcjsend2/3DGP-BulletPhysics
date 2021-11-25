@@ -536,7 +536,6 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetStencilRef(1);
 
-	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT | RENDER_SKYBOX);
 
 	if (m_pPlayer)
@@ -544,6 +543,7 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 	}
 
+	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
 
 	if (m_pPlayer)
 	{
