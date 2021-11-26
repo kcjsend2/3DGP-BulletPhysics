@@ -441,7 +441,7 @@ void CGameFramework::ProcessInput()
 void CGameFramework::Update()
 {
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->clear();
-	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
+	//m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 
 	for (int j = 0; j < 4; ++j)
