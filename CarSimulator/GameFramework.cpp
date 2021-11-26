@@ -407,6 +407,7 @@ void CGameFramework::ProcessInput()
 	static UCHAR pKeyBuffer[256];
 	DWORD dwBehave = 0;
 
+	m_fInputLimit -= m_GameTimer.GetTimeElapsed();
 	if (::GetKeyboardState(pKeyBuffer))
 	{
 		if (pKeyBuffer[VK_UP] & 0xF0) dwBehave |= KEY_FORWARD;
@@ -417,14 +418,19 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= KEY_DOWN;
 		if (pKeyBuffer[VK_LSHIFT] & 0xF0) dwBehave |= KEY_SHIFT;
 		if (pKeyBuffer['X'] & 0xF0) dwBehave |= KEY_X;
-		if (pKeyBuffer['F'] & 0xF0) m_pScene->GetTerrain()->GetShader()->ChangeRendermode();
-		if (pKeyBuffer['I'] & 0xF0) m_pPlayer->SetRigidBodyPosition(XMFLOAT3{ 2000.0f, 5.0f, 2050.0f });
 
-		if (pKeyBuffer['D'] & 0xF0)
+		if (m_fInputLimit < 0.0f)
 		{
-			m_pScene->GetParticleShader()->OnOff();
-			XMFLOAT3 particlePos = Vector3::Add(m_pPlayer->GetPosition(), Vector3::ScalarProduct(m_pPlayer->GetLook(), 10));
-			m_pScene->GetParticleShader()->SetBasePosition(particlePos);
+			m_fInputLimit = 1.0f;
+			if (pKeyBuffer['F'] & 0xF0) m_pScene->GetTerrain()->GetShader()->ChangeRendermode();
+			if (pKeyBuffer['I'] & 0xF0) m_pPlayer->SetRigidBodyPosition(XMFLOAT3{ 2000.0f, 5.0f, 2050.0f });
+
+			if (pKeyBuffer['D'] & 0xF0)
+			{
+				m_pScene->GetParticleShader()->OnOff();
+				XMFLOAT3 particlePos = Vector3::Add(m_pPlayer->GetPosition(), Vector3::ScalarProduct(m_pPlayer->GetLook(), 10));
+				m_pScene->GetParticleShader()->SetBasePosition(particlePos);
+			}
 		}
 	}
 
@@ -435,7 +441,7 @@ void CGameFramework::ProcessInput()
 void CGameFramework::Update()
 {
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->clear();
-	//m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
+	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pScene->GetTerrain());
 	m_pShadowMap[0]->GetShader()->GetObjectVector()->push_back(m_pPlayer);
 
 	for (int j = 0; j < 4; ++j)

@@ -400,6 +400,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_nWidth = nWidth;
 	m_nLength = nLength;
 
+
 	SetMaterial(XMFLOAT4(0.6f, 0.6f, 0.2f, 0.0f), XMFLOAT4(0.6f, 0.6f, 0.2f, 0.0f), XMFLOAT3(0.3f, 0.3f, 0.3f), 0.1f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	/*지형 객체는 격자 메쉬들의 배열로 만들 것이다. nBlockWidth, nBlockLength는 격자 메쉬 하나의 가로, 세로 크
@@ -478,11 +479,82 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_pbtRigidBody = new btRigidBody(rbInfo);
 	pbtDynamicsWorld->addRigidBody(m_pbtRigidBody);
 	SetShader(pShader);
+
+	m_fTessellatedHeight = new float[nWidth * nLength];
+
+	for (int i = 0; i < nLength; ++i)
+	{
+		for (int j = 0; j < nWidth; ++j)
+		{
+			m_fTessellatedHeight[i * nLength + j] = GetTessellatedHeight(j, i);
+		}
+	}
 }
 CHeightMapTerrain::~CHeightMapTerrain(void)
 {
 	if (m_pHeightMapImage)
 		delete m_pHeightMapImage;
+}
+
+XMFLOAT3 CHeightMapTerrain::GetCubicBezierSum(std::array<XMFLOAT3, 25>& patch, XMFLOAT2 t)
+{
+	std::array<float, 5> uB, vB;
+	float txInv{ 1.0f - t.x };
+	uB[0] = txInv * txInv * txInv * txInv;
+	uB[1] = 4.0f * t.x * txInv * txInv * txInv;
+	uB[2] = 6.0f * t.x * t.x * txInv * txInv;
+	uB[3] = 4.0f * t.x * t.x * t.x * txInv;
+	uB[4] = t.x * t.x * t.x * t.x;
+
+	float tyInv{ 1.0f - t.y };
+	vB[0] = tyInv * tyInv * tyInv * tyInv;
+	vB[1] = 4.0f * t.y * tyInv * tyInv * tyInv;
+	vB[2] = 6.0f * t.y * t.y * tyInv * tyInv;
+	vB[3] = 4.0f * t.y * t.y * t.y * tyInv;
+	vB[4] = t.y * t.y * t.y * t.y;
+
+	XMFLOAT3 sum{ 0.0f, 0.0f, 0.0f };
+	for (int i = 0; i < 5; ++i)
+	{
+		XMFLOAT3 subSum{ 0.0f, 0.0f, 0.0f };
+		for (int j = 0; j < 5; ++j)
+		{
+			XMFLOAT3 temp{ Vector3::ScalarProduct(patch[(i * 5) + j], uB[j]) };
+			subSum = Vector3::Add(subSum, temp);
+		}
+		subSum = Vector3::ScalarProduct(subSum, vB[i]);
+		sum = Vector3::Add(sum, subSum);
+	}
+	return sum;
+
+}
+
+float CHeightMapTerrain::GetTessellatedHeight(float fObjectx, float fObjectz)
+{
+	XMFLOAT3 LB{ GetPosition() };
+
+	// 지형 패치 25개
+	std::array<XMFLOAT3, 25> vertices;
+	for (int i = 0, z = 4; z >= 0; --z)
+	{
+		for (int x = 0; x < 5; ++x)
+		{
+			vertices[i].x = LB.x + (x * m_nWidth / 4 * m_xmf3Scale.x);
+			vertices[i].z = LB.z + (z * m_nLength / 4 * m_xmf3Scale.z);
+			vertices[i].y = GetHeight(vertices[i].x, vertices[i].z);
+			++i;
+		}
+	}
+
+	// 플레이어의 위치 t
+	XMFLOAT2 uv{ (fObjectx - LB.x) / (m_nWidth * m_xmf3Scale.x), 1.0f - ((fObjectz - LB.z) / (m_nLength * m_xmf3Scale.z)) };
+
+	return GetCubicBezierSum(vertices, uv).y;
+}
+
+float CHeightMapTerrain::GetTessellatedHeightArray(int x, int z)
+{
+	return m_fTessellatedHeight[m_nLength * z + x];
 }
 
 CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) : CGameObject(6)

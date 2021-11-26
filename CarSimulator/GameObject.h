@@ -194,9 +194,15 @@ class CHeightMapTerrain : public CGameObject
 public:
 	CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, LPCTSTR pFileName, int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
 	virtual ~CHeightMapTerrain();
+	virtual XMFLOAT3 GetCubicBezierSum(std::array<XMFLOAT3, 25>& patch, XMFLOAT2 t);
+	virtual float GetTessellatedHeight(float x, float z);
+	virtual float GetTessellatedHeightArray(int x, int z);
+
 private:
 	//지형의 높이 맵으로 사용할 이미지이다.
 	CHeightMapImage *m_pHeightMapImage;
+
+	float* m_fTessellatedHeight;
 
 	//높이 맵의 가로와 세로 크기이다.
 	int m_nWidth;
@@ -219,6 +225,7 @@ public:
 	//지형의 크기(가로/세로)를 반환한다. 높이 맵의 크기에 스케일을 곱한 값이다.
 	float GetWidth() { return(m_nWidth * m_xmf3Scale.x); }
 	float GetLength() { return(m_nLength * m_xmf3Scale.z); }
+
 };
 
 class CSkyBox : public CGameObject

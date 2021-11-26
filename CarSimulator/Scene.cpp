@@ -116,7 +116,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	m_pBillBoardShader = new CTreeBillBoardShader;
 	m_pBillBoardShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pBillBoardShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
+	m_pBillBoardShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap, m_pTerrain.get());
 
 	m_pAnimatedBillBoardShader = new CAnimatedBillBoardShader;
 	m_pAnimatedBillBoardShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);

@@ -1140,8 +1140,10 @@ D3D12_INPUT_LAYOUT_DESC CTreeBillBoardShader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 
-void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap, void* pContext)
 {
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
@@ -1158,7 +1160,8 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 	{
 		for (int j = 0; j < 100; ++j)
 		{
-			pxmf3GrassPosition[(i * 100) + j] = XMFLOAT3{float(i * 20), 0.0f, float(j * 20) };
+			float y = pTerrain->GetTessellatedHeightArray(floor(i * 20 / pTerrain->GetScale().x), floor(j * 20 / pTerrain->GetScale().z));
+			pxmf3GrassPosition[(i * 100) + j] = XMFLOAT3{float(i * 20), y, float(j * 20) };
 		}
 	}
 
@@ -1308,7 +1311,7 @@ D3D12_BLEND_DESC CMirrorShader::CreateBlendState()
 	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
 	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
 	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
 	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
