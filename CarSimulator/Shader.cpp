@@ -858,7 +858,7 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 {
 	m_ubShadowCB = new UploadBuffer<CB_SHADOW>(pd3dDevice, 1, true);
 
-	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL;
+	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL, * pd3dHullShaderBlob, * pd3dDomainShaderBlob;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
 	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -889,12 +889,36 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 
 	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dInstancingPipelineState);
 
+	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
+	d3dPipelineStateDesc.VS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "VS_Terrain", "vs_5_1", &pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "PS_Terrain", "ps_5_1", &pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.HS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "HSTerrainTessellation", "hs_5_1", &pd3dHullShaderBlob);
+	d3dPipelineStateDesc.DS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "DSTerrainTessellation", "ds_5_1", &pd3dDomainShaderBlob);
+	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+	d3dPipelineStateDesc.BlendState = CreateBlendState();
+	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
+	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
+	d3dPipelineStateDesc.SampleMask = UINT_MAX;
+	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+	d3dPipelineStateDesc.NumRenderTargets = 1;
+	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	d3dPipelineStateDesc.SampleDesc.Count = 1;
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	auto hresult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dTessellationPipelineState);
+
 
 	if (pd3dVertexShaderBlob)
 		pd3dVertexShaderBlob->Release();
 
 	if (pd3dPixelShaderBlob)
 		pd3dPixelShaderBlob->Release();
+
+	if (pd3dHullShaderBlob)
+		pd3dHullShaderBlob->Release();
+
+	if (pd3dDomainShaderBlob)
+		pd3dDomainShaderBlob->Release();
 
 	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
@@ -922,6 +946,7 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 			o->ShadowPassRender(pd3dCommandList);
 		}
 	}
+
 	pd3dCommandList->SetPipelineState(m_pd3dInstancingPipelineState);
 	for (std::shared_ptr<CGameObject> o : m_vpInstancingGameObjects)
 	{
@@ -930,6 +955,9 @@ void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* 
 			o->ShadowPassRender(pd3dCommandList);
 		}
 	}
+
+	pd3dCommandList->SetPipelineState(m_pd3dTessellationPipelineState);
+	m_pTerrain->ShadowPassRender(pd3dCommandList);
 }
 
 void CShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3TargetPos, float fBoundary, int nShadowIndex)

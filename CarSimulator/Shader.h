@@ -90,6 +90,7 @@ public:
 	void SetLight(CLight* pLight) { m_pLight = pLight; }
 	std::vector<std::shared_ptr<CGameObject>>* GetObjectVector() { return &m_vpGameObjects; }
 	std::vector<std::shared_ptr<CGameObject>>* GetInstancingObjectVector() { return &m_vpInstancingGameObjects; }
+	std::shared_ptr<CHeightMapTerrain>& GetTerrainPtr() { return m_pTerrain; }
 
 	struct CB_SHADOW
 	{
@@ -112,7 +113,9 @@ protected:
 	UploadBuffer<CB_SHADOW>* m_ubShadowCB;
 	std::vector<std::shared_ptr<CGameObject>> m_vpGameObjects;
 	std::vector<std::shared_ptr<CGameObject>> m_vpInstancingGameObjects;
+	std::shared_ptr<CHeightMapTerrain> m_pTerrain;
 	ID3D12PipelineState* m_pd3dInstancingPipelineState;
+	ID3D12PipelineState* m_pd3dTessellationPipelineState;
 	XMFLOAT4X4 m_xmf4x4ShadowTransform[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 	XMFLOAT4X4 m_xmf4x4LightViewProj[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 };

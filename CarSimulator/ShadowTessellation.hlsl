@@ -5,8 +5,6 @@ struct VS_Terrain_INPUT
 {
     float3 position : POSITION;
     float3 normal : NORMAL;
-    float2 uv0 : TEXCOORD0;
-    float2 uv1 : TEXCOORD1;
 };
 
 //정점 셰이더의 출력(픽셀 셰이더의 입력)을 위한 구조체를 선언한다.
@@ -15,8 +13,6 @@ struct VS_Terrain_OUTPUT
     float4 position : POSITION0;
     float3 position_w : POSITION1;
     float3 normal : NORMAL;
-    float2 uv0 : TEXCOORD0;
-    float2 uv1 : TEXCOORD1;
 };
 
 struct HS_TERRAIN_TESSELLATION_CONSTANT
@@ -29,18 +25,13 @@ struct HS_TERRAIN_TESSELLATION_OUTPUT
 {
     float3 position : POSITION;
     float3 normal : NORMAL;
-    float2 uv0 : TEXCOORD0;
-    float2 uv1 : TEXCOORD1;
 };
 
 struct DS_TERRAIN_TESSELLATION_OUTPUT
 {
-    float4 position : SV_POSITION;
-    float4 position_w : POSITION;
+    float4 position_w : SV_POSITION;
     float3 normal : NORMAL;
-    float2 uv0 : TEXCOORD0;
-    float2 uv1 : TEXCOORD1;
-    float4 tessellation : TEXCOORD2;
+    float4 tessellation : TEXCOORD;
 };
 
 
@@ -50,8 +41,6 @@ VS_Terrain_OUTPUT VS_Terrain(VS_Terrain_INPUT input)
     output.position = float4(input.position, 1.0f);
     output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
-    output.uv0 = input.uv0;
-    output.uv1 = input.uv1;
     
     float4 position_wvp = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
     
@@ -71,8 +60,6 @@ HS_TERRAIN_TESSELLATION_OUTPUT HSTerrainTessellation(InputPatch<VS_Terrain_OUTPU
     HS_TERRAIN_TESSELLATION_OUTPUT output;
 
     output.position = input[i].position.xyz;
-    output.uv0 = input[i].uv0;
-    output.uv1 = input[i].uv1;
     output.normal = input[i].normal;
 
     return (output);
@@ -141,13 +128,11 @@ DS_TERRAIN_TESSELLATION_OUTPUT DSTerrainTessellation(HS_TERRAIN_TESSELLATION_CON
     float uB[5], vB[5];
     BernsteinCoeffcient5x5(uv.x, uB);
     BernsteinCoeffcient5x5(uv.y, vB);
-    
-    output.uv0 = lerp(lerp(patch[0].uv0, patch[4].uv0, uv.x), lerp(patch[20].uv0, patch[24].uv0, uv.x), uv.y);
-    output.uv1 = lerp(lerp(patch[0].uv1, patch[4].uv1, uv.x), lerp(patch[20].uv1, patch[24].uv1, uv.x), uv.y);
 
     float3 position = CubicBezierSum5x5(patch, uB, vB);
-    output.position_w = mul(float4(position, 1.0f), gmtxWorld);
-    output.position = mul(output.position_w, gmtxViewProj);
+    matrix mtxWorldViewProjection = mul(gmtxWorld, gmtxLightViewProj[nShadowIndex]);
+    output.position_w = mul(float4(position, 1.0f), mtxWorldViewProjection);
+
     output.tessellation = float4(patchConstant.fTessEdges[0], patchConstant.fTessEdges[1], patchConstant.fTessEdges[2], patchConstant.fTessEdges[3]);
     
     output.normal = lerp(lerp(patch[0].normal, patch[4].normal, uv.x), lerp(patch[20].normal, patch[24].normal, uv.x), uv.y);
@@ -155,69 +140,9 @@ DS_TERRAIN_TESSELLATION_OUTPUT DSTerrainTessellation(HS_TERRAIN_TESSELLATION_CON
     return (output);
 }
 
-
-float4 PS_Terrain(DS_TERRAIN_TESSELLATION_OUTPUT input) : SV_TARGET
+void PS_Terrain(DS_TERRAIN_TESSELLATION_OUTPUT input)
 {
-    float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 debugColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    int cascadedIndex = 2;
-    
-    for (int i = 0; i < 3; ++i)
-    {
-        float4 Cascaded = mul(input.position_w, gmtxLightViewProj[i]);
-        Cascaded = Cascaded / Cascaded.w;
-        if (Cascaded.x > -1.0f && Cascaded.x < 1.0f && Cascaded.z > -1.0f && Cascaded.z < 1.0f && Cascaded.y > -1.0f && Cascaded.y < 1.0f)
-        {
-            cascadedIndex = i;
-            break;
-        }
-    }
-    
-    float4 position_shadow = mul(input.position_w, gmtxShadowTransform[cascadedIndex]);
-    
-    cColor += material.AmbientLight * material.DiffuseAlbedo;
-    
-    float3 toEyeW = normalize(cameraPos - input.position_w.xyz);
-    
-    float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
-    shadowFactor[0] = CalcShadowFactor(position_shadow, cascadedIndex);
-    
-    for (int i = 0; i < nLights; i++)
-    {
-        if (position_shadow.x < 0.0f || position_shadow.x > 1.0f || position_shadow.z < 0.0f || position_shadow.z > 1.0f || position_shadow.y < 0.0f || position_shadow.y > 1.0f)
-            cColor += ComputeLighting(light[i], input.position_w.xyz, input.normal, toEyeW, 1.0f);
-        else
-        {
-            cColor += ComputeLighting(light[i], input.position_w.xyz, input.normal, toEyeW, shadowFactor[0]);
-            debugColor = float4(1.0f, 0.0f, 0.0f, 0.0f);
-        }
-    }
-    // Add in specular reflections.
-    
-    float3 r = reflect(-toEyeW, input.normal);
-    float4 reflectionColor = { 1.0f, 1.0f, 1.0f, 0.0f };
-    
-    float3 fresnelFactor = SchlickFresnel(material.FresnelR0, input.normal, r);
-    cColor.rgb += material.Shininess * fresnelFactor * reflectionColor.rgb;
-	
-    // Common convention to take alpha from diffuse albedo.
-    
-    cColor.a = material.DiffuseAlbedo.a;
-    
-    // cColor *= debugColor;
-    
-    float4 cBaseTexColor = gtxtTerrain[0].Sample(gsamAnisotropicWrap, input.uv0);
-    float4 cDetailTexColor = gtxtTerrain[1].Sample(gsamAnisotropicWrap, input.uv1);
-    float4 cRoadTexColor = gtxtTerrain[2].Sample(gsamAnisotropicWrap, input.uv0);
-    
-    if (cRoadTexColor.a > 0.0f)
-    {
-        cColor *= saturate((cBaseTexColor * (0.5f - cRoadTexColor.a * 0.5f)) + (cDetailTexColor * (0.5f - cRoadTexColor.a * 0.5f)) + (cRoadTexColor * cRoadTexColor.a));
-    }
-    else
-    {
-        cColor *= saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
-    }
-    
-    return (cColor);
+	// Fetch the material data.
+    MATERIAL matData = material;
+    float4 diffuseAlbedo = matData.DiffuseAlbedo;
 }

@@ -133,6 +133,7 @@
     <FxCompile Include="CubemapPlayer.hlsl" />
     <FxCompile Include="Mirror.hlsl" />
     <FxCompile Include="Particle_Instancing.hlsl" />
+    <FxCompile Include="ShadowTessellation.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />
