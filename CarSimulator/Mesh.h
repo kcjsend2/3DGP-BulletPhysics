@@ -247,5 +247,15 @@ public:
 protected:
 	ID3D12Resource* m_pd3dSizeBuffer = NULL;
 	ID3D12Resource* m_pd3dSizeUploadBuffer = NULL;
+};
 
+class CParticleMesh : public CMesh
+{
+public:
+	CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight);
+	virtual ~CParticleMesh();
+
+protected:
+	ID3D12Resource* m_pd3dSizeBuffer = NULL;
+	ID3D12Resource* m_pd3dSizeUploadBuffer = NULL;
 };

@@ -37,6 +37,7 @@ Texture2DArray gtxtTreeBillBoard[2] : register(t16);
 Texture2D gtxtExplosionBillBoard : register(t18);
 TextureCube gtxtCubeMap : register(t19);
 Texture2D gtxtMirror : register(t20);
+Texture2D gtxtParticle : register(t21);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {
@@ -46,6 +47,12 @@ struct INSTANCED_GAMEOBJECT_INFO
 StructuredBuffer<INSTANCED_GAMEOBJECT_INFO> gGameObjectInfos : register(t0, space1);
 
 StructuredBuffer<LIGHT_INFO> light : register(t1, space1);
+
+struct INSTANCED_PARTICLE_INFO
+{
+    matrix m_mtxParticle;
+};
+StructuredBuffer<INSTANCED_PARTICLE_INFO> gParticleInfos : register(t2, space1);
 
 SamplerState gsamPointWrap : register(s0);
 SamplerState gsamPointClamp : register(s1);

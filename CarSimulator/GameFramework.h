@@ -61,6 +61,7 @@ private:
 
 	//다음은 게임 프레임워크에서 사용할 타이머이다.
 	CGameTimer m_GameTimer;
+	float m_fInputLimit = 0.0f;
 
 	//다음은 프레임 레이트를 주 윈도우의 캡션에 출력하기 위한 문자열이다.
 	_TCHAR m_pszFrameRate[50];

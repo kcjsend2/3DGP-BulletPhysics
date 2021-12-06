@@ -2,11 +2,13 @@
 #include "Light.h"
 class CCamera;
 
-#define RENDER_SKYBOX 0b00001
-#define RENDER_LIGHT 0b00010
-#define RENDER_TERRAIN 0b00100
-#define RENDER_INSTANCING_OBJECT 0b01000
-#define RENDER_BILLBOARD 0b10000
+#define RENDER_SKYBOX 0b0000001
+#define RENDER_LIGHT 0b0000010
+#define RENDER_TERRAIN 0b0000100
+#define RENDER_INSTANCING_OBJECT 0b0001000
+#define RENDER_BILLBOARD 0b0010000
+#define RENDER_ROOM 0b0100000
+#define RENDER_PARTICLE 0b1000000
 
 class CScene
 {
@@ -38,6 +40,7 @@ protected:
 	CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
 	CMirrorShader* m_pMirrorShader = NULL;
 	CRoomShader* m_pRoomShader = NULL;
+	CPaticleBillBoardShader* m_pParticleShader = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 
@@ -49,4 +52,5 @@ public:
 	std::shared_ptr<CHeightMapTerrain> GetTerrain() { return(m_pTerrain); }
 	CInstancingShader* GetInstancingShader() { return m_pInstancingShader; }
 	CLightsShader* GetLightShader() { return m_pLightShader; }
+	CPaticleBillBoardShader* GetParticleShader() { return m_pParticleShader; }
 };

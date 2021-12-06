@@ -151,6 +151,8 @@ private:
 		virtual void UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
 		virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ);
 		virtual void Update(float fTimeElapsed, btRaycastVehicle* pbtVehicle, int index);
+	private:
+		XMFLOAT3 m_xmf3Look;
 	};
 
 public:
@@ -165,6 +167,7 @@ public:
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	void FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	void EraseBullet() { m_pBullet = NULL; }
+	void SetRigidBodyPosition(XMFLOAT3 xmf3Position);
 
 	std::shared_ptr<CWheel>* GetWheels() { return m_pWheel; }
 

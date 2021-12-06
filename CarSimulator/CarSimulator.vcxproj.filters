@@ -132,6 +132,7 @@
     <FxCompile Include="AnimatedBillBoard.hlsl" />
     <FxCompile Include="CubemapPlayer.hlsl" />
     <FxCompile Include="Mirror.hlsl" />
+    <FxCompile Include="Particle_Instancing.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

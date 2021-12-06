@@ -218,7 +218,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 21;
+	srvHeapDesc.NumDescriptors = 23;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -407,6 +407,7 @@ void CGameFramework::ProcessInput()
 	static UCHAR pKeyBuffer[256];
 	DWORD dwBehave = 0;
 
+	m_fInputLimit -= m_GameTimer.GetTimeElapsed();
 	if (::GetKeyboardState(pKeyBuffer))
 	{
 		if (pKeyBuffer[VK_UP] & 0xF0) dwBehave |= KEY_FORWARD;
@@ -416,8 +417,21 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwBehave |= KEY_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwBehave |= KEY_DOWN;
 		if (pKeyBuffer[VK_LSHIFT] & 0xF0) dwBehave |= KEY_SHIFT;
-		if (pKeyBuffer[0x58] & 0xF0) dwBehave |= KEY_X;
-		if (pKeyBuffer[0x46] & 0xF0) m_pScene->GetTerrain()->GetShader()->ChangeRendermode();
+		if (pKeyBuffer['X'] & 0xF0) dwBehave |= KEY_X;
+
+		if (m_fInputLimit < 0.0f)
+		{
+			m_fInputLimit = 1.0f;
+			if (pKeyBuffer['F'] & 0xF0) m_pScene->GetTerrain()->GetShader()->ChangeRendermode();
+			if (pKeyBuffer['I'] & 0xF0) m_pPlayer->SetRigidBodyPosition(XMFLOAT3{ 2000.0f, 5.0f, 2050.0f });
+
+			if (pKeyBuffer['D'] & 0xF0)
+			{
+				m_pScene->GetParticleShader()->OnOff();
+				XMFLOAT3 particlePos = Vector3::Add(m_pPlayer->GetPosition(), Vector3::ScalarProduct(m_pPlayer->GetLook(), 10));
+				m_pScene->GetParticleShader()->SetBasePosition(particlePos);
+			}
+		}
 	}
 
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
@@ -520,7 +534,7 @@ void CGameFramework::FrameAdvance()
 
 	// 렌더타겟 렌더
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	m_pd3dCommandList->SetGraphicsRootDescriptorTable(7, m_pShadowMap[0]->GetSrv());
+	m_pd3dCommandList->SetGraphicsRootDescriptorTable(8, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -536,23 +550,23 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetStencilRef(1);
 
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT);
+
 	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT | RENDER_SKYBOX);
+
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_SKYBOX);
+	if (m_pPlayer)
+	{
+		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
+	}
+	m_pScene->RenderMirror(m_pd3dCommandList.Get());
 
 	if (m_pPlayer)
 	{
 		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 	}
 
-
-	if (m_pPlayer)
-	{
-		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
-	}
-
-	m_pScene->RenderMirror(m_pd3dCommandList.Get());
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN);
-
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN | RENDER_ROOM | RENDER_PARTICLE);
 	m_pd3dCommandList->OMSetStencilRef(0);
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

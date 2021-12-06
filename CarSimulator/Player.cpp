@@ -335,7 +335,7 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	SetPosition(XMFLOAT3(2000.0f, 5.0f, 2050.0f));
+	SetPosition(XMFLOAT3(1000.0f, 5.0f, 1000.0f));
 
 	auto vehicleExtents = pVehicleMesh.get()[0].GetBoundingBox().Extents;
 	auto wheelExtents = pWheelMesh.get()[0].GetBoundingBox().Extents;
@@ -348,11 +348,6 @@ CVehiclePlayer::CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	btCarTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
 
 	m_pbtRigidBody = BulletHelper::CreateRigidBody(1000.0f, btCarTransform, chassisShape, pbtDynamicsWorld);
-
-	btTransform btCenterOfMassTransform;
-	btCenterOfMassTransform.setIdentity();
-	btCenterOfMassTransform.setOrigin(btVector3(m_xmf3Position.x, m_xmf3Position.y - 4.0f, m_xmf3Position.z));
-	m_pbtRigidBody->setCenterOfMassTransform(btCenterOfMassTransform);
 
 	m_vehicleRayCaster = new btDefaultVehicleRaycaster(pbtDynamicsWorld);
 	m_vehicle = new btRaycastVehicle(m_tuning, m_pbtRigidBody, m_vehicleRayCaster);
@@ -591,15 +586,12 @@ void CVehiclePlayer::ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList,
 
 void CVehiclePlayer::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
-	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-	XMMATRIX ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, -1.0f, mirrorZ);
 	
 	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
 	
-	xmf4x4World._33 = -m_xmf3Look.z;
-	
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR));
+	//xmf4x4World._33 = -m_xmf3Look.z;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * XMMatrixReflect(mirrorZPlane)));
 
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
@@ -671,6 +663,14 @@ void CVehiclePlayer::FireBullet(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_pBullet = std::make_shared<CBullet>(pd3dDevice, pd3dCommandList, m_xmf3Position, m_vehicle->getForwardVector(), pbtDynamicsWorld);
 }
 
+void CVehiclePlayer::SetRigidBodyPosition(XMFLOAT3 xmf3Position)
+{
+	btTransform btCenterOfMassTransform;
+	btCenterOfMassTransform.setIdentity();
+	btCenterOfMassTransform.setOrigin(btVector3(xmf3Position.x, xmf3Position.y, xmf3Position.z));
+	m_vehicle->getRigidBody()->setCenterOfMassTransform(btCenterOfMassTransform);
+}
+
 CVehiclePlayer::CWheel::CWheel(std::shared_ptr<CMeshFileRead> pWheelMesh)
 {
 	SetMaterial(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.3f, 0.3f, 0.3f), 0.0f);
@@ -695,14 +695,12 @@ void CVehiclePlayer::CWheel::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void CVehiclePlayer::CWheel::UpdateReflectedShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float mirrorZ)
 {
-	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-	XMMATRIX ZR = XMMatrixTranslation(0.0f, 0.0f, 2 * (mirrorZ - GetPosition().z));
+	XMVECTOR mirrorZPlane = XMVectorSet(0.0f, 0.0f, -1.0f, mirrorZ);
 
 	XMFLOAT4X4 xmf4x4World = m_xmf4x4World;
-;
-	
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * ZR ));
+
+	//xmf4x4World._33 = -m_xmf3Look.z;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&xmf4x4World) * XMMatrixReflect(mirrorZPlane)));
 
 	//객체의 월드 변환 행렬을 루트 상수(32-비트 값)를 통하여 셰이더 변수(상수 버퍼)로 복사한다.
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
@@ -728,6 +726,8 @@ void CVehiclePlayer::CWheel::Update(float fTimeElapsed, btRaycastVehicle* pbtVeh
 	btScalar m[16];
 	wheelTransform.getOpenGLMatrix(m);
 	m_xmf4x4World = Matrix4x4::glMatrixToD3DMatrix(m);
+
+	m_xmf3Look = XMFLOAT3(m_xmf4x4World._31, m_xmf4x4World._32, m_xmf4x4World._33);
 }
 
 CCubeMappingPlayer::CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CShader* pShader, int nMeshes) : CPlayer(nMeshes)
@@ -768,7 +768,7 @@ CCubeMappingPlayer::CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	D3D12_CLEAR_VALUE d3dRtvClearValue = { DXGI_FORMAT_R8G8B8A8_UNORM, { 0.0f, 0.0f, 0.0f, 1.0f } };
 	ID3D12Resource* pd3dResource = m_pTexture->CreateTexture(pd3dDevice, pd3dCommandList, nCubeMapSize, nCubeMapSize, 6, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ, &d3dRtvClearValue, RESOURCE_TEXTURE_CUBE, 0);
 
-	pShader->CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 7);
+	pShader->CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 8);
 
 	D3D12_RENDER_TARGET_VIEW_DESC d3dRTVDesc;
 	d3dRTVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -794,7 +794,7 @@ void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dComma
 {
 	pd3dCommandList->SetDescriptorHeaps(nDescriptorHeaps, pDescriptorHeaps);
 	pd3dCommandList->SetGraphicsRootSignature(pScene->GetGraphicsRootSignature());
-	pd3dCommandList->SetGraphicsRootDescriptorTable(7, hDescriptorStart);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(8, hDescriptorStart);
 
 	static XMFLOAT3 pxmf3LookAts[6] = { XMFLOAT3(+100.0f, 0.0f, 0.0f), XMFLOAT3(-100.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, +100.0f, 0.0f), XMFLOAT3(0.0f, -100.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, +100.0f), XMFLOAT3(0.0f, 0.0f, -100.0f) };
 	static XMFLOAT3 pxmf3Ups[6] = { XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, +1.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f) };
@@ -813,7 +813,7 @@ void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dComma
 
 		pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[i], TRUE, &m_d3dDsvCPUDescriptorHandle);
 
-		pScene->Render(pd3dCommandList.Get(), m_apCameras[i].get(), RENDER_LIGHT | RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_SKYBOX);
+		pScene->Render(pd3dCommandList.Get(), m_apCameras[i].get(), RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_ROOM | RENDER_PARTICLE);
 	}
 
 	pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
