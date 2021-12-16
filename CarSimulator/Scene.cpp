@@ -40,8 +40,6 @@ void CScene::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 	m_pLightShader->Update(fTimeElapsed, pPlayer->GetPosition());
 	m_pAnimatedBillBoardShader->UpdateShaderVariables(pd3dCommandList, fTimeElapsed);
 
-	m_pParticleShader->UpdateShaderVariables(pd3dDevice, pd3dCommandList, fTimeElapsed);
-
 	auto pBullet = pPlayer->GetBullet();
 
 	if (pBullet)
@@ -129,10 +127,6 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pRoomShader = new CRoomShader;
 	m_pRoomShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pRoomShader->BuildObjects(pd3dDevice, pd3dCommandList);
-
-	m_pParticleShader = new CPaticleBillBoardShader;
-	m_pParticleShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pParticleShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -179,8 +173,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	
 	if(nRenderMode & RENDER_ROOM)
 		m_pRoomShader->Render(pd3dCommandList);
-	if(nRenderMode & RENDER_PARTICLE)
-		m_pParticleShader->Render(pd3dCommandList);
 }
 
 float CScene::RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -268,12 +260,12 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[9];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[8];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[2].InitAsConstants(3, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[2].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	//UploadBuffer 클래스를 이용하여 업로드
 	pd3dRootParameters[3].InitAsConstantBufferView(3);
@@ -282,7 +274,6 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	//구조화 된 버퍼, stdafx.h의 CreateBufferResource 함수 이용해 업로드
 	pd3dRootParameters[5].InitAsShaderResourceView(0, 1);
 	pd3dRootParameters[6].InitAsShaderResourceView(1, 1);
-	pd3dRootParameters[7].InitAsShaderResourceView(2, 1);
 
 	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 3개, 0 ~ 2
 	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 4개, 3 ~ 6
@@ -292,11 +283,10 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE AnimatedBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 18, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 18
 	CD3DX12_DESCRIPTOR_RANGE CubeMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 19, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 19
 	CD3DX12_DESCRIPTOR_RANGE MirrorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 20, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 20
-	CD3DX12_DESCRIPTOR_RANGE ParticleRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 21, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 21
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[9] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, MirrorRange, ParticleRange };
+	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[8] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, MirrorRange };
 
-	pd3dRootParameters[8].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
+	pd3dRootParameters[7].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
 
 	////디스크립터 테이블 이용하여 업로드
 	//pd3dRootParameters[7].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
@@ -323,7 +313,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 		p.c_str();
 	}
 
-	pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&pd3dGraphicsRootSignature);
+	auto tmp = pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&pd3dGraphicsRootSignature);
 
 	if (pd3dSignatureBlob)
 		pd3dSignatureBlob->Release();

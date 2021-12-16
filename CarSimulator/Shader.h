@@ -293,41 +293,6 @@ protected:
 	UploadBuffer<CB_ANIMATEDBILLBOARD>* m_ubAnimatedBillBoard;
 };
 
-class CPaticleBillBoardShader : public CShader
-{
-public:
-	CPaticleBillBoardShader() {};
-	virtual ~CPaticleBillBoardShader() {};
-
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreateGeometryShader(ID3DBlob** ppd3dShaderBlob);
-	virtual D3D12_BLEND_DESC CreateBlendState();
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
-	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
-	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
-	virtual void UpdateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void SetBasePosition(XMFLOAT3 xmf3Position) { m_xmf3BasePosition = xmf3Position; }
-	virtual void OnOff() { m_bRender = 1 - m_bRender; }
-	virtual void AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position);
-	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-protected:
-	std::default_random_engine dre;
-	std::uniform_real_distribution<float> urd{-1.0f, 1.0f};
-
-	std::vector<CParticle*> m_vpParticleBillBoard;
-
-	bool m_bRender = false;
-	float m_fCreationCycle = 0.3f;
-	XMFLOAT3 m_xmf3BasePosition = { 0.0f, 0.0f, 0.0f };
-
-	//인스턴스 데이터를 포함하는 버퍼와 포인터이다.
-	ID3D12Resource* m_pd3dcbParticles = NULL;
-	XMFLOAT4X4* m_pcbMappedParticles = NULL;
-};
-
 class CMirrorShader : public CShader
 {
 public:

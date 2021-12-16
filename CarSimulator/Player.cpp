@@ -794,7 +794,7 @@ void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dComma
 {
 	pd3dCommandList->SetDescriptorHeaps(nDescriptorHeaps, pDescriptorHeaps);
 	pd3dCommandList->SetGraphicsRootSignature(pScene->GetGraphicsRootSignature());
-	pd3dCommandList->SetGraphicsRootDescriptorTable(8, hDescriptorStart);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(7, hDescriptorStart);
 
 	static XMFLOAT3 pxmf3LookAts[6] = { XMFLOAT3(+100.0f, 0.0f, 0.0f), XMFLOAT3(-100.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, +100.0f, 0.0f), XMFLOAT3(0.0f, -100.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, +100.0f), XMFLOAT3(0.0f, 0.0f, -100.0f) };
 	static XMFLOAT3 pxmf3Ups[6] = { XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, +1.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f) };

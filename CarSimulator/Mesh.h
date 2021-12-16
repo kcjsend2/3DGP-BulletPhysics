@@ -15,6 +15,21 @@ public:
 	~CVertex() { }
 };
 
+class CParticleVertex : public CVertex
+{
+public:
+	XMFLOAT3						m_xmf3Color = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3						m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3						m_xmf3Acceleration = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT2						m_xmf2Size = XMFLOAT2(0.0f, 0.0f);
+	XMFLOAT2						m_xmf2AgeLifetime = XMFLOAT2(0.0f, 0.0f); //(Age, Lifetime)
+	UINT							m_nType = 0;
+
+public:
+	CParticleVertex() { }
+	~CParticleVertex() { }
+};
+
 class CDiffusedVertex : public CVertex
 {
 protected:

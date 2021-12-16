@@ -875,3 +875,4 @@ CParticleMesh::~CParticleMesh()
 	if (m_pd3dSizeBuffer)
 		m_pd3dSizeBuffer->Release();
 }
+

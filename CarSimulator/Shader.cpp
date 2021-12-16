@@ -508,7 +508,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
 
 	btCollisionShape* CubeShape = new btBoxShape(btVector3(btScalar(fLength / 2), btScalar(fHeight / 2), btScalar(fDepth / 2)));
 
@@ -685,7 +685,7 @@ void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Terrain_Road.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 7, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 7, 7);
 }
 
 D3D12_RASTERIZER_DESC CTerrainShader::CreateRasterizerState()
@@ -1080,7 +1080,7 @@ void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 10, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 10, 7);
 
 	m_pSkybox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList);
 }
@@ -1180,7 +1180,7 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/treearray.dds", RESOURCE_TEXTURE2DARRAY, 0);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/grassarray.dds", RESOURCE_TEXTURE2DARRAY, 1);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 16, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 16, 7);
 
 	XMFLOAT3* pxmf3GrassPosition = new XMFLOAT3[10000];
 
@@ -1260,7 +1260,7 @@ void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Explosion_Effect.dds", RESOURCE_TEXTURE2D, 0);
 
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 18, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 18, 7);
 }
 
 void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
@@ -1385,7 +1385,7 @@ void CMirrorShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
 	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/ice.dds", RESOURCE_TEXTURE2D, 0);
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 20, 8);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture, 20, 7);
 }
 
 
@@ -1502,190 +1502,4 @@ void CRoomShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	pObject->SetMaterial(XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT3(0.6f, 0.6f, 0.6f), 0.8f);
 
 	m_vpObjects.push_back(pObject);
-}
-
-D3D12_SHADER_BYTECODE CPaticleBillBoardShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Particle_Instancing.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE CPaticleBillBoardShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Particle_Instancing.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE CPaticleBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Particle_Instancing.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
-}
-
-
-D3D12_BLEND_DESC CPaticleBillBoardShader::CreateBlendState()
-{
-	D3D12_BLEND_DESC d3dBlendDesc;
-	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
-	d3dBlendDesc.AlphaToCoverageEnable = TRUE;
-	d3dBlendDesc.IndependentBlendEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
-	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
-	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-	return(d3dBlendDesc);
-}
-
-D3D12_INPUT_LAYOUT_DESC CPaticleBillBoardShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 1;
-	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-	pd3dInputElementDescs[0] = { "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-
-	return(d3dInputLayoutDesc);
-}
-
-//깊이-스텐실 검사를 위한 상태를 설정하기 위한 구조체를 반환한다.
-D3D12_DEPTH_STENCIL_DESC CPaticleBillBoardShader::CreateDepthStencilState()
-{
-	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
-	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
-	d3dDepthStencilDesc.DepthEnable = FALSE;
-	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-	d3dDepthStencilDesc.StencilEnable = FALSE;
-	d3dDepthStencilDesc.StencilReadMask = 0x00;
-	d3dDepthStencilDesc.StencilWriteMask = 0x00;
-	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-	return(d3dDepthStencilDesc);
-}
-
-//그래픽스 파이프라인 상태 객체를 생성한다.
-void CPaticleBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
-{
-	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL;
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
-	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
-	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
-	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
-	d3dPipelineStateDesc.GS = CreateGeometryShader(&pd3dGeometryShaderBlob);
-	d3dPipelineStateDesc.HS = CreateHullShader(&pd3dGeometryShaderBlob);
-	d3dPipelineStateDesc.DS = CreateDomainShader(&pd3dGeometryShaderBlob);
-	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
-	d3dPipelineStateDesc.BlendState = CreateBlendState();
-	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
-	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
-	d3dPipelineStateDesc.SampleMask = UINT_MAX;
-	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
-	d3dPipelineStateDesc.NumRenderTargets = 1;
-	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	d3dPipelineStateDesc.SampleDesc.Count = 1;
-	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-	auto tmp = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
-
-	if (pd3dVertexShaderBlob)
-		pd3dVertexShaderBlob->Release();
-
-	if (pd3dPixelShaderBlob)
-		pd3dPixelShaderBlob->Release();
-
-	if (pd3dGeometryShaderBlob)
-		pd3dGeometryShaderBlob->Release();
-
-	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs)
-		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
-}
-
-void CPaticleBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
-{
-	m_vpParticleBillBoard.reserve(1000);
-
-	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-
-	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Fire_Particle.dds", RESOURCE_TEXTURE2D, 0);
-
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 21, 8);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-}
-
-void CPaticleBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	CShader::Render(pd3dCommandList);
-
-	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
-	if(m_vpParticleBillBoard.size() > 0)
-		m_vpParticleBillBoard[0]->Render(pd3dCommandList, m_vpParticleBillBoard.size());
-}
-
-void CPaticleBillBoardShader::AddBillBoard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position)
-{
-	if (m_vpParticleBillBoard.size() < 1000)
-	{
-		CParticle* pObject = new CParticle(8.0f, { urd(dre), 1.0f, urd(dre) });
-		std::shared_ptr<CMesh> pMesh = std::make_shared<CParticleMesh>(pd3dDevice, pd3dCommandList, 1.0f, 1.0f);
-
-		pObject->SetMesh(pMesh);
-		pObject->SetPosition(xmf3Position);
-
-		m_vpParticleBillBoard.push_back(pObject);
-	}
-}
-
-void CPaticleBillBoardShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	//인스턴스 정보를 저장할 정점 버퍼를 업로드 힙 유형으로 생성한다.
-	//파티클의 최대 갯수는 1000개이다.
-	m_pd3dcbParticles = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, sizeof(XMFLOAT4X4) * 1000, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
-
-	//정점 버퍼(업로드 힙)에 대한 포인터를 저장한다.
-	m_pd3dcbParticles->Map(0, NULL, (void**)&m_pcbMappedParticles);
-}
-
-void CPaticleBillBoardShader::UpdateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
-{
-	if (m_bRender)
-	{
-		m_fCreationCycle -= fTimeElapsed;
-		if (m_fCreationCycle < 0.0f)
-		{
-			m_fCreationCycle = 0.3f;
-			AddBillBoard(pd3dDevice, pd3dCommandList, m_xmf3BasePosition);
-		}
-	}
-
-	pd3dCommandList->SetGraphicsRootShaderResourceView(7, m_pd3dcbParticles->GetGPUVirtualAddress());
-	int cnt = 0;
-	for (auto i = m_vpParticleBillBoard.begin(); i != m_vpParticleBillBoard.end();)
-	{
-		if ((*i)->GetLiveTime() < 0.0f)
-		{
-			i = m_vpParticleBillBoard.erase(i);
-			continue;
-		}
-		(*i)->Update(fTimeElapsed);
-		XMStoreFloat4x4(&m_pcbMappedParticles[cnt], XMMatrixTranspose(XMLoadFloat4x4(&m_vpParticleBillBoard[cnt]->GetWorldTransformMatrix())));
-		cnt++;
-		i++;
-	}
 }

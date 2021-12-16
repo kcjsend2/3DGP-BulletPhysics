@@ -427,9 +427,6 @@ void CGameFramework::ProcessInput()
 
 			if (pKeyBuffer['D'] & 0xF0)
 			{
-				m_pScene->GetParticleShader()->OnOff();
-				XMFLOAT3 particlePos = Vector3::Add(m_pPlayer->GetPosition(), Vector3::ScalarProduct(m_pPlayer->GetLook(), 10));
-				m_pScene->GetParticleShader()->SetBasePosition(particlePos);
 			}
 		}
 	}
@@ -534,7 +531,7 @@ void CGameFramework::FrameAdvance()
 
 	// ·»´õÅ¸°Ù ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	m_pd3dCommandList->SetGraphicsRootDescriptorTable(8, m_pShadowMap[0]->GetSrv());
+	m_pd3dCommandList->SetGraphicsRootDescriptorTable(7, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();

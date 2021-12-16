@@ -12,6 +12,7 @@ cbuffer cbCommonInfo : register(b2)
     int nLights : packoffset(c0.x);
     int nShadowIndex : packoffset(c0.y);
     int nSkyboxTextureIndex : packoffset(c0.z);
+    float fTimeElapsed : packoffset(c0.w);
 }
 
 cbuffer cbShadowInfo : register(b3)
@@ -47,12 +48,6 @@ struct INSTANCED_GAMEOBJECT_INFO
 StructuredBuffer<INSTANCED_GAMEOBJECT_INFO> gGameObjectInfos : register(t0, space1);
 
 StructuredBuffer<LIGHT_INFO> light : register(t1, space1);
-
-struct INSTANCED_PARTICLE_INFO
-{
-    matrix m_mtxParticle;
-};
-StructuredBuffer<INSTANCED_PARTICLE_INFO> gParticleInfos : register(t2, space1);
 
 SamplerState gsamPointWrap : register(s0);
 SamplerState gsamPointClamp : register(s1);

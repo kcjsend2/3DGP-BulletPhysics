@@ -274,17 +274,3 @@ private:
 
 	std::vector<float> m_vfFrameTime;
 };
-
-class CParticle : public CGameObject
-{
-public:
-	CParticle(float fLiveTime, XMFLOAT3 m_xmf3Velocity);
-	virtual ~CParticle();
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapesd);
-	virtual float GetLiveTime() { return m_fLiveTime; }
-	virtual void Update(float fTimeElapsed);
-
-private:
-	XMFLOAT3 m_xmf3Velocity;
-	float m_fLiveTime;
-};

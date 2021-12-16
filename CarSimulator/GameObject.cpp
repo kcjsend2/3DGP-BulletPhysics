@@ -658,29 +658,3 @@ void CAnimatedBillBoard::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCo
 		m_ny = m_nCurrentFrame / m_nxDivided;
 	}
 }
-
-CParticle::CParticle(float fLiveTime, XMFLOAT3 xmf3Velocity)
-{
-	m_fLiveTime = fLiveTime;
-	m_xmf3Velocity = xmf3Velocity;
-}
-
-CParticle::~CParticle()
-{
-}
-
-void CParticle::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed)
-{
-	m_fLiveTime -= fTimeElapsed;
-
-	XMFLOAT3 xmf3Position = GetPosition();
-
-	SetPosition(xmf3Position.x + m_xmf3Velocity.x * fTimeElapsed, xmf3Position.y + m_xmf3Velocity.y * fTimeElapsed, xmf3Position.z + m_xmf3Velocity.z * fTimeElapsed);
-}
-
-void CParticle::Update(float fTimeElapsed)
-{
-	m_fLiveTime -= fTimeElapsed;
-	XMFLOAT3 particlePos = Vector3::Add(GetPosition(), Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false));
-	SetPosition(particlePos);
-}
