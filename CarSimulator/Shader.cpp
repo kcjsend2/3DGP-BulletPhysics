@@ -867,8 +867,8 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
-	d3dPipelineStateDesc.RasterizerState.DepthBias = 10000;
-	d3dPipelineStateDesc.RasterizerState.DepthBiasClamp = 0.0f;
+	d3dPipelineStateDesc.RasterizerState.DepthBias = 100000;
+	d3dPipelineStateDesc.RasterizerState.DepthBiasClamp = 1.0f;
 	d3dPipelineStateDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
 
 	d3dPipelineStateDesc.BlendState = CreateBlendState();
@@ -895,6 +895,11 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.HS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "HSTerrainTessellation", "hs_5_1", &pd3dHullShaderBlob);
 	d3dPipelineStateDesc.DS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "DSTerrainTessellation", "ds_5_1", &pd3dDomainShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+
+	d3dPipelineStateDesc.RasterizerState.DepthBias = 100000;
+	d3dPipelineStateDesc.RasterizerState.DepthBiasClamp = 1.0f;
+	d3dPipelineStateDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
+
 	d3dPipelineStateDesc.BlendState = CreateBlendState();
 	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
 	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
