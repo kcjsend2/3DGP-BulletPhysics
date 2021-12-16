@@ -427,6 +427,14 @@ void CGameFramework::ProcessInput()
 
 			if (pKeyBuffer['D'] & 0xF0)
 			{
+				if (m_pScene->GetParticleObject())
+				{
+					m_pScene->ReleaseParticle();
+				}
+				else
+				{
+					m_pScene->CreateParticle(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), Vector3::Add(m_pPlayer->GetPosition(), Vector3::ScalarProduct(m_pPlayer->GetLook(), 10)));
+				}
 			}
 		}
 	}
@@ -488,10 +496,16 @@ void CGameFramework::FrameAdvance()
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
-	m_pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
+	m_pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	m_pd3dCommandList->SetGraphicsRootSignature(m_pScene->GetGraphicsRootSignature());
 	Update();
+	
+	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
+	m_pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &fTimeElapsed, 3);
+
+	XMFLOAT3 xmf3Velocity = { urd(dre), 5.0f, urd(dre) };
+	m_pd3dCommandList->SetGraphicsRoot32BitConstants(8, 3, &xmf3Velocity, 0);
 
 	// ½¦µµ¿ì ¸Ê ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

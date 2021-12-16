@@ -5,7 +5,7 @@ class CCamera;
 //정점을 표현하기 위한 클래스를 선언한다.
 class CVertex
 {
-protected:
+public:
 	//정점의 위치 벡터이다(모든 정점은 최소한 위치 벡터를 가져야 한다).
 	XMFLOAT3 m_xmf3Position;
 
@@ -151,6 +151,12 @@ protected:
 public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nInstances);
+
+	virtual void PreRender(ID3D12GraphicsCommandList* pd3dCommandList) {};
+	virtual void PostRender(ID3D12GraphicsCommandList* pd3dCommandList) {};
+
+	virtual void IncreaseCurrentPipline() {};
+	virtual void ResetCurrentPipline() {};
 };
 
 class CTriangleMesh : public CMesh
@@ -267,10 +273,37 @@ protected:
 class CParticleMesh : public CMesh
 {
 public:
-	CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight);
+	CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, float fLifetime, UINT nMaxParticles);
 	virtual ~CParticleMesh();
 
-protected:
-	ID3D12Resource* m_pd3dSizeBuffer = NULL;
-	ID3D12Resource* m_pd3dSizeUploadBuffer = NULL;
+	int m_nParticle;
+
+	bool m_bStart = true;
+	bool m_nCurrentPipline = 0;
+
+	UINT m_nMaxParticles = 300;
+
+
+	ID3D12Resource* m_pd3dStreamOutputBuffer = NULL;
+	ID3D12Resource* m_pd3dDrawBuffer = NULL;
+
+	ID3D12Resource* m_pd3dDefaultBufferFilledSize = NULL;
+	ID3D12Resource* m_pd3dUploadBufferFilledSize = NULL;
+	UINT64* m_pnUploadBufferFilledSize = NULL;
+
+	ID3D12QueryHeap* m_pd3dSOQueryHeap = NULL;
+	ID3D12Resource* m_pd3dSOQueryBuffer = NULL;
+	D3D12_QUERY_DATA_SO_STATISTICS* m_pd3dSOQueryDataStatistics = NULL;
+
+	D3D12_STREAM_OUTPUT_BUFFER_VIEW	m_d3dStreamOutputBufferView;
+
+	virtual void CreateVertexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, float fLifetime);
+	virtual void CreateStreamOutputBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nMaxParticles);
+
+	virtual void PreRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void PostRender(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	virtual void IncreaseCurrentPipline() { m_nCurrentPipline++; }
+	virtual void ResetCurrentPipline() { m_nCurrentPipline = 0; }
 };

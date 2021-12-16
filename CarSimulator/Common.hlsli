@@ -30,6 +30,11 @@ cbuffer cbAnimatedBillBoardInfo : register(b4)
     int nyDivided : packoffset(c0.w);
 }
 
+cbuffer cbCommonInfo : register(b5)
+{
+    float3 fRandomVelocity : packoffset(c0);
+}
+
 Texture2D gShadowMap[3] : register(t0);
 Texture2D gTextureMaps[4] : register(t3);
 Texture2D gtxtTerrain[3] : register(t7);

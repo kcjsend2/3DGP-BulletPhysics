@@ -127,6 +127,11 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pRoomShader = new CRoomShader;
 	m_pRoomShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pRoomShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_pParticleShader = new CParticleShader;
+	m_pParticleShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pParticleShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
+
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -136,6 +141,16 @@ void CScene::ReleaseUploadBuffers()
 	m_pTerrain->ReleaseUploadBuffers();
 
 	m_pLightShader->ReleaseUploadBuffers();
+}
+
+void CScene::CreateParticle(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position)
+{
+	m_pParticleObject = std::make_shared<CParticleObject>(pd3dDevice, pd3dCommandList, xmf3Position, XMFLOAT3{0.0f, 0.0f, 0.0f}, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{ 8.0f, 8.0f }, 100.0f, 100, m_pParticleShader);
+}
+
+void CScene::ReleaseParticle()
+{
+	m_pParticleObject = NULL;
 }
 
 bool CScene::ProcessInput(UCHAR* pKeysBuffer)
@@ -173,6 +188,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	
 	if(nRenderMode & RENDER_ROOM)
 		m_pRoomShader->Render(pd3dCommandList);
+
+	if (nRenderMode & RENDER_PARTICLE && m_pParticleObject)
+		m_pParticleObject->Render(pd3dCommandList);
 }
 
 float CScene::RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -260,7 +278,7 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[8];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[9];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -283,11 +301,13 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE AnimatedBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 18, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 18
 	CD3DX12_DESCRIPTOR_RANGE CubeMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 19, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 19
 	CD3DX12_DESCRIPTOR_RANGE MirrorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 20, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 20
+	CD3DX12_DESCRIPTOR_RANGE ParticleRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 21, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 21
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[8] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, MirrorRange };
+	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[9] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, MirrorRange, ParticleRange };
 
 	pd3dRootParameters[7].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
 
+	pd3dRootParameters[8].InitAsConstants(3, 5, 0, D3D12_SHADER_VISIBILITY_ALL);
 	////디스크립터 테이블 이용하여 업로드
 	//pd3dRootParameters[7].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
 	//pd3dRootParameters[8].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
@@ -299,7 +319,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	auto staticSamplers = GetStaticSamplers();
 
-	CD3DX12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc(_countof(pd3dRootParameters), pd3dRootParameters, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	CD3DX12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc(_countof(pd3dRootParameters), pd3dRootParameters, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_ALLOW_STREAM_OUTPUT);
 
 	ID3DBlob* pd3dSignatureBlob = NULL;
 	ID3DBlob* pd3dErrorBlob = NULL;

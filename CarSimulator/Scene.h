@@ -27,6 +27,8 @@ public:
 	void RenderMirror(ID3D12GraphicsCommandList* pd3dCommandList);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 	void ReleaseUploadBuffers();
+	void CreateParticle(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position);
+	void ReleaseParticle();
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice);
 	ID3D12RootSignature *GetGraphicsRootSignature();
@@ -40,6 +42,9 @@ protected:
 	CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
 	CMirrorShader* m_pMirrorShader = NULL;
 	CRoomShader* m_pRoomShader = NULL;
+	CParticleShader* m_pParticleShader = NULL;
+
+	std::shared_ptr<CParticleObject> m_pParticleObject = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 
@@ -51,4 +56,5 @@ public:
 	std::shared_ptr<CHeightMapTerrain> GetTerrain() { return(m_pTerrain); }
 	CInstancingShader* GetInstancingShader() { return m_pInstancingShader; }
 	CLightsShader* GetLightShader() { return m_pLightShader; }
+	std::shared_ptr<CParticleObject> GetParticleObject() { return m_pParticleObject; }
 };

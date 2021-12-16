@@ -79,6 +79,8 @@ private:
 
 	std::unique_ptr<CShadowMap> m_pShadowMap[3];
 
+	std::default_random_engine dre;
+	std::uniform_real_distribution<float> urd{ -5.0f, 5.0f };
 public:
 	CCamera* m_pCamera = NULL;
 

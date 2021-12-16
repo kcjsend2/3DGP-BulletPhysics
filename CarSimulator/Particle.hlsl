@@ -47,25 +47,7 @@ void GetBillboardCorners(float3 position, float2 size, out float4 pf4Positions[4
     pf4Positions[3] = float4(position - size.x * f3Right + size.y * f3Up, 1.0f);
 }
 
-void GetPositions(float3 position, float2 f2Size, out float3 pf3Positions[8])
-{
-    float3 f3Right = float3(1.0f, 0.0f, 0.0f);
-    float3 f3Up = float3(0.0f, 1.0f, 0.0f);
-    float3 f3Look = float3(0.0f, 0.0f, 1.0f);
-
-    float3 f3Extent = normalize(float3(1.0f, 1.0f, 1.0f));
-
-    pf3Positions[0] = position + float3(-f2Size.x, 0.0f, -f2Size.y);
-    pf3Positions[1] = position + float3(-f2Size.x, 0.0f, +f2Size.y);
-    pf3Positions[2] = position + float3(+f2Size.x, 0.0f, -f2Size.y);
-    pf3Positions[3] = position + float3(+f2Size.x, 0.0f, +f2Size.y);
-    pf3Positions[4] = position + float3(-f2Size.x, 0.0f, 0.0f);
-    pf3Positions[5] = position + float3(+f2Size.x, 0.0f, 0.0f);
-    pf3Positions[6] = position + float3(0.0f, 0.0f, +f2Size.y);
-    pf3Positions[7] = position + float3(0.0f, 0.0f, -f2Size.y);
-}
-
-[maxvertexcount(9)]
+[maxvertexcount(2)]
 void GSParticleStreamOutput(point VS_PARTICLE_INPUT input[1], inout PointStream<VS_PARTICLE_INPUT> output)
 {
     VS_PARTICLE_INPUT particle = input[0];
@@ -75,32 +57,32 @@ void GSParticleStreamOutput(point VS_PARTICLE_INPUT input[1], inout PointStream<
     {
         if (particle.type == PARTICLE_TYPE_EMITTER)
         {
-            particle.color = float3(1.0f, 0.0f, 0.0f);
-//			particle.age.x = 0.0f;
+            particle.color = float3(0.0f, 0.0f, 0.0f);
 
+            if (particle.age.x > 0.2f)
+            {
+                particle.age.x = 0.0f;
+
+            }
             output.Append(particle);
 
-            float3 pf3Positions[8];
-            GetPositions(particle.position, float2(particle.size.x * 1.25f, particle.size.x * 1.25f), pf3Positions);
+            particle.color = float3(0.0f, 0.0f, 0.0f);
 
-            particle.color = float3(0.0f, 0.0f, 1.0f);
-            particle.age.x = 0.0f;
-
-            for (int j = 0; j < 8; j++)
+            if (particle.age.x == 0.0f)
             {
-                particle.type = (j >= 4) ? PARTICLE_TYPE_EMITTER : PARTICLE_TYPE_FLARE;
-                particle.position = pf3Positions[j].xyz;
-                particle.velocity = float3(0.0f, particle.size.x * particle.age.y * 4.0f, 0.0f) * 2.0f;
-                particle.acceleration = float3(0.0f, 250.125f, 0.0f) * abs(f4Random.x);
-                particle.age.y = (particle.type == PARTICLE_TYPE_EMITTER) ? 0.25f : 1.5f + (0.75f * abs(j - 4));
+                particle.type = PARTICLE_TYPE_FLARE;
+                particle.position = particle.position;
+                particle.velocity = fRandomVelocity;
+                particle.acceleration = float3(0.0f, 0.0f, 0.0f);
+                particle.age.y = 2.0f;
 
                 output.Append(particle);
             }
         }
         else
         {
-            particle.color = GetParticleColor(particle.age.x, particle.age.y);
-            particle.position += (0.5f * particle.acceleration * fTimeElapsed * fTimeElapsed) + (particle.velocity * fTimeElapsed);
+            particle.color = float3(0.0f, 0.0f, 0.0f);
+            particle.position += particle.velocity * fTimeElapsed;
 
             output.Append(particle);
         }
@@ -145,9 +127,10 @@ void GSParticleDraw(point VS_PARTICLE_INPUT input[1], inout TriangleStream<GS_PA
 float4 PSParticleDraw(GS_PARTICLE_OUTPUT input) : SV_TARGET
 {
     float4 cColor = gtxtParticle.Sample(gsamLinearWrap, input.uv);
-    if (input.type == PARTICLE_TYPE_FLARE)
+
+    if (input.type == PARTICLE_TYPE_EMITTER)
     {
-        cColor.rgb *= GetParticleColor(input.age.x, input.age.y);
+        cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     return (cColor);

@@ -61,6 +61,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void OnPrepareStreamRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList) {};
 	virtual void Update(float fTimeElapsed);
@@ -70,6 +71,7 @@ public:
 
 protected:
 	ID3D12PipelineState* m_pd3dPipelineState = NULL;
+	ID3D12PipelineState* m_pd3dStreamPipeline = NULL;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE m_d3dSrvCPUDescriptorHandle;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE m_d3dSrvGPUDescriptorHandle;
 	std::shared_ptr<CTexture> m_pTexture;
@@ -312,4 +314,24 @@ public:
 protected:
 	ID3D12PipelineState* m_pd3StencilPipeline = NULL;
 	std::unique_ptr<CGameObject> m_pMirror;
+};
+
+class CParticleShader : public CShader
+{
+public:
+	CParticleShader();
+	virtual ~CParticleShader();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreateGeometryShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_STREAM_OUTPUT_DESC CreateStreamOuputState(int nPipelineState);
+	virtual D3D12_BLEND_DESC CreateBlendState();
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 };

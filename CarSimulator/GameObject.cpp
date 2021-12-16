@@ -172,11 +172,6 @@ CGameObject::CGameObject(int nMeshes)
 
 CGameObject::~CGameObject()
 {
-	if (m_pShader)
-	{
-		m_pShader->ReleaseShaderVariables();
-		m_pShader->Release();
-	}
 }
 
 void CGameObject::SetShader(CShader* pShader)
@@ -656,5 +651,56 @@ void CAnimatedBillBoard::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCo
 
 		m_nx = m_nCurrentFrame % m_nxDivided;
 		m_ny = m_nCurrentFrame / m_nxDivided;
+	}
+}
+
+CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, float fLifetime, UINT nMaxParticles, CShader* pShader) : CGameObject()
+{
+	m_vpMeshes.reserve(10);
+
+	std::shared_ptr<CParticleMesh> pMesh = std::make_shared<CParticleMesh>(pd3dDevice, pd3dCommandList, xmf3Position, xmf3Velocity, xmf3Acceleration, xmf3Color, xmf2Size, fLifetime, nMaxParticles);
+	SetMesh(pMesh);
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	SetShader(pShader);
+}
+
+CParticleObject::~CParticleObject()
+{
+}
+
+void CParticleObject::ReleaseUploadBuffers()
+{
+	CGameObject::ReleaseUploadBuffers();
+}
+
+void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender();
+	m_pShader->OnPrepareStreamRender(pd3dCommandList);
+	UpdateShaderVariables(pd3dCommandList);
+
+	for (int i = 0; i < m_vpMeshes.size(); i++) if (m_vpMeshes[i]) m_vpMeshes[i]->PreRender(pd3dCommandList); //Stream Output
+	for (int i = 0; i < m_vpMeshes.size(); i++) if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList); //Stream Output
+
+	for (int i = 0; i < m_vpMeshes.size(); i++)
+	{
+		if (m_vpMeshes[i])
+		{
+			m_vpMeshes[i]->PostRender(pd3dCommandList); //Stream Output
+			m_vpMeshes[i]->IncreaseCurrentPipline();
+		}
+	}
+
+	m_pShader->OnPrepareRender(pd3dCommandList);
+	for (int i = 0; i < m_vpMeshes.size(); i++) if (m_vpMeshes[i]) m_vpMeshes[i]->PreRender(pd3dCommandList); //Draw
+	for (int i = 0; i < m_vpMeshes.size(); i++)
+	{
+		if (m_vpMeshes[i])
+		{
+			m_vpMeshes[i]->Render(pd3dCommandList); //Draw
+			m_vpMeshes[i]->ResetCurrentPipline();
+		}
 	}
 }
