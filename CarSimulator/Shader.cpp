@@ -2,12 +2,12 @@
 #include "Shader.h"
 #include "GameObject.h"
 
-CShader::CShader()
+CGraphicsShader::CGraphicsShader()
 {
 	
 }
 
-CShader::~CShader()
+CGraphicsShader::~CGraphicsShader()
 {
 	if (m_pd3dPipelineState)
 	{
@@ -17,7 +17,7 @@ CShader::~CShader()
 }
 
 //래스터라이저 상태를 설정하기 위한 구조체를 반환한다.
-D3D12_RASTERIZER_DESC CShader::CreateRasterizerState()
+D3D12_RASTERIZER_DESC CGraphicsShader::CreateRasterizerState()
 {
 	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
 	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
@@ -36,7 +36,7 @@ D3D12_RASTERIZER_DESC CShader::CreateRasterizerState()
 }
 
 //깊이-스텐실 검사를 위한 상태를 설정하기 위한 구조체를 반환한다.
-D3D12_DEPTH_STENCIL_DESC CShader::CreateDepthStencilState()
+D3D12_DEPTH_STENCIL_DESC CGraphicsShader::CreateDepthStencilState()
 {
 	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
 	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
@@ -58,7 +58,7 @@ D3D12_DEPTH_STENCIL_DESC CShader::CreateDepthStencilState()
 }
 
 //블렌딩 상태를 설정하기 위한 구조체를 반환한다.
-D3D12_BLEND_DESC CShader::CreateBlendState()
+D3D12_BLEND_DESC CGraphicsShader::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
 	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
@@ -78,7 +78,7 @@ D3D12_BLEND_DESC CShader::CreateBlendState()
 }
 
 //입력 조립기에게 정점 버퍼의 구조를 알려주기 위한 구조체를 반환한다.
-D3D12_INPUT_LAYOUT_DESC CShader::CreateInputLayout()
+D3D12_INPUT_LAYOUT_DESC CGraphicsShader::CreateInputLayout()
 {
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = NULL;
@@ -86,7 +86,7 @@ D3D12_INPUT_LAYOUT_DESC CShader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 
-D3D12_SHADER_BYTECODE CShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CGraphicsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
@@ -94,28 +94,28 @@ D3D12_SHADER_BYTECODE CShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 	return(d3dShaderByteCode);
 }
 
-D3D12_SHADER_BYTECODE CShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CGraphicsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
 	d3dShaderByteCode.pShaderBytecode = NULL;
 	return(d3dShaderByteCode);
 }
-D3D12_SHADER_BYTECODE CShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CGraphicsShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
 	d3dShaderByteCode.pShaderBytecode = NULL;
 	return(d3dShaderByteCode);
 }
-D3D12_SHADER_BYTECODE CShader::CreateHullShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CGraphicsShader::CreateHullShader(ID3DBlob** ppd3dShaderBlob)
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
 	d3dShaderByteCode.pShaderBytecode = NULL;
 	return(d3dShaderByteCode);
 }
-D3D12_SHADER_BYTECODE CShader::CreateDomainShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CGraphicsShader::CreateDomainShader(ID3DBlob** ppd3dShaderBlob)
 {
 	D3D12_SHADER_BYTECODE d3dShaderByteCode;
 	d3dShaderByteCode.BytecodeLength = 0;
@@ -123,7 +123,7 @@ D3D12_SHADER_BYTECODE CShader::CreateDomainShader(ID3DBlob** ppd3dShaderBlob)
 	return(d3dShaderByteCode);
 }
 //셰이더 소스 코드를 컴파일하여 바이트 코드 구조체를 반환한다.
-D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR *pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CGraphicsShader::CompileShaderFromFile(WCHAR *pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob)
 {
 	UINT nCompileFlags = 0;
 	ComPtr<ID3DBlob> errors;
@@ -148,7 +148,7 @@ D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR *pszFileName, LPCSTR 
 }
 
 //그래픽스 파이프라인 상태 객체를 생성한다.
-void CShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGraphicsRootSignature)
+void CGraphicsShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGraphicsRootSignature)
 {
 	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL, * pd3dHullShaderBlob = NULL, * pd3dDomainShaderBlob = NULL;
 
@@ -192,17 +192,17 @@ void CShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGr
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
-void CShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+void CGraphicsShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 
 }
 
-void CShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void CGraphicsShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 
 }
 
-void CShader::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World)
+void CGraphicsShader::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World)
 {
 	XMFLOAT4X4 xmf4x4World;
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(pxmf4x4World)));
@@ -210,32 +210,32 @@ void CShader::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, X
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 }
 
-void CShader::ReleaseShaderVariables()
+void CGraphicsShader::ReleaseShaderVariables()
 {
 
 }
 
-void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void CGraphicsShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//파이프라인에 그래픽스 상태 객체를 설정한다.
 	pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
 }
 
-void CShader::OnPrepareStreamRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void CGraphicsShader::OnPrepareStreamRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	pd3dCommandList->SetPipelineState(m_pd3dStreamPipeline);
 }
 
-void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+void CGraphicsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender(pd3dCommandList);
 }
 
-void CShader::Update(float fTimeElapsed)
+void CGraphicsShader::Update(float fTimeElapsed)
 {
 }
 
-void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
+void CGraphicsShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
 {
 	UINT nSrvDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -249,14 +249,36 @@ void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_pt
 		D3D12_SHADER_RESOURCE_VIEW_DESC d3dShaderResourceViewDesc = pTexture->GetShaderResourceViewDesc(i);
 		pd3dDevice->CreateShaderResourceView(pShaderResource, &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorHandle);
 		m_d3dSrvCPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
-		pTexture->SetGpuDescriptorHandle(i, m_d3dSrvGPUDescriptorHandle);
+		pTexture->SetSrvGpuDescriptorHandle(i, m_d3dSrvGPUDescriptorHandle);
 		m_d3dSrvGPUDescriptorHandle.ptr += nSrvDescriptorIncrementSize;
 	}
-	int nRootParameters = pTexture->GetRootParameters();
-	for (int i = 0; i < nRootParameters; i++) pTexture->SetRootParameterIndex(i, nRootParameterStartIndex + i);
+	int nRootParameters = pTexture->GetGraphicsSrvRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetGraphicsSrvRootParameterIndex(i, nRootParameterStartIndex + i, i);
 }
 
-void CShader::SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+void CGraphicsShader::CreateUnorderedAccessView(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
+{
+	UINT nUavDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	m_d3dSrvCPUDescriptorHandle.ptr += (nUavDescriptorIncrementSize * nDescriptorHeapIndex);
+	m_d3dSrvGPUDescriptorHandle.ptr += (nUavDescriptorIncrementSize * nDescriptorHeapIndex);
+
+	int nTextures = pTexture->GetTextures();
+	for (int i = 0; i < nTextures; i++)
+	{
+		ID3D12Resource* pShaderResource = pTexture->GetResource(i);
+		D3D12_UNORDERED_ACCESS_VIEW_DESC d3dUnorderedAccessViewDesc = pTexture->GetUnorderedAccessViewDesc(i);
+		pd3dDevice->CreateUnorderedAccessView(pShaderResource, NULL, &d3dUnorderedAccessViewDesc, m_d3dUavCPUDescriptorHandle);
+		m_d3dUavCPUDescriptorHandle.ptr += nUavDescriptorIncrementSize;
+		pTexture->SetUavGpuDescriptorHandle(i, m_d3dUavGPUDescriptorHandle);
+		m_d3dUavGPUDescriptorHandle.ptr += nUavDescriptorIncrementSize;
+	}
+
+	int nRootParameters = pTexture->GetComputeUavRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetComputeUavRootParameterIndex(i, nRootParameterStartIndex + i, i);
+}
+
+void CGraphicsShader::SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
 {
 	m_d3dSrvCPUDescriptorHandle = pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -353,11 +375,11 @@ D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CPlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"CubemapPlayer.hlsl", "VS_CMPlayer", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"CubemapPlayer.hlsl", "VS_CMPlayer", "vs_5_1", ppd3dShaderBlob));
 }
 D3D12_SHADER_BYTECODE CPlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"CubemapPlayer.hlsl", "PS_CMPlayer", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"CubemapPlayer.hlsl", "PS_CMPlayer", "ps_5_1", ppd3dShaderBlob));
 }
 
 CObjectsShader::CObjectsShader()
@@ -382,17 +404,17 @@ D3D12_INPUT_LAYOUT_DESC CObjectsShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	CGraphicsShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
 
 void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
@@ -418,7 +440,7 @@ void CObjectsShader::ReleaseUploadBuffers()
 
 void CObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 
 	for (int i = 0; i < m_vpObjects.size(); i++)
 	{
@@ -455,17 +477,17 @@ D3D12_INPUT_LAYOUT_DESC CInstancingShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CInstancingShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Instancing.hlsl", "VS_Instancing", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Instancing.hlsl", "VS_Instancing", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CInstancingShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Instancing.hlsl", "PS_Instancing", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Instancing.hlsl", "PS_Instancing", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CInstancingShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	CGraphicsShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
 
 void CInstancingShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -514,10 +536,10 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	m_pTexture = std::make_shared<CTexture>(4, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Stone01.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal01.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Metal02.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Rock01.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 3, 7);
 
@@ -591,7 +613,7 @@ void CInstancingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 void CInstancingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
 
@@ -665,21 +687,21 @@ D3D12_INPUT_LAYOUT_DESC CTerrainShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Terrain.hlsl", "VS_Terrain", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Terrain.hlsl", "VS_Terrain", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Terrain.hlsl", "PS_Terrain", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Terrain.hlsl", "PS_Terrain", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreateHullShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Terrain.hlsl", "HSTerrainTessellation", "hs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Terrain.hlsl", "HSTerrainTessellation", "hs_5_1", ppd3dShaderBlob));
 }
 D3D12_SHADER_BYTECODE CTerrainShader::CreateDomainShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Terrain.hlsl", "DSTerrainTessellation", "ds_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Terrain.hlsl", "DSTerrainTessellation", "ds_5_1", ppd3dShaderBlob));
 }
 void CTerrainShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -692,9 +714,9 @@ void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 
 	m_pTexture = std::make_shared<CTexture>(3, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Base_Texture.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Terrain_Road.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Base_Texture.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Detail_Texture_7.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Terrain_Road.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 7, 7);
 }
@@ -720,7 +742,7 @@ D3D12_RASTERIZER_DESC CTerrainShader::CreateRasterizerState()
 void CTerrainShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if(m_bRenderMode)
-		CShader::Render(pd3dCommandList);
+		CGraphicsShader::Render(pd3dCommandList);
 	else
 		pd3dCommandList->SetPipelineState(m_pd3dWireframePipeline);
 
@@ -762,7 +784,7 @@ void CLightsShader::ReleaseObjects()
 
 void CLightsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
 
@@ -790,12 +812,12 @@ D3D12_INPUT_LAYOUT_DESC CLightsShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CLightsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Default.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CLightsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Default.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CLightsShader::ReleaseUploadBuffers()
@@ -874,8 +896,8 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
 	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
-	d3dPipelineStateDesc.VS = CShader::CompileShaderFromFile(L"Shadow.hlsl", "VS", "vs_5_1", &pd3dVertexShaderBlob);
-	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.VS = CGraphicsShader::CompileShaderFromFile(L"Shadow.hlsl", "VS", "vs_5_1", &pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CGraphicsShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
 	d3dPipelineStateDesc.RasterizerState.DepthBias = 100000;
@@ -895,16 +917,16 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
 
 
-	d3dPipelineStateDesc.VS = CShader::CompileShaderFromFile(L"ShadowInstancing.hlsl", "VS", "vs_5_1", &pd3dVertexShaderBlob);
-	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"ShadowInstancing.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.VS = CGraphicsShader::CompileShaderFromFile(L"ShadowInstancing.hlsl", "VS", "vs_5_1", &pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CGraphicsShader::CompileShaderFromFile(L"ShadowInstancing.hlsl", "PS", "ps_5_1", &pd3dPixelShaderBlob);
 
 	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dInstancingPipelineState);
 
 	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
-	d3dPipelineStateDesc.VS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "VS_Terrain", "vs_5_1", &pd3dVertexShaderBlob);
-	d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "PS_Terrain", "ps_5_1", &pd3dPixelShaderBlob);
-	d3dPipelineStateDesc.HS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "HSTerrainTessellation", "hs_5_1", &pd3dHullShaderBlob);
-	d3dPipelineStateDesc.DS = CShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "DSTerrainTessellation", "ds_5_1", &pd3dDomainShaderBlob);
+	d3dPipelineStateDesc.VS = CGraphicsShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "VS_Terrain", "vs_5_1", &pd3dVertexShaderBlob);
+	d3dPipelineStateDesc.PS = CGraphicsShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "PS_Terrain", "ps_5_1", &pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.HS = CGraphicsShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "HSTerrainTessellation", "hs_5_1", &pd3dHullShaderBlob);
+	d3dPipelineStateDesc.DS = CGraphicsShader::CompileShaderFromFile(L"ShadowTessellation.hlsl", "DSTerrainTessellation", "ds_5_1", &pd3dDomainShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
 	d3dPipelineStateDesc.RasterizerState.DepthBias = 100000;
@@ -942,12 +964,12 @@ void CShadowShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 
 D3D12_SHADER_BYTECODE CShadowShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shadow.hlsl", "VS", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Shadow.hlsl", "VS", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CShadowShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Shadow.hlsl", "PS", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CShadowShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CPlayer* pPlayer, float fBoundary, int nShadowIndex)
@@ -1055,13 +1077,13 @@ D3D12_DEPTH_STENCIL_DESC CSkyBoxShader::CreateDepthStencilState()
 
 D3D12_SHADER_BYTECODE CSkyBoxShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Skybox.hlsl", "VS_SkyBox", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Skybox.hlsl", "VS_SkyBox", "vs_5_1", ppd3dShaderBlob));
 }
 
 
 D3D12_SHADER_BYTECODE CSkyBoxShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Skybox.hlsl", "PS_SkyBox", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Skybox.hlsl", "PS_SkyBox", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CSkyBoxShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -1089,12 +1111,12 @@ void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	m_pTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Back_0.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Left_0.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Right_0.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D_ARRAY, 5);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D_ARRAY, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Back_0.dds", RESOURCE_TEXTURE2D_ARRAY, 1);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Left_0.dds", RESOURCE_TEXTURE2D_ARRAY, 2);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Right_0.dds", RESOURCE_TEXTURE2D_ARRAY, 3);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D_ARRAY, 4);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D_ARRAY, 5);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 10, 7);
 
@@ -1103,7 +1125,7 @@ void CSkyBoxShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 void CSkyBoxShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 
 	UpdateShaderVariables(pd3dCommandList);
 
@@ -1121,17 +1143,17 @@ CTreeBillBoardShader::~CTreeBillBoardShader()
 
 D3D12_SHADER_BYTECODE CTreeBillBoardShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTreeBillBoardShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTreeBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"BillBoardTree.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
 }
 
 void CTreeBillBoardShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -1193,8 +1215,8 @@ void CTreeBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphics
 
 	m_pTexture = std::make_shared<CTexture>(2, RESOURCE_TEXTURE2DARRAY, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/treearray.dds", RESOURCE_TEXTURE2DARRAY, 0);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/grassarray.dds", RESOURCE_TEXTURE2DARRAY, 1);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/treearray.dds", RESOURCE_TEXTURE2DARRAY, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/grassarray.dds", RESOURCE_TEXTURE2DARRAY, 1);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 16, 7);
 
@@ -1234,7 +1256,7 @@ void CTreeBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3d
 
 void CTreeBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 	UpdateShaderVariables(pd3dCommandList);
 	m_pBillBoard->Render(pd3dCommandList);
 }
@@ -1250,17 +1272,17 @@ CAnimatedBillBoardShader::~CAnimatedBillBoardShader()
 
 D3D12_SHADER_BYTECODE CAnimatedBillBoardShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "PS_BillBoard", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CAnimatedBillBoardShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "VS_BillBoard", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CAnimatedBillBoardShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"AnimatedBillBoard.hlsl", "GS_BillBoard", "gs_5_1", ppd3dShaderBlob));
 }
 
 void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
@@ -1274,7 +1296,7 @@ void CAnimatedBillBoardShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
 
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Explosion_Effect.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Explosion_Effect.dds", RESOURCE_TEXTURE2D, 0);
 
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 18, 7);
 }
@@ -1297,7 +1319,7 @@ void CAnimatedBillBoardShader::UpdateShaderVariables(ID3D12GraphicsCommandList* 
 
 void CAnimatedBillBoardShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 	int CBIndex = 0;
 	for (auto i = m_vpAnimatedBillBoard.begin(); i < m_vpAnimatedBillBoard.end(); ++i)
 	{
@@ -1323,12 +1345,12 @@ CMirrorShader::~CMirrorShader()
 
 D3D12_SHADER_BYTECODE CMirrorShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Mirror.hlsl", "VS_Mirror", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Mirror.hlsl", "VS_Mirror", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CMirrorShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Mirror.hlsl", "PS_Mirror", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Mirror.hlsl", "PS_Mirror", "ps_5_1", ppd3dShaderBlob));
 }
 
 
@@ -1400,14 +1422,14 @@ void CMirrorShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
 	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/ice.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/ice.dds", RESOURCE_TEXTURE2D, 0);
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 20, 7);
 }
 
 
 void CMirrorShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	CShader::Render(pd3dCommandList);
+	CGraphicsShader::Render(pd3dCommandList);
 	m_pMirror->Render(pd3dCommandList);
 }
 
@@ -1419,7 +1441,7 @@ void CMirrorShader::StencilRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void CMirrorShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	CGraphicsShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 
 	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL;
 
@@ -1433,7 +1455,7 @@ void CMirrorShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	d3dPipelineStateDesc.DS = CreateDomainShader(&pd3dGeometryShaderBlob);
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 
-	d3dPipelineStateDesc.BlendState = CShader::CreateBlendState();
+	d3dPipelineStateDesc.BlendState = CGraphicsShader::CreateBlendState();
 	d3dPipelineStateDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = 0;
 
 	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
@@ -1474,12 +1496,12 @@ void CMirrorShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 
 D3D12_SHADER_BYTECODE CRoomShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default_No_Light.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Default_No_Light.hlsl", "VS_Default", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CRoomShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Default_No_Light.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
+	return(CGraphicsShader::CompileShaderFromFile(L"Default_No_Light.hlsl", "PS_Default", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_INPUT_LAYOUT_DESC CRoomShader::CreateInputLayout()
@@ -1534,32 +1556,32 @@ void CParticleShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_d3dSrvGPUDescriptorHandle = pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
 	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	m_pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Fire_Particle.dds", RESOURCE_TEXTURE2D, 0);
+	m_pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Assets/Image/Textures/Fire_Particle.dds", RESOURCE_TEXTURE2D, 0);
 	CreateShaderResourceViews(pd3dDevice, m_pTexture, 21, 7);
 }
 
 D3D12_SHADER_BYTECODE CParticleShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState)
 {
 	if (nPipelineState == 0)
-		return(CShader::CompileShaderFromFile(L"particle.hlsl", "VSParticleStreamOutput", "vs_5_1", ppd3dShaderBlob));
+		return(CGraphicsShader::CompileShaderFromFile(L"particle.hlsl", "VSParticleStreamOutput", "vs_5_1", ppd3dShaderBlob));
 	else
-		return(CShader::CompileShaderFromFile(L"particle.hlsl", "VSParticleDraw", "vs_5_1", ppd3dShaderBlob));
+		return(CGraphicsShader::CompileShaderFromFile(L"particle.hlsl", "VSParticleDraw", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CParticleShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState)
 {
 	if (nPipelineState == 0)
-		return(CShader::CompileShaderFromFile(L"particle.hlsl", "GSParticleStreamOutput", "gs_5_1", ppd3dShaderBlob));
+		return(CGraphicsShader::CompileShaderFromFile(L"particle.hlsl", "GSParticleStreamOutput", "gs_5_1", ppd3dShaderBlob));
 	else
-		return(CShader::CompileShaderFromFile(L"particle.hlsl", "GSParticleDraw", "gs_5_1", ppd3dShaderBlob));
+		return(CGraphicsShader::CompileShaderFromFile(L"particle.hlsl", "GSParticleDraw", "gs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CParticleShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState)
 {
 	if (nPipelineState == 0)
-		return(CShader::CreatePixelShader(ppd3dShaderBlob));
+		return(CGraphicsShader::CreatePixelShader(ppd3dShaderBlob));
 	else
-		return(CShader::CompileShaderFromFile(L"particle.hlsl", "PSParticleDraw", "ps_5_1", ppd3dShaderBlob));
+		return(CGraphicsShader::CompileShaderFromFile(L"particle.hlsl", "PSParticleDraw", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_BLEND_DESC CParticleShader::CreateBlendState()
@@ -1732,3 +1754,158 @@ void CParticleShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature
 		delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
+CShader::CShader()
+{
+}
+
+CShader::~CShader()
+{
+	if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
+}
+
+D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob)
+{
+	UINT nCompileFlags = 0;
+#if defined(_DEBUG)
+	nCompileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
+	ID3DBlob* pd3dErrorBlob = NULL;
+	::D3DCompileFromFile(pszFileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, pszShaderName, pszShaderProfile, nCompileFlags, 0, ppd3dShaderBlob, NULL);
+
+	D3D12_SHADER_BYTECODE d3dShaderByteCode;
+	d3dShaderByteCode.BytecodeLength = (*ppd3dShaderBlob)->GetBufferSize();
+	d3dShaderByteCode.pShaderBytecode = (*ppd3dShaderBlob)->GetBufferPointer();
+
+	return(d3dShaderByteCode);
+}
+
+void CShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void CShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+}
+
+void CShader::ReleaseShaderVariables()
+{
+}
+
+void CShader::ReleaseUploadBuffers()
+{
+}
+
+void CShader::OnPrepare(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (m_pd3dPipelineState) pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
+}
+
+CComputeShader::CComputeShader()
+{
+}
+
+CComputeShader::~CComputeShader()
+{
+}
+
+D3D12_SHADER_BYTECODE CComputeShader::CreateComputeShader(ID3DBlob** ppd3dShaderBlob)
+{
+	D3D12_SHADER_BYTECODE d3dShaderByteCode;
+	d3dShaderByteCode.BytecodeLength = 0;
+	d3dShaderByteCode.pShaderBytecode = NULL;
+
+	return(d3dShaderByteCode);
+}
+
+void CComputeShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature, UINT cxThreadGroups, UINT cyThreadGroups, UINT czThreadGroups)
+{
+	ID3DBlob* pd3dComputeShaderBlob = NULL;
+
+	D3D12_CACHED_PIPELINE_STATE d3dCachedPipelineState = { };
+	D3D12_COMPUTE_PIPELINE_STATE_DESC d3dPipelineStateDesc;
+	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_COMPUTE_PIPELINE_STATE_DESC));
+	d3dPipelineStateDesc.pRootSignature = pd3dRootSignature;
+	d3dPipelineStateDesc.CS = CreateComputeShader(&pd3dComputeShaderBlob);
+	d3dPipelineStateDesc.NodeMask = 0;
+	d3dPipelineStateDesc.CachedPSO = d3dCachedPipelineState;
+	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	HRESULT hResult = pd3dDevice->CreateComputePipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pd3dPipelineState);
+
+	if (pd3dComputeShaderBlob) pd3dComputeShaderBlob->Release();
+
+	m_cxThreadGroups = cxThreadGroups;
+	m_cyThreadGroups = cyThreadGroups;
+	m_czThreadGroups = czThreadGroups;
+}
+
+void CComputeShader::CreateUnorderedAccessView(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
+{
+	UINT nUavDescriptorIncrementSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	m_d3dUavCPUDescriptorHandle.ptr += (nUavDescriptorIncrementSize * nDescriptorHeapIndex);
+	m_d3dUavGPUDescriptorHandle.ptr += (nUavDescriptorIncrementSize * nDescriptorHeapIndex);
+
+	int nTextures = pTexture->GetTextures();
+	for (int i = 0; i < nTextures; i++)
+	{
+		ID3D12Resource* pShaderResource = pTexture->GetResource(i);
+		D3D12_UNORDERED_ACCESS_VIEW_DESC d3dUnorderedAccessViewDesc = pTexture->GetUnorderedAccessViewDesc(i);
+		pd3dDevice->CreateUnorderedAccessView(pShaderResource, NULL, &d3dUnorderedAccessViewDesc, m_d3dUavCPUDescriptorHandle);
+		m_d3dUavCPUDescriptorHandle.ptr += nUavDescriptorIncrementSize;
+		pTexture->SetUavGpuDescriptorHandle(i, m_d3dUavGPUDescriptorHandle);
+		m_d3dUavGPUDescriptorHandle.ptr += nUavDescriptorIncrementSize;
+	}
+
+	int nRootParameters = pTexture->GetGraphicsSrvRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetGraphicsSrvRootParameterIndex(i, nRootParameterStartIndex + i, i);
+}
+
+void CComputeShader::Dispatch(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepare(pd3dCommandList);
+	UpdateShaderVariables(pd3dCommandList, NULL);
+	pd3dCommandList->Dispatch(m_cxThreadGroups, m_cyThreadGroups, m_czThreadGroups);
+}
+
+void CComputeShader::Dispatch(ID3D12GraphicsCommandList* pd3dCommandList, UINT cxThreadGroups, UINT cyThreadGroups, UINT czThreadGroups)
+{
+	OnPrepare(pd3dCommandList);
+	UpdateShaderVariables(pd3dCommandList, NULL);
+	pd3dCommandList->Dispatch(cxThreadGroups, cyThreadGroups, czThreadGroups);
+}
+
+CPostProcessingShader::CPostProcessingShader()
+{
+}
+
+CPostProcessingShader::~CPostProcessingShader()
+{
+}
+
+D3D12_SHADER_BYTECODE CPostProcessingShader::CreateComputeShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"PostProcessing.hlsl", "CSEdgeDetection", "cs_5_1", ppd3dShaderBlob));
+}
+
+void CPostProcessingShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void CPostProcessingShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void CPostProcessingShader::ReleaseShaderVariables()
+{
+}
+
+void CPostProcessingShader::BuildObjects(ComPtr<ID3D12DescriptorHeap> pd3dUavDescriptorHeap)
+{
+	m_d3dUavCPUDescriptorHandle = pd3dUavDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dUavGPUDescriptorHandle = pd3dUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+}
+
+void CPostProcessingShader::ReleaseUploadBuffers()
+{
+}

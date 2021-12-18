@@ -134,6 +134,7 @@
     <FxCompile Include="Mirror.hlsl" />
     <FxCompile Include="Particle.hlsl" />
     <FxCompile Include="ShadowTessellation.hlsl" />
+    <FxCompile Include="PostProcessing.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LightUtil.hlsli" />

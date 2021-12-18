@@ -44,6 +44,7 @@ private:
 
 	ComPtr<ID3D12Resource> m_pd3dShaderResourceBuffer;
 	ComPtr<ID3D12DescriptorHeap> m_pd3dSrvDescriptorHeap;
+	ComPtr<ID3D12DescriptorHeap> m_pd3dUavDescriptorHeap;
 	UINT m_nSrvDescriptorIncrementSize;
 	//쉐이더 리소스 버퍼, 서술자 힙 인터페이스 포인터, 쉐이더 리소스 서술자 원소의 크기이다.
 

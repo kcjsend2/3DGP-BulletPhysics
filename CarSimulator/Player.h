@@ -122,7 +122,7 @@ public:
 class CCubeMappingPlayer : public CPlayer
 {
 public:
-	CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CShader* pShader, int nMeshes);
+	CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LONG nCubeMapSize, CGraphicsShader* pShader, int nMeshes);
 	~CCubeMappingPlayer();
 
 	virtual void OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dCommandList, ComPtr<ID3D12CommandQueue> pd3dCommandQueue, std::shared_ptr<CScene> pScene, ID3D12DescriptorHeap** pDescriptorHeaps, int nDescriptorHeaps, D3D12_GPU_DESCRIPTOR_HANDLE hDescriptorStart);
@@ -156,7 +156,7 @@ private:
 	};
 
 public:
-	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, CShader* pShader,int nMeshes = 5);
+	CVehiclePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, CGraphicsShader* pShader,int nMeshes = 5);
 	virtual ~CVehiclePlayer();
 	std::shared_ptr<CBullet> GetBullet() { return m_pBullet; };
 	virtual void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, DWORD dwBehave);

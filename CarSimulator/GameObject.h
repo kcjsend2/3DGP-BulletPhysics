@@ -2,7 +2,7 @@
 #include "Mesh.h"
 
 class CCamera;
-class CShader;
+class CGraphicsShader;
 class CScene;
 
 #define RESOURCE_TEXTURE2D			0x01
@@ -37,30 +37,40 @@ struct CB_ANIMATEDBILLBOARD
 class CTexture
 {
 public:
-	CTexture(int nTextureResources, UINT nResourceType, int nSamplers, int nRootParameters);
+	CTexture(int nTextureResources, UINT nResourceType, int nSamplers, int nGraphicsSrvRootParameters, int nComputeUavRootParameters = 0, int nComputeSrvRootParameters = 0);
 	virtual ~CTexture();
 
 private:
-	int m_nReferences = 0;
+	int								m_nReferences = 0;
 
-	UINT m_nTextureType;
+	UINT							m_nTextureType = RESOURCE_TEXTURE2D;
 
-	int	m_nTextures = 0;
+	int								m_nTextures = 0;
+	_TCHAR(*m_ppstrTextureNames)[64] = NULL;
 	ID3D12Resource** m_ppd3dTextures = NULL;
 	ID3D12Resource** m_ppd3dTextureUploadBuffers;
 
 	UINT* m_pnResourceTypes = NULL;
 
-	_TCHAR(*m_ppstrTextureNames)[64] = NULL;
-
 	DXGI_FORMAT* m_pdxgiBufferFormats = NULL;
 	int* m_pnBufferElements = NULL;
 
-	int	m_nRootParameters = 0;
-	int* m_pnRootParameterIndices = NULL;
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles = NULL;
+	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dUavGpuDescriptorHandles = NULL;
 
-	int	m_nSamplers = 0;
+	int								m_nGraphicsSrvRootParameters = 0;
+	int* m_pnGraphicsSrvRootParameterIndices = NULL;
+	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dGraphicsRootParameterSrvGpuDescriptorHandles = NULL;
+
+	int								m_nComputeUavRootParameters = 0;
+	int* m_pnComputeUavRootParameterIndices = NULL;
+	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dComputeRootParameterUavGpuDescriptorHandles = NULL;
+
+	int								m_nComputeSrvRootParameters = 0;
+	int* m_pnComputeSrvRootParameterIndices = NULL;
+	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dComputeRootParameterSrvGpuDescriptorHandles = NULL;
+
+	int								m_nSamplers = 0;
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSamplerGpuDescriptorHandles = NULL;
 
 public:
@@ -69,22 +79,38 @@ public:
 
 	void SetSampler(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSamplerGpuDescriptorHandle);
 
-	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, int nParameterIndex, int nTextureIndex);
-	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateComputeShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateGraphicsShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void ReleaseShaderVariables();
 
-	void LoadTextureFromDDSFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, wchar_t* pszFileName, UINT nResourceType, UINT nIndex);
+	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, wchar_t* pszFileName, UINT nResourceType, UINT nIndex);
+	void LoadBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nElements, UINT nStride, DXGI_FORMAT ndxgiFormat, UINT nIndex);
+	ID3D12Resource* CreateTexture(ID3D12Device* pd3dDevice, UINT nWidth, UINT nHeight, UINT nElements, UINT nMipLevels, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE* pd3dClearValue, UINT nResourceType, UINT nIndex);
 
-	void SetRootParameterIndex(int nIndex, UINT nRootParameterIndex);
-	void SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle);
+	int GetGraphicsSrvRootParameters() { return(m_nGraphicsSrvRootParameters); }
+	void SetGraphicsSrvRootParameters(UINT nRootParameterStartIndex);
+	void SetGraphicsSrvRootParameterIndex(int nIndex, int nRootParameterIndex, int nGpuHandleIndex);
+	int GetGraphicsSrvRootParameterIndex(int nIndex) { return(m_pnGraphicsSrvRootParameterIndices[nIndex]); }
 
-	int GetRootParameters() { return(m_nRootParameters); }
+	void SetSrvGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
+
+	int GetComputeSrvRootParameters() { return(m_nComputeSrvRootParameters); }
+	void SetComputeSrvRootParameters(UINT nRootParameterStartIndex);
+	void SetComputeSrvRootParameterIndex(int nIndex, int nRootParameterIndex, int nGpuHandleIndex);
+	int GetComputeSrvRootParameterIndex(int nIndex) { return(m_pnComputeSrvRootParameterIndices[nIndex]); }
+
+	int GetComputeUavRootParameters() { return(m_nComputeUavRootParameters); }
+	void SetComputeUavRootParameters(UINT nRootParameterStartIndex);
+	void SetComputeUavRootParameterIndex(int nIndex, int nRootParameterIndex, int nGpuHandleIndex);
+	int GetComputeUavRootParameterIndex(int nIndex) { return(m_pnComputeUavRootParameterIndices[nIndex]); }
+
+	void SetUavGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dUavGpuDescriptorHandle);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetUavGpuDescriptorHandle(int nIndex) { return(m_pd3dUavGpuDescriptorHandles[nIndex]); }
+
 	int GetTextures() { return(m_nTextures); }
-	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
-	ID3D12Resource* CreateTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, UINT nWidth, UINT nHeight, UINT nElements, UINT nMipLevels, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE* pd3dClearValue, UINT nResourceType, UINT nIndex);
 	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
-	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }
+	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
 
 	UINT GetTextureType() { return(m_nTextureType); }
 	UINT GetTextureType(int nIndex) { return(m_pnResourceTypes[nIndex]); }
@@ -92,6 +118,7 @@ public:
 	int GetBufferElements(int nIndex) { return(m_pnBufferElements[nIndex]); }
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(int nIndex);
+	D3D12_UNORDERED_ACCESS_VIEW_DESC GetUnorderedAccessViewDesc(int nIndex);
 
 	void ReleaseUploadBuffers();
 };
@@ -112,7 +139,7 @@ public:
 	void Release() { if (--m_nReferences <= 0) delete this; }
 protected:
 	XMFLOAT4X4 m_xmf4x4World;
-	CShader* m_pShader = NULL;
+	CGraphicsShader* m_pShader = NULL;
 	btRigidBody* m_pbtRigidBody = NULL;
 	int m_nInstance = 1;
 	int m_nTextureIndex = 0;
@@ -129,7 +156,7 @@ public:
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
 	void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
 
-	virtual void SetShader(CShader* pShader);
+	virtual void SetShader(CGraphicsShader* pShader);
 	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -140,7 +167,7 @@ public:
 	virtual void SetMatrix(XMFLOAT4X4 xmf4x4Matrix) { m_xmf4x4World = xmf4x4Matrix; }
 	virtual BoundingOrientedBox GetBoudingBox(int index);
 	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CScene* pScene) { }
-	virtual CShader* GetShader() { return m_pShader; }
+	virtual CGraphicsShader* GetShader() { return m_pShader; }
 
 public:
 	//상수 버퍼를 생성한다.
@@ -278,7 +305,7 @@ private:
 class CParticleObject : public CGameObject
 {
 public:
-	CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, float fLifetime, UINT nMaxParticles, CShader* pShader);
+	CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, float fLifetime, UINT nMaxParticles, CGraphicsShader* pShader);
 	virtual ~CParticleObject();
 
 	void ReleaseUploadBuffers();

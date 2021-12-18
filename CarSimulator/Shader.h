@@ -34,11 +34,11 @@ struct VS_VB_LIGHT_INFO
 };
 
 //셰이더 소스 코드를 컴파일하고 그래픽스 상태 객체를 생성한다.
-class CShader
+class CGraphicsShader
 {
 public:
-	CShader();
-	virtual ~CShader();
+	CGraphicsShader();
+	virtual ~CGraphicsShader();
 private:
 	int m_nReferences = 0;
 public:
@@ -66,6 +66,7 @@ public:
 	virtual void ReflectedRender(ID3D12GraphicsCommandList* pd3dCommandList) {};
 	virtual void Update(float fTimeElapsed);
 	virtual void CreateShaderResourceViews(ID3D12Device* pd3dDevice, std::shared_ptr<CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
+	virtual void CreateUnorderedAccessView(ID3D12Device* pd3dDevice, std::shared_ptr <CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
 	virtual void SetSrvDescriptorHeapHandle(ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
 	virtual void ChangeRendermode() {}
 
@@ -74,11 +75,14 @@ protected:
 	ID3D12PipelineState* m_pd3dStreamPipeline = NULL;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE m_d3dSrvCPUDescriptorHandle;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE m_d3dSrvGPUDescriptorHandle;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE m_d3dUavCPUDescriptorHandle;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE m_d3dUavGPUDescriptorHandle;
+
 	std::shared_ptr<CTexture> m_pTexture;
 	int m_nPipelineStates = 0;
 };
 
-class CShadowShader : public CShader
+class CShadowShader : public CGraphicsShader
 {
 public:
 	CShadowShader();
@@ -122,7 +126,7 @@ protected:
 	XMFLOAT4X4 m_xmf4x4LightViewProj[3] = { Matrix4x4::Identity(), Matrix4x4::Identity(), Matrix4x4::Identity() };
 };
 
-class CPlayerShader : public CShader
+class CPlayerShader : public CGraphicsShader
 {
 public:
 	CPlayerShader();
@@ -138,7 +142,7 @@ protected:
 };
 
 //“CObjectsShader” 클래스는 게임 객체들을 포함하는 셰이더 객체이다.
-class CObjectsShader : public CShader
+class CObjectsShader : public CGraphicsShader
 {
 public:
 	CObjectsShader();
@@ -192,7 +196,7 @@ public:
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 };
 
-class CTerrainShader : public CShader
+class CTerrainShader : public CGraphicsShader
 {
 public:
 	CTerrainShader();
@@ -214,7 +218,7 @@ protected:
 	ID3D12PipelineState* m_pd3dWireframePipeline = NULL;
 };
 
-class CLightsShader : public CShader
+class CLightsShader : public CGraphicsShader
 {
 public:
 	CLightsShader();
@@ -238,7 +242,7 @@ protected:
 
 };
 
-class CSkyBoxShader : public CShader
+class CSkyBoxShader : public CGraphicsShader
 {
 public:
 	CSkyBoxShader();
@@ -256,7 +260,7 @@ protected:
 	std::unique_ptr<CSkyBox> m_pSkybox;
 };
 
-class CTreeBillBoardShader : public CShader
+class CTreeBillBoardShader : public CGraphicsShader
 {
 public:
 	CTreeBillBoardShader();
@@ -295,7 +299,7 @@ protected:
 	UploadBuffer<CB_ANIMATEDBILLBOARD>* m_ubAnimatedBillBoard;
 };
 
-class CMirrorShader : public CShader
+class CMirrorShader : public CGraphicsShader
 {
 public:
 	CMirrorShader();
@@ -316,7 +320,7 @@ protected:
 	std::unique_ptr<CGameObject> m_pMirror;
 };
 
-class CParticleShader : public CShader
+class CParticleShader : public CGraphicsShader
 {
 public:
 	CParticleShader();
@@ -334,4 +338,71 @@ public:
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
+};
+
+class CShader
+{
+public:
+	CShader();
+	virtual ~CShader();
+
+private:
+	int m_nReferences = 0;
+
+public:
+	void AddRef() { m_nReferences++; }
+	void Release() { if (--m_nReferences <= 0) delete this; }
+
+	D3D12_SHADER_BYTECODE CompileShaderFromFile(WCHAR* pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob);
+
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+	virtual void ReleaseShaderVariables();
+
+	virtual void ReleaseUploadBuffers();
+
+	virtual void OnPrepare(ID3D12GraphicsCommandList* pd3dCommandList);
+
+protected:
+	ID3D12PipelineState* m_pd3dPipelineState = NULL;
+};
+
+class CComputeShader : public CShader
+{
+public:
+	CComputeShader();
+	virtual ~CComputeShader();
+
+public:
+	virtual D3D12_SHADER_BYTECODE CreateComputeShader(ID3DBlob** ppd3dShaderBlob);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature, UINT cxThreadGroups, UINT cyThreadGroups, UINT czThreadGroups);
+	virtual void CreateUnorderedAccessView(ID3D12Device* pd3dDevice, std::shared_ptr <CTexture> pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
+
+	virtual void Dispatch(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Dispatch(ID3D12GraphicsCommandList* pd3dCommandList, UINT cxThreadGroups, UINT cyThreadGroups, UINT czThreadGroups);
+
+protected:
+	UINT m_cxThreadGroups = 0;
+	UINT m_cyThreadGroups = 0;
+	UINT m_czThreadGroups = 0;
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE m_d3dUavCPUDescriptorHandle;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE m_d3dUavGPUDescriptorHandle;
+};
+
+class CPostProcessingShader : public CComputeShader
+{
+public:
+	CPostProcessingShader();
+	virtual ~CPostProcessingShader();
+
+public:
+	virtual D3D12_SHADER_BYTECODE CreateComputeShader(ID3DBlob** ppd3dShaderBlob);
+
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseShaderVariables();
+	virtual void BuildObjects(ComPtr<ID3D12DescriptorHeap> pd3dUavDescriptorHeap);
+	virtual void ReleaseUploadBuffers();
 };

@@ -87,9 +87,10 @@ void CScene::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 	}
 }
 
-void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap)
+void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap, ComPtr<ID3D12DescriptorHeap> pd3dUavDescriptorHeap)
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	m_pd3dComputeRootSignature = CreateComputeRootSignature(pd3dDevice);
 
 	m_pLightShader = new CLightsShader;
 
@@ -132,6 +133,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pParticleShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pParticleShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 
+
+	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 0, 0);
+	m_pTexture->CreateTexture(pd3dDevice, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, NULL, RESOURCE_TEXTURE2D, 0);
+	m_pPostProcessingShader = new CPostProcessingShader;
+	m_pPostProcessingShader->CreateShader(pd3dDevice, m_pd3dComputeRootSignature, (UINT)(FRAME_BUFFER_WIDTH / 32.0f + 0.5f), (UINT)(FRAME_BUFFER_HEIGHT / 32.0f + 0.5f), 1);
+	m_pPostProcessingShader->BuildObjects(pd3dUavDescriptorHeap);
+	m_pPostProcessingShader->CreateUnorderedAccessView(pd3dDevice, m_pTexture, 0, 0);
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -163,6 +171,42 @@ ID3D12RootSignature* CScene::GetGraphicsRootSignature()
 	return(m_pd3dGraphicsRootSignature);
 }
 
+ID3D12RootSignature* CScene::CreateComputeRootSignature(ID3D12Device* pd3dDevice)
+{
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[1];
+
+	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	pd3dDescriptorRanges[0].NumDescriptors = 1;
+	pd3dDescriptorRanges[0].BaseShaderRegister = 0; //u0: RWTexture2D
+	pd3dDescriptorRanges[0].RegisterSpace = 0;
+	pd3dDescriptorRanges[0].OffsetInDescriptorsFromTableStart = 0;
+
+	D3D12_ROOT_PARAMETER pd3dRootParameters[1];
+
+	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[0].DescriptorTable.pDescriptorRanges = &pd3dDescriptorRanges[0]; //RWTexture2D
+	pd3dRootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	CD3DX12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc(_countof(pd3dRootParameters), pd3dRootParameters, 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS);
+
+	ID3D12RootSignature* pd3dRootSignature = NULL;
+
+	ID3DBlob* pd3dSignatureBlob = NULL;
+	ID3DBlob* pd3dErrorBlob = NULL;
+	auto tmp = D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pd3dSignatureBlob, &pd3dErrorBlob);
+	pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&pd3dRootSignature);
+	if (pd3dSignatureBlob) pd3dSignatureBlob->Release();
+	if (pd3dErrorBlob) pd3dErrorBlob->Release();
+
+	return(pd3dRootSignature);
+}
+
+ID3D12RootSignature* CScene::GetComputeRootSignature()
+{
+	return m_pd3dComputeRootSignature;
+}
+
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nRenderMode)
 {
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
@@ -191,6 +235,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	if (nRenderMode & RENDER_PARTICLE && m_pParticleObject)
 		m_pParticleObject->Render(pd3dCommandList);
+}
+
+void CScene::Dispatch(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pPostProcessingShader->Dispatch(pd3dCommandList);
 }
 
 float CScene::RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList)

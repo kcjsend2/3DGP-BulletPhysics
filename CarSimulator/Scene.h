@@ -18,11 +18,12 @@ public:
 	//씬에서 마우스와 키보드 메시지를 처리한다.
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap);
+	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, btAlignedObjectArray<btCollisionShape*>& btCollisionShapes, btDiscreteDynamicsWorld* pbtDynamicsWorld, ComPtr<ID3D12DescriptorHeap> pd3dSrvDescriptorHeap, ComPtr<ID3D12DescriptorHeap> pd3dUavDescriptorHeap);
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld, std::shared_ptr<CVehiclePlayer> pPlayer);
 	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nRenderMode);
+	void Dispatch(ID3D12GraphicsCommandList* pd3dCommandList);
 	float RenderStencilMirror(ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderMirror(ID3D12GraphicsCommandList* pd3dCommandList);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
@@ -31,7 +32,10 @@ public:
 	void ReleaseParticle();
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice);
-	ID3D12RootSignature *GetGraphicsRootSignature();
+	ID3D12RootSignature* GetGraphicsRootSignature();
+	ID3D12RootSignature* CreateComputeRootSignature(ID3D12Device* pd3dDevice);
+	ID3D12RootSignature* GetComputeRootSignature();
+	std::shared_ptr<CTexture> GetTexture() { return m_pTexture; }
 
 protected:
 	//배치(Batch) 처리를 하기 위하여 씬을 셰이더들의 리스트로 표현한다.
@@ -44,9 +48,13 @@ protected:
 	CRoomShader* m_pRoomShader = NULL;
 	CParticleShader* m_pParticleShader = NULL;
 
+	std::shared_ptr<CTexture> m_pTexture = NULL;
+	CPostProcessingShader* m_pPostProcessingShader = NULL;
+
 	std::shared_ptr<CParticleObject> m_pParticleObject = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
+	ID3D12RootSignature* m_pd3dComputeRootSignature = NULL;
 
 
 protected:
