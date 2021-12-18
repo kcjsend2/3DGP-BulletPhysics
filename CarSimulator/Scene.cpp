@@ -137,7 +137,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 0, 0);
 	m_pTexture->CreateTexture(pd3dDevice, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, NULL, RESOURCE_TEXTURE2D, 0);
 	m_pPostProcessingShader = new CPostProcessingShader;
-	m_pPostProcessingShader->CreateShader(pd3dDevice, m_pd3dComputeRootSignature, (UINT)(FRAME_BUFFER_WIDTH / 32.0f + 0.5f), (UINT)(FRAME_BUFFER_HEIGHT / 32.0f + 0.5f), 1);
+	m_pPostProcessingShader->CreateShader(pd3dDevice, m_pd3dComputeRootSignature, (UINT)(FRAME_BUFFER_WIDTH / 32.0f + 0.5f), (UINT)(FRAME_BUFFER_HEIGHT / 30.0f + 0.5f), 1);
 	m_pPostProcessingShader->BuildObjects(pd3dUavDescriptorHeap);
 	m_pPostProcessingShader->CreateUnorderedAccessView(pd3dDevice, m_pTexture, 0, 0);
 }

@@ -10,7 +10,7 @@ static float3 gf3ToLuminance = float3(0.3f, 0.59f, 0.11f);
 #define _WITH_SOBEL_EDGE
 
 #ifdef _WITH_GROUPSHARED_MEMORY
-groupshared float4 gf4GroupSharedCache[32 + 2][32 + 2];
+groupshared float4 gf4GroupSharedCache[32 + 2][30 + 2];
 
 //////////////////////////////////////////////////////////////////////////////////
 // Sobel Edge Detection
@@ -87,7 +87,7 @@ void LaplacianEdge(int3 n3DispatchThreadID : SV_DispatchThreadID)
 }
 #endif
 
-[numthreads(32, 32, 1)]
+[numthreads(32, 30, 1)]
 void CSEdgeDetection(int3 n3GroupThreadID : SV_GroupThreadID, int3 n3DispatchThreadID : SV_DispatchThreadID)
 {
 #ifdef _WITH_GROUPSHARED_MEMORY
@@ -96,18 +96,18 @@ void CSEdgeDetection(int3 n3GroupThreadID : SV_GroupThreadID, int3 n3DispatchThr
         gf4GroupSharedCache[0][0] = gtxtRWOutput[int2(n3DispatchThreadID.x - 1, n3DispatchThreadID.y - 1)];
     else if ((n3GroupThreadID.x == 31) && (n3GroupThreadID.y == 0))
         gf4GroupSharedCache[33][0] = gtxtRWOutput[int2(n3DispatchThreadID.x + 1, n3DispatchThreadID.y - 1)];
-    else if ((n3GroupThreadID.x == 0) && (n3GroupThreadID.y == 31))
-        gf4GroupSharedCache[0][33] = gtxtRWOutput[int2(n3DispatchThreadID.x - 1, n3DispatchThreadID.y + 1)];
-    else if ((n3GroupThreadID.x == 31) && (n3GroupThreadID.y == 31))
-        gf4GroupSharedCache[33][33] = gtxtRWOutput[int2(n3DispatchThreadID.x + 1, n3DispatchThreadID.y + 1)];
+    else if ((n3GroupThreadID.x == 0) && (n3GroupThreadID.y == 29))
+        gf4GroupSharedCache[0][31] = gtxtRWOutput[int2(n3DispatchThreadID.x - 1, n3DispatchThreadID.y + 1)];
+    else if ((n3GroupThreadID.x == 31) && (n3GroupThreadID.y == 29))
+        gf4GroupSharedCache[33][31] = gtxtRWOutput[int2(n3DispatchThreadID.x + 1, n3DispatchThreadID.y + 1)];
     if (n3GroupThreadID.x == 0)
         gf4GroupSharedCache[0][n3GroupThreadID.y + 1] = gtxtRWOutput[int2(n3DispatchThreadID.x - 1, n3DispatchThreadID.y)];
     if (n3GroupThreadID.y == 0)
         gf4GroupSharedCache[n3GroupThreadID.x + 1][0] = gtxtRWOutput[int2(n3DispatchThreadID.x, n3DispatchThreadID.y - 1)];
     if (n3GroupThreadID.x == 31)
         gf4GroupSharedCache[33][n3GroupThreadID.y + 1] = gtxtRWOutput[int2(n3DispatchThreadID.x + 1, n3DispatchThreadID.y)];
-    if (n3GroupThreadID.y == 31)
-        gf4GroupSharedCache[n3GroupThreadID.x + 1][33] = gtxtRWOutput[int2(n3DispatchThreadID.x, n3DispatchThreadID.y + 1)];
+    if (n3GroupThreadID.y == 29)
+        gf4GroupSharedCache[n3GroupThreadID.x + 1][31] = gtxtRWOutput[int2(n3DispatchThreadID.x, n3DispatchThreadID.y + 1)];
 
     GroupMemoryBarrierWithGroupSync();
 
