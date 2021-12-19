@@ -247,7 +247,7 @@ void CGameFramework::BuildDescriptorHeaps()
 		hCpuDsv.ptr += m_nDsvDescriptorIncrementSize;
 	}
 
-	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.NumDescriptors = 2;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dUavDescriptorHeap));
@@ -589,6 +589,10 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->SetDescriptorHeaps(_countof(UavdescriptorHeaps), UavdescriptorHeaps);
 	m_pd3dCommandList->SetComputeRootDescriptorTable(0, m_pd3dUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
+	D3D12_GPU_DESCRIPTOR_HANDLE hnd = m_pd3dUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	hnd.ptr += m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	m_pd3dCommandList->SetComputeRootDescriptorTable(1, hnd);
+
 	m_pd3dCommandList->CopyResource(m_pScene->GetTexture()->GetResource(0), m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get());
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(0), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 	
@@ -596,12 +600,13 @@ void CGameFramework::FrameAdvance()
 	m_pScene->Dispatch(m_pd3dCommandList.Get());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST));
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(0), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(1), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
 
-	m_pd3dCommandList->CopyResource(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), m_pScene->GetTexture()->GetResource(0));
+	m_pd3dCommandList->CopyResource(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), m_pScene->GetTexture()->GetResource(1));
 
-	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(0), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST));
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(1), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(0), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	hResult = m_pd3dCommandList->Close();
