@@ -117,7 +117,7 @@ void GSParticleDraw(point VS_PARTICLE_INPUT input[1], inout TriangleStream<GS_PA
     output.type = input[0].type;
     for (int i = 0; i < 4; i++)
     {
-        output.position = mul(pVertices[i], gmtxViewProj);
+        output.position = mul(mul(pVertices[i], gmtxView), gmtxProj);
         output.uv = gf2QuadUVs[i];
 
         outputStream.Append(output);

@@ -320,6 +320,10 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
+void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CB_BLUR blurInfo)
+{
+}
+
 void CGameObject::ShadowPassRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender();
@@ -689,7 +693,7 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	OnPrepareRender();
 	for (int i = 0; i < m_vpMeshes.size(); i++)
 	{
-		pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &i, 2);
+		pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &i, 21);
 		if (m_vpMeshes[i]) m_vpMeshes[i]->Render(pd3dCommandList);
 	}
 }

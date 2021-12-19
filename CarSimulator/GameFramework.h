@@ -82,6 +82,8 @@ private:
 
 	std::default_random_engine dre;
 	std::uniform_real_distribution<float> urd{ -5.0f, 5.0f };
+
+	CTexture* m_pVelocityMap = NULL;
 public:
 	CCamera* m_pCamera = NULL;
 
@@ -103,6 +105,7 @@ public:
 	void CreateSwapChain();
 	void CreateRtvAndDsvDescriptorHeaps();
 	void BuildDescriptorHeaps();
+	void CreateVelocityMap();
 	void CreateDirect3DDevice();
 	void CreateCommandQueueAndList();
 	//스왑 체인, 디바이스, 서술자 힙, 명령 큐/할당자/리스트를 생성하는 함수이다.

@@ -45,7 +45,6 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
 
-
 	CreateDirect3DDevice();
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
@@ -253,6 +252,34 @@ void CGameFramework::BuildDescriptorHeaps()
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dUavDescriptorHeap));
 }
 
+void CGameFramework::CreateVelocityMap()
+{
+	m_pVelocityMap = new CTexture(1, RESOURCE_TEXTURE2D, 0, 0, 1);
+	m_pVelocityMap->CreateTexture(m_pd3dDevice.Get(), FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_RENDER_TARGET, NULL, RESOURCE_TEXTURE2D, 0);
+
+	UINT nUavDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	auto srvCpuStart = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	srvCpuStart.ptr += (nUavDescriptorIncrementSize * 21);
+
+	auto srvGpuStart = m_pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	srvGpuStart.ptr += (nUavDescriptorIncrementSize * 21);
+
+	int nTextures = m_pVelocityMap->GetTextures();
+	for (int i = 0; i < nTextures; i++)
+	{
+		ID3D12Resource* pShaderResource = m_pVelocityMap->GetResource(i);
+		D3D12_UNORDERED_ACCESS_VIEW_DESC d3dUnorderedAccessViewDesc = m_pVelocityMap->GetUnorderedAccessViewDesc(i);
+		m_pd3dDevice->CreateUnorderedAccessView(pShaderResource, NULL, &d3dUnorderedAccessViewDesc, srvCpuStart);
+		srvCpuStart.ptr += nUavDescriptorIncrementSize;
+		m_pVelocityMap->SetUavGpuDescriptorHandle(i, srvGpuStart);
+		srvGpuStart.ptr += nUavDescriptorIncrementSize;
+	}
+	int nRootParameters = m_pVelocityMap->GetComputeUavRootParameters();
+	for (int i = 0; i < nRootParameters; i++) m_pVelocityMap->SetComputeUavRootParameterIndex(i, 6 + i, i);
+
+}
+
 //½º¿ÒÃ¼ÀÎÀÇ °¢ ÈÄ¸é ¹öÆÛ¿¡ ´ëÇÑ ·»´õ Å¸°Ù ºä¸¦ »ý¼ºÇÑ´Ù.
 void CGameFramework::CreateRenderTargetViews()
 {
@@ -313,7 +340,9 @@ void CGameFramework::BuildObjects()
 
 	if (m_pScene)
 		m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_btCollisionShapes, m_pbtDynamicsWorld.get(), m_pd3dSrvDescriptorHeap, m_pd3dUavDescriptorHeap);
-	
+
+	CreateVelocityMap();
+
 	CShadowShader* pShadowShader = new CShadowShader();
 	pShadowShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
 	for (int i = 0; i < 3; ++i)
@@ -504,10 +533,10 @@ void CGameFramework::FrameAdvance()
 	Update();
 	
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
-	m_pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &fTimeElapsed, 3);
+	m_pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &fTimeElapsed, 22);
 
 	XMFLOAT3 xmf3Velocity = { urd(dre), 5.0f, urd(dre) };
-	m_pd3dCommandList->SetGraphicsRoot32BitConstants(8, 3, &xmf3Velocity, 0);
+	m_pd3dCommandList->SetGraphicsRoot32BitConstants(7, 3, &xmf3Velocity, 0);
 
 	// ½¦µµ¿ì ¸Ê ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -547,19 +576,24 @@ void CGameFramework::FrameAdvance()
 
 	// ·»´õÅ¸°Ù ·»´õ
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	m_pd3dCommandList->SetGraphicsRootDescriptorTable(7, m_pShadowMap[0]->GetSrv());
+	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
 
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dVelocityMapHandle = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	d3dVelocityMapHandle.ptr += 21 * m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRenderTargets[2] = { d3dRtvCPUDescriptorHandle, d3dVelocityMapHandle };
+
 	float pfClearColor[4] = { 0.0f, 0.8f, 0.9f, 1.0f };
 
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
+	m_pd3dCommandList->OMSetRenderTargets(2, d3dRenderTargets, TRUE, &d3dDsvCPUDescriptorHandle);
 
 	m_pd3dCommandList->OMSetStencilRef(1);
 
@@ -576,7 +610,7 @@ void CGameFramework::FrameAdvance()
 
 	if (m_pPlayer)
 	{
-		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
+		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera); //
 	}
 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN | RENDER_ROOM | RENDER_PARTICLE);

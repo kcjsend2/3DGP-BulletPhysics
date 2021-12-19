@@ -768,7 +768,7 @@ CCubeMappingPlayer::CCubeMappingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	D3D12_CLEAR_VALUE d3dRtvClearValue = { DXGI_FORMAT_R8G8B8A8_UNORM, { 0.0f, 0.0f, 0.0f, 1.0f } };
 	ID3D12Resource* pd3dResource = m_pTexture->CreateTexture(pd3dDevice, nCubeMapSize, nCubeMapSize, 6, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ, &d3dRtvClearValue, RESOURCE_TEXTURE_CUBE, 0);
 
-	pShader->CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 8);
+	pShader->CreateShaderResourceViews(pd3dDevice, m_pTexture, 19, 6);
 
 	D3D12_RENDER_TARGET_VIEW_DESC d3dRTVDesc;
 	d3dRTVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -794,7 +794,7 @@ void CCubeMappingPlayer::OnPreRender(ComPtr<ID3D12GraphicsCommandList> pd3dComma
 {
 	pd3dCommandList->SetDescriptorHeaps(nDescriptorHeaps, pDescriptorHeaps);
 	pd3dCommandList->SetGraphicsRootSignature(pScene->GetGraphicsRootSignature());
-	pd3dCommandList->SetGraphicsRootDescriptorTable(7, hDescriptorStart);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(6, hDescriptorStart);
 
 	static XMFLOAT3 pxmf3LookAts[6] = { XMFLOAT3(+100.0f, 0.0f, 0.0f), XMFLOAT3(-100.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, +100.0f, 0.0f), XMFLOAT3(0.0f, -100.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, +100.0f), XMFLOAT3(0.0f, 0.0f, -100.0f) };
 	static XMFLOAT3 pxmf3Ups[6] = { XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, +1.0f), XMFLOAT3(0.0f, +1.0f, 0.0f), XMFLOAT3(0.0f, +1.0f, 0.0f) };

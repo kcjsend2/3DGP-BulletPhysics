@@ -70,7 +70,7 @@ void GS_BillBoard(point GS_BILLBOARD_INPUT input[1], uint p_id : SV_PrimitiveID,
     for (int i = 0; i < 4; i++)
     {
         vertex[i].y += h_height;
-        output.position = mul(vertex[i], gmtxViewProj);
+        output.position = mul(mul(vertex[i], gmtxView), gmtxProj);
         output.uv = uv[i];
         output.p_id = p_id;
         

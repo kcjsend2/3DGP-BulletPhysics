@@ -50,7 +50,7 @@ protected:
 
 	std::shared_ptr<CTexture> m_pTexture = NULL;
 	CPostProcessingShader* m_pPostProcessingShader = NULL;
-
+	UploadBuffer<CB_BLUR>* m_ubBlurCB;
 	std::shared_ptr<CParticleObject> m_pParticleObject = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;

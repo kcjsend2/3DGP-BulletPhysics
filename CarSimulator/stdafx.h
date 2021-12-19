@@ -71,6 +71,12 @@ inline bool IsEqual(float fA, float fB) { return(::IsZero(fA - fB)); }
 inline float InverseSqrt(float fValue) { return 1.0f / sqrtf(fValue); }
 inline void Swap(float* pfS, float* pfT) { float fTemp = *pfS; *pfS = *pfT; *pfT = fTemp; }
 
+struct CB_BLUR
+{
+	XMFLOAT4X4 m_xmf4x4OldView;
+	XMFLOAT4X4 m_xmf4x4View;
+};
+
 //3차원 벡터의 연산 
 namespace Vector3
 {

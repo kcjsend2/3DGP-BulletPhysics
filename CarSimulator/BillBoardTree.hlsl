@@ -64,7 +64,7 @@ void GS_BillBoard(point GS_BILLBOARD_INPUT input[1], uint p_id : SV_PrimitiveID,
     for (int i = 0; i < 4; i++)
     {
         vertex[i].y += h_height;
-        output.position = mul(vertex[i], gmtxViewProj);
+        output.position = mul(mul(vertex[i], gmtxView), gmtxProj);
         output.uv = uv[i];
         output.p_id = p_id;
         
@@ -81,10 +81,12 @@ void GS_BillBoard(point GS_BILLBOARD_INPUT input[1], uint p_id : SV_PrimitiveID,
 
 float4 PS_BillBoard(GS_BILLBOARD_OUTPUT input) : SV_TARGET
 {
+    PS_OUTPUT output;
+
     float3 uvw = float3(input.uv, int(input.p_id % 4));
     float4 cColor = gtxtTreeBillBoard[input.textureIndex].Sample(gsamLinearClamp, uvw);
     
     clip(cColor.a - 0.5f);
-    
-    return cColor;
+
+    return (cColor);
 }

@@ -16,7 +16,7 @@ VS_TEXTURED_OUTPUT VS_SkyBox(VS_TEXTURED_INPUT input)
 {
     VS_TEXTURED_OUTPUT output;
     
-    output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
+    output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxView), gmtxProj);
     
     output.uv = input.uv;
 

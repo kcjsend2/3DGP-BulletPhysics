@@ -49,6 +49,8 @@ protected:
 	XMFLOAT4X4 m_xmf4x4View;
 	XMFLOAT4X4 m_xmf4x4Projection;
 
+	XMFLOAT4X4 m_xmf4x4PrevView;
+
 	D3D12_VIEWPORT m_d3dViewport;
 	D3D12_RECT m_d3dScissorRect;
 
@@ -100,8 +102,7 @@ public:
 
 	void SetLookAtPosition(XMFLOAT3 xmf3LookAtWorld)
 	{
-		m_xmf3LookAtWorld =
-			xmf3LookAtWorld;
+		m_xmf3LookAtWorld = xmf3LookAtWorld;
 	}
 
 	XMFLOAT3& GetLookAtPosition() { return(m_xmf3LookAtWorld); }
@@ -114,8 +115,10 @@ public:
 	void SetOffset(XMFLOAT3 xmf3Offset) { m_xmf3Offset = xmf3Offset; }
 	XMFLOAT3& GetOffset() { return(m_xmf3Offset); }
 	void SetTimeLag(float fTimeLag) { m_fTimeLag = fTimeLag; }
-	float GetTimeLag() { return(m_fTimeLag); }XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
+	float GetTimeLag() { return(m_fTimeLag); }
+	XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
 	XMFLOAT4X4 GetProjectionMatrix() { return(m_xmf4x4Projection); }
+	XMFLOAT4X4 GetPrevViewMatrix() { return m_xmf4x4PrevView; }
 	D3D12_VIEWPORT GetViewport() { return(m_d3dViewport); }
 	D3D12_RECT GetScissorRect() { return(m_d3dScissorRect); }
 

@@ -41,6 +41,8 @@ struct DS_TERRAIN_TESSELLATION_OUTPUT
     float2 uv0 : TEXCOORD0;
     float2 uv1 : TEXCOORD1;
     float4 tessellation : TEXCOORD2;
+    float4 velocityPosition :VELOCITY;
+    float4 direction : DIRECTION;
 };
 
 
@@ -53,7 +55,7 @@ VS_Terrain_OUTPUT VS_Terrain(VS_Terrain_INPUT input)
     output.uv0 = input.uv0;
     output.uv1 = input.uv1;
     
-    float4 position_wvp = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
+    float4 position_wvp = mul(mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxView), gmtxProj);
     
     return (output);
 }
@@ -147,17 +149,35 @@ DS_TERRAIN_TESSELLATION_OUTPUT DSTerrainTessellation(HS_TERRAIN_TESSELLATION_CON
 
     float3 position = CubicBezierSum5x5(patch, uB, vB);
     output.position_w = mul(float4(position, 1.0f), gmtxWorld);
-    output.position = mul(output.position_w, gmtxViewProj);
+    output.position = mul(mul(output.position_w, gmtxView), gmtxProj);
     output.tessellation = float4(patchConstant.fTessEdges[0], patchConstant.fTessEdges[1], patchConstant.fTessEdges[2], patchConstant.fTessEdges[3]);
     
     output.normal = lerp(lerp(patch[0].normal, patch[4].normal, uv.x), lerp(patch[20].normal, patch[24].normal, uv.x), uv.y);
-    
+
+    float4 fOldPos = mul(mul(mul(float4(position, 1.0f), gmtxWorld), gmtxOldView), gmtxProj);
+
+    float3 fDir = output.position.xyz - fOldPos.xyz;
+
+    float a = dot(normalize(fDir), normalize(mul(float4(output.normal, 0.0f), gmtxView).xyz));
+
+    if (a < 0.5f)
+        output.velocityPosition = fOldPos;
+    else
+        output.velocityPosition = output.position;
+
+    float2 velocity = (output.position.xy / output.position.w) - (fOldPos.xy / fOldPos.w);
+    output.direction.xy = velocity * 0.5f;
+    output.direction.y *= -1.0f;
+    output.direction.z = output.velocityPosition.z;
+    output.direction.w = output.velocityPosition.w;
+
     return (output);
 }
 
 
-float4 PS_Terrain(DS_TERRAIN_TESSELLATION_OUTPUT input) : SV_TARGET
+PS_OUTPUT PS_Terrain(DS_TERRAIN_TESSELLATION_OUTPUT input)
 {
+    PS_OUTPUT output;
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 debugColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     int cascadedIndex = 2;
@@ -218,6 +238,12 @@ float4 PS_Terrain(DS_TERRAIN_TESSELLATION_OUTPUT input) : SV_TARGET
     {
         cColor *= saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
     }
-    
-    return (cColor);
+
+    output.color = cColor;
+
+    output.VelocityMap.xy = input.direction.xy;
+    output.VelocityMap.z = 1.0f;
+    output.VelocityMap.w = input.direction.z / input.direction.w;
+
+    return (output);
 }

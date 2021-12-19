@@ -16,7 +16,7 @@ VS_TEXTURED_OUTPUT VS_Mirror(VS_TEXTURED_INPUT input)
 {
     VS_TEXTURED_OUTPUT output;
 
-    output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
+    output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxView), gmtxProj);
 
     output.uv = input.uv;
 
@@ -26,7 +26,7 @@ VS_TEXTURED_OUTPUT VS_Mirror(VS_TEXTURED_INPUT input)
 
 float4 PS_Mirror(VS_TEXTURED_OUTPUT input) : SV_TARGET
 {
-    float4 cColor = gtxtMirror.Sample(gsamLinearClamp, input.uv);
+    float4 cColor = float4(0.0f, 0.5f, 0.0f, 0.0f);
 
     cColor.a = 0.6f;
 

@@ -4,6 +4,7 @@
 
 CCamera::CCamera()
 {
+	m_xmf4x4PrevView = Matrix4x4::Identity();
 	m_xmf4x4View = Matrix4x4::Identity();
 	m_xmf4x4Projection = Matrix4x4::Identity();
 	m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
@@ -91,6 +92,7 @@ void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMF
 void CCamera::GenerateViewMatrix()
 {
 	m_xmf4x4View = Matrix4x4::LookAtLH(m_xmf3Position, m_xmf3LookAtWorld, m_xmf3Up);
+	m_xmf4x4PrevView = m_xmf4x4View;
 }
 
 void CCamera::RegenerateViewMatrix()
@@ -104,6 +106,8 @@ void CCamera::RegenerateViewMatrix()
 
 	//카메라의 z-축과 x-축에 수직인 벡터를 y-축으로 설정한다.
 	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+	m_xmf4x4PrevView = m_xmf4x4View;
 
 	m_xmf4x4View._11 = m_xmf3Right.x; m_xmf4x4View._12 = m_xmf3Up.x; m_xmf4x4View._13 = m_xmf3Look.x;
 	m_xmf4x4View._21 = m_xmf3Right.y; m_xmf4x4View._22 = m_xmf3Up.y; m_xmf4x4View._23 = m_xmf3Look.y;
@@ -150,7 +154,7 @@ void CCamera::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 	XMFLOAT4X4 xmf4x4ViewProj;
 	XMStoreFloat4x4(&xmf4x4ViewProj, XMLoadFloat4x4(&Matrix4x4::Multiply((XMFLOAT4X4&)xmf4x4Projection, (XMFLOAT4X4&)xmf4x4View)));
 
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4ViewProj, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4View, 0);
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 3, &m_xmf3Position, 16);
 }
 

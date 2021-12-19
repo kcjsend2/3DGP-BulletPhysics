@@ -13,23 +13,43 @@ struct VS_INSTANCING_OUTPUT
     float3 position_w : POSITION;
     float3 normal : NORMAL;
     float2 uv : TEXCOORD;
+    float4 velocityPosition : VELOCITY;
+    float4 direction : DIRECTION;
     int InstanceID : SV_InstanceID;
 };
 
 VS_INSTANCING_OUTPUT VS_Instancing(VS_INSTANCING_INPUT input, uint InstanceID : SV_InstanceID)
 {
     VS_INSTANCING_OUTPUT output;
-    output.position = mul(mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject), gmtxViewProj);
+    output.position = mul(mul(mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject), gmtxView), gmtxProj);
     output.position_w = mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gGameObjectInfos[InstanceID].m_mtxGameObject).xyz);
     output.uv = input.uv;
     output.InstanceID = InstanceID;
     
+    float4 fOldPos = mul(mul(mul(float4(input.position, 1.0f), gGameObjectInfos[InstanceID].m_mtxGameObject), gmtxOldView), gmtxProj);
+
+    float3 fDir = output.position.xyz - fOldPos.xyz;
+
+    float a = dot(normalize(fDir), normalize(mul(float4(output.normal, 0.0f), gmtxView).xyz));
+
+    if (a < 0.5f)
+        output.velocityPosition = fOldPos;
+    else
+        output.velocityPosition = output.position;
+
+    float2 velocity = (output.position.xy / output.position.w) - (fOldPos.xy / fOldPos.w);
+    output.direction.xy = velocity * 0.5f;
+    output.direction.y *= -1.0f;
+    output.direction.z = output.velocityPosition.z;
+    output.direction.w = output.velocityPosition.w;
+
     return (output);
 }
 
-float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
+PS_OUTPUT PS_Instancing(VS_INSTANCING_OUTPUT input)
 {
+    PS_OUTPUT output;
     float4 cColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
     
@@ -68,5 +88,11 @@ float4 PS_Instancing(VS_INSTANCING_OUTPUT input) : SV_TARGET
     cColor.a = material.DiffuseAlbedo.a;
     cColor *= gTextureMaps[gGameObjectInfos[input.InstanceID].m_nTextrueIndex].Sample(gsamLinearWrap, input.uv);
     
-    return (cColor);
+    output.color = cColor;
+
+    output.VelocityMap.xy = input.direction.xy;
+    output.VelocityMap.z = 1.0f;
+    output.VelocityMap.w = input.direction.z / input.direction.w;
+
+    return (output);
 }

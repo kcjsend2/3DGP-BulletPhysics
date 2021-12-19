@@ -42,7 +42,7 @@ VS_Terrain_OUTPUT VS_Terrain(VS_Terrain_INPUT input)
     output.position_w = mul(float4(input.position, 1.0f), gmtxWorld).xyz;
     output.normal = normalize(mul(float4(input.normal, 0.0f), gmtxWorld).xyz);
     
-    float4 position_wvp = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj);
+    float4 position_wvp = mul(mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxView), gmtxProj);
     
     return (output);
 }

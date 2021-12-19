@@ -16,7 +16,7 @@ struct VS_DEFAULT_OUTPUT
 VS_DEFAULT_OUTPUT VS_Default(VS_DEFAULT_INPUT input)
 {
     VS_DEFAULT_OUTPUT output;
-    output.position = mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxViewProj /*gmtxLightViewProj*/);
+    output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxWorld), gmtxView), gmtxProj);
     
     return (output);
 }

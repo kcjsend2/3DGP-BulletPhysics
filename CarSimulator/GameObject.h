@@ -160,6 +160,7 @@ public:
 	virtual void Update(float fTimeElapsed, btDiscreteDynamicsWorld* pbtDynamicsWorld);
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CB_BLUR blurInfo);
 	virtual void ShadowPassRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nInstances);
 	virtual btRigidBody* GetRigidBody() { return m_pbtRigidBody; }
@@ -184,7 +185,6 @@ public:
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
 	XMFLOAT4X4 GetWorldTransformMatrix() { return m_xmf4x4World; }
-
 	//게임 객체의 위치를 설정한다.
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);

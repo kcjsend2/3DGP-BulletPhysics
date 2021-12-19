@@ -92,6 +92,8 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 	m_pd3dComputeRootSignature = CreateComputeRootSignature(pd3dDevice);
 
+	m_ubBlurCB = new UploadBuffer<CB_BLUR>(pd3dDevice, 1, true);
+
 	m_pLightShader = new CLightsShader;
 
 	m_pLightShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
@@ -226,6 +228,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
+	CB_BLUR cbBlur;
+	cbBlur.m_xmf4x4OldView = pCamera->GetPrevViewMatrix();
+	cbBlur.m_xmf4x4View = pCamera->GetViewMatrix();
+	m_ubBlurCB->CopyData(0, cbBlur);
+	pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_ubBlurCB->Resource()->GetGPUVirtualAddress());
+
 	if(nRenderMode & RENDER_SKYBOX)
 		m_pSkyboxShader->Render(pd3dCommandList, pCamera);
 
@@ -342,20 +350,19 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> CScene::GetStaticSamplers()
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
-	CD3DX12_ROOT_PARAMETER pd3dRootParameters[9];
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[8];
 
 	//32비트 루트 상수
 	pd3dRootParameters[0].InitAsConstants(28, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[1].InitAsConstants(19, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	pd3dRootParameters[2].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[1].InitAsConstants(23, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	//UploadBuffer 클래스를 이용하여 업로드
+	pd3dRootParameters[2].InitAsConstantBufferView(2);
 	pd3dRootParameters[3].InitAsConstantBufferView(3);
-	pd3dRootParameters[4].InitAsConstantBufferView(4);
 
 	//구조화 된 버퍼, stdafx.h의 CreateBufferResource 함수 이용해 업로드
-	pd3dRootParameters[5].InitAsShaderResourceView(0, 1);
-	pd3dRootParameters[6].InitAsShaderResourceView(1, 1);
+	pd3dRootParameters[4].InitAsShaderResourceView(0, 1);
+	pd3dRootParameters[5].InitAsShaderResourceView(1, 1);
 
 	CD3DX12_DESCRIPTOR_RANGE shadowMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 3개, 0 ~ 2
 	CD3DX12_DESCRIPTOR_RANGE texRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 3, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 4개, 3 ~ 6
@@ -364,22 +371,15 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	CD3DX12_DESCRIPTOR_RANGE TreeBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 16, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 2개, 16 ~ 17
 	CD3DX12_DESCRIPTOR_RANGE AnimatedBillboardRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 18, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 18
 	CD3DX12_DESCRIPTOR_RANGE CubeMapRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 19, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 19
-	CD3DX12_DESCRIPTOR_RANGE MirrorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 20, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 20
-	CD3DX12_DESCRIPTOR_RANGE ParticleRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 21, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 21
+	CD3DX12_DESCRIPTOR_RANGE ParticleRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 20, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND); // 1개, 20
 
-	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[9] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, MirrorRange, ParticleRange };
+	CD3DX12_DESCRIPTOR_RANGE descriptorRanges[8] = { shadowMapRange, texRange, TerrainRange, SkyboxRange, TreeBillboardRange, AnimatedBillboardRange, CubeMapRange, ParticleRange };
 
-	pd3dRootParameters[7].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
+	pd3dRootParameters[6].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
 
-	pd3dRootParameters[8].InitAsConstants(3, 5, 0, D3D12_SHADER_VISIBILITY_ALL);
-	////디스크립터 테이블 이용하여 업로드
-	//pd3dRootParameters[7].InitAsDescriptorTable(1, &shadowMapRange); //쉐도우 맵
-	//pd3dRootParameters[8].InitAsDescriptorTable(1, &texRange); //텍스쳐 배열
-	//pd3dRootParameters[9].InitAsDescriptorTable(1, &TerrainRange); // 베이스 텍스쳐 + 디테일 텍스쳐
-	//pd3dRootParameters[10].InitAsDescriptorTable(1, &SkyboxRange); // 스카이박스 텍스쳐
-	//pd3dRootParameters[11].InitAsDescriptorTable(1, &TreeBillboardRange); // 빌보드 텍스쳐
-	//pd3dRootParameters[12].InitAsDescriptorTable(1, &AnimatedBillboardRange); // 애니메이션 빌보드 텍스쳐
-	//pd3dRootParameters[13].InitAsDescriptorTable(1, &CubeMapRange); // 큐브 맵 텍스쳐
+	
+	pd3dRootParameters[7].InitAsConstants(3, 4, 0, D3D12_SHADER_VISIBILITY_ALL);
+
 
 	auto staticSamplers = GetStaticSamplers();
 

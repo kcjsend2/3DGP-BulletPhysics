@@ -1,28 +1,25 @@
 #include "LightUtil.hlsli"
 
 //카메라의 정보를 위한 상수 버퍼를 선언한다.
-cbuffer cbCameraInfo : register(b1)
-{
-    matrix gmtxViewProj : packoffset(c0);
-    float3 cameraPos : packoffset(c4);
-};
 
-cbuffer cbCommonInfo : register(b2)
+cbuffer cbCommonInfo : register(b1)
 {
-    int nLights : packoffset(c0.x);
-    int nShadowIndex : packoffset(c0.y);
-    int nSkyboxTextureIndex : packoffset(c0.z);
-    float fTimeElapsed : packoffset(c0.w);
+    matrix gmtxProj : packoffset(c0);
+    float3 cameraPos : packoffset(c4);
+    int nLights : packoffset(c8.x);
+    int nShadowIndex : packoffset(c8.y);
+    int nSkyboxTextureIndex : packoffset(c8.z);
+    float fTimeElapsed : packoffset(c8.w);
 }
 
-cbuffer cbShadowInfo : register(b3)
+cbuffer cbShadowInfo : register(b2)
 {
     matrix gmtxShadowTransform[3];
     matrix gmtxLightViewProj[3];
     float3 ShadowCameraPos;
 }
 
-cbuffer cbAnimatedBillBoardInfo : register(b4)
+cbuffer cbAnimatedBillBoardInfo : register(b3)
 {
     int nx : packoffset(c0.x);
     int ny : packoffset(c0.y);
@@ -30,10 +27,22 @@ cbuffer cbAnimatedBillBoardInfo : register(b4)
     int nyDivided : packoffset(c0.w);
 }
 
-cbuffer cbCommonInfo : register(b5)
+cbuffer cbParticleInfo : register(b4)
 {
     float3 fRandomVelocity : packoffset(c0);
 }
+
+cbuffer cbMotionBlurInfo : register(b2)
+{
+    matrix gmtxOldView;
+    matrix gmtxView;
+}
+
+struct PS_OUTPUT
+{
+    float4 color : SV_TARGET0;
+    float4 VelocityMap : SV_TARGET1;
+};
 
 Texture2D gShadowMap[3] : register(t0);
 Texture2D gTextureMaps[4] : register(t3);
@@ -42,8 +51,7 @@ Texture2D gtxtSkybox[6] : register(t10);
 Texture2DArray gtxtTreeBillBoard[2] : register(t16);
 Texture2D gtxtExplosionBillBoard : register(t18);
 TextureCube gtxtCubeMap : register(t19);
-Texture2D gtxtMirror : register(t20);
-Texture2D gtxtParticle : register(t21);
+Texture2D gtxtParticle : register(t20);
 
 struct INSTANCED_GAMEOBJECT_INFO
 {
