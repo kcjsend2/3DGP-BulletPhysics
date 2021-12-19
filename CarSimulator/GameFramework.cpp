@@ -191,7 +191,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
-	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers;
+	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers + 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
@@ -217,7 +217,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 void CGameFramework::BuildDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 24;
+	srvHeapDesc.NumDescriptors = 23;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	m_pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pd3dSrvDescriptorHeap));
@@ -257,20 +257,20 @@ void CGameFramework::CreateVelocityMap()
 	m_pVelocityMap = new CTexture(1, RESOURCE_TEXTURE2D, 0, 0, 1);
 	m_pVelocityMap->CreateTexture(m_pd3dDevice.Get(), FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_RENDER_TARGET, NULL, RESOURCE_TEXTURE2D, 0);
 
-	UINT nUavDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	UINT nUavDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-	auto srvCpuStart = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	srvCpuStart.ptr += (nUavDescriptorIncrementSize * 21);
+	auto srvCpuStart = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	srvCpuStart.ptr += (nUavDescriptorIncrementSize * 2);
 
-	auto srvGpuStart = m_pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	srvGpuStart.ptr += (nUavDescriptorIncrementSize * 21);
+	auto srvGpuStart = m_pd3dRtvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	srvGpuStart.ptr += (nUavDescriptorIncrementSize * 2);
 
 	int nTextures = m_pVelocityMap->GetTextures();
 	for (int i = 0; i < nTextures; i++)
 	{
 		ID3D12Resource* pShaderResource = m_pVelocityMap->GetResource(i);
 		D3D12_UNORDERED_ACCESS_VIEW_DESC d3dUnorderedAccessViewDesc = m_pVelocityMap->GetUnorderedAccessViewDesc(i);
-		m_pd3dDevice->CreateUnorderedAccessView(pShaderResource, NULL, &d3dUnorderedAccessViewDesc, srvCpuStart);
+		m_pd3dDevice->CreateRenderTargetView(pShaderResource, NULL, srvCpuStart);
 		srvCpuStart.ptr += nUavDescriptorIncrementSize;
 		m_pVelocityMap->SetUavGpuDescriptorHandle(i, srvGpuStart);
 		srvGpuStart.ptr += nUavDescriptorIncrementSize;
@@ -583,8 +583,8 @@ void CGameFramework::FrameAdvance()
 
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dVelocityMapHandle = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	d3dVelocityMapHandle.ptr += 21 * m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dVelocityMapHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	d3dVelocityMapHandle.ptr += 2 * m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRenderTargets[2] = { d3dRtvCPUDescriptorHandle, d3dVelocityMapHandle };
 
@@ -593,7 +593,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-	m_pd3dCommandList->OMSetRenderTargets(2, d3dRenderTargets, TRUE, &d3dDsvCPUDescriptorHandle);
+	m_pd3dCommandList->OMSetRenderTargets(2, d3dRenderTargets, FALSE, &d3dDsvCPUDescriptorHandle);
 
 	m_pd3dCommandList->OMSetStencilRef(1);
 
