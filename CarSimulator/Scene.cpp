@@ -134,7 +134,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pParticleShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 
 
-	m_pTexture = std::make_shared<CTexture>(2, RESOURCE_TEXTURE2D, 0, 0, 0);
+	m_pTexture = std::make_shared<CTexture>(2, RESOURCE_TEXTURE2D, 0, 0, 2, 0);
 	m_pTexture->CreateTexture(pd3dDevice, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST, NULL, RESOURCE_TEXTURE2D, 0);
 	m_pTexture->CreateTexture(pd3dDevice, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, NULL, RESOURCE_TEXTURE2D, 1);
 
@@ -253,6 +253,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 void CScene::Dispatch(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pTexture->UpdateComputeShaderVariables(pd3dCommandList);
 	m_pPostProcessingShader->Dispatch(pd3dCommandList);
 }
 

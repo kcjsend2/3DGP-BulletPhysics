@@ -1864,8 +1864,8 @@ void CComputeShader::CreateUnorderedAccessView(ID3D12Device* pd3dDevice, std::sh
 		m_d3dUavGPUDescriptorHandle.ptr += nUavDescriptorIncrementSize;
 	}
 
-	int nRootParameters = pTexture->GetGraphicsSrvRootParameters();
-	for (int i = 0; i < nRootParameters; i++) pTexture->SetGraphicsSrvRootParameterIndex(i, nRootParameterStartIndex + i, i);
+	int nRootParameters = pTexture->GetComputeUavRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetComputeUavRootParameterIndex(i, nRootParameterStartIndex + i, i);
 }
 
 void CComputeShader::Dispatch(ID3D12GraphicsCommandList* pd3dCommandList)

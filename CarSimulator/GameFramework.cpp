@@ -587,11 +587,6 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->SetComputeRootSignature(m_pScene->GetComputeRootSignature());
 	ID3D12DescriptorHeap* UavdescriptorHeaps[] = { m_pd3dUavDescriptorHeap.Get() };
 	m_pd3dCommandList->SetDescriptorHeaps(_countof(UavdescriptorHeaps), UavdescriptorHeaps);
-	m_pd3dCommandList->SetComputeRootDescriptorTable(0, m_pd3dUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
-	D3D12_GPU_DESCRIPTOR_HANDLE hnd = m_pd3dUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	hnd.ptr += m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	m_pd3dCommandList->SetComputeRootDescriptorTable(1, hnd);
 
 	m_pd3dCommandList->CopyResource(m_pScene->GetTexture()->GetResource(0), m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get());
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(0), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
