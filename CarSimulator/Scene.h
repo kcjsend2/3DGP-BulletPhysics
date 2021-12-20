@@ -2,13 +2,14 @@
 #include "Light.h"
 class CCamera;
 
-#define RENDER_SKYBOX 0b0000001
-#define RENDER_LIGHT 0b0000010
-#define RENDER_TERRAIN 0b0000100
-#define RENDER_INSTANCING_OBJECT 0b0001000
-#define RENDER_BILLBOARD 0b0010000
-#define RENDER_ROOM 0b0100000
-#define RENDER_PARTICLE 0b1000000
+#define RENDER_SKYBOX 0b00000001
+#define RENDER_LIGHT 0b00000010
+#define RENDER_TERRAIN 0b00000100
+#define RENDER_INSTANCING_OBJECT 0b00001000
+#define RENDER_BILLBOARD 0b00010000
+#define RENDER_ROOM 0b00100000
+#define RENDER_PARTICLE 0b01000000
+#define RENDER_INIT 0b10000000
 
 class CScene
 {
@@ -43,7 +44,7 @@ protected:
 	CLightsShader* m_pLightShader = NULL;
 	CSkyBoxShader* m_pSkyboxShader = NULL;
 	CTreeBillBoardShader* m_pBillBoardShader = NULL;
-	CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
+	//CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
 	CMirrorShader* m_pMirrorShader = NULL;
 	CRoomShader* m_pRoomShader = NULL;
 	CParticleShader* m_pParticleShader = NULL;

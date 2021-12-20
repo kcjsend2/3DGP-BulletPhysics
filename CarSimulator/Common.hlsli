@@ -19,12 +19,10 @@ cbuffer cbShadowInfo : register(b2)
     float3 ShadowCameraPos;
 }
 
-cbuffer cbAnimatedBillBoardInfo : register(b3)
+cbuffer cbMotionBlurInfo : register(b3)
 {
-    int nx : packoffset(c0.x);
-    int ny : packoffset(c0.y);
-    int nxDivided : packoffset(c0.z);
-    int nyDivided : packoffset(c0.w);
+    matrix gmtxOldView : packoffset(c0);
+    matrix gmtxView : packoffset(c4);
 }
 
 cbuffer cbParticleInfo : register(b4)
@@ -32,11 +30,6 @@ cbuffer cbParticleInfo : register(b4)
     float3 fRandomVelocity : packoffset(c0);
 }
 
-cbuffer cbMotionBlurInfo : register(b2)
-{
-    matrix gmtxOldView;
-    matrix gmtxView;
-}
 
 struct PS_OUTPUT
 {

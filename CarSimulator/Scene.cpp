@@ -38,7 +38,7 @@ void CScene::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 	m_pInstancingShader->UpdateShaderVariables(pd3dCommandList);
 
 	m_pLightShader->Update(fTimeElapsed, pPlayer->GetPosition());
-	m_pAnimatedBillBoardShader->UpdateShaderVariables(pd3dCommandList, fTimeElapsed);
+	//m_pAnimatedBillBoardShader->UpdateShaderVariables(pd3dCommandList, fTimeElapsed);
 
 	auto pBullet = pPlayer->GetBullet();
 
@@ -66,7 +66,7 @@ void CScene::Update(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 					vpInstancingObjects[1]->SetMesh(i->get()->GetMesh(0));
 				}
 
-				m_pAnimatedBillBoardShader->AddBillBoard(pd3dDevice, pd3dCommandList, i->get()->GetPosition(), 20, 5, 4, std::vector<float>(20, 0.1f));
+				//m_pAnimatedBillBoardShader->AddBillBoard(pd3dDevice, pd3dCommandList, i->get()->GetPosition(), 20, 5, 4, std::vector<float>(20, 0.1f));
 
 				pbtDynamicsWorld->removeRigidBody(i->get()->GetRigidBody());
 				i = vpInstancingObjects.erase(i);
@@ -119,9 +119,9 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pBillBoardShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pBillBoardShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap, m_pTerrain.get());
 
-	m_pAnimatedBillBoardShader = new CAnimatedBillBoardShader;
-	m_pAnimatedBillBoardShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pAnimatedBillBoardShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
+	//m_pAnimatedBillBoardShader = new CAnimatedBillBoardShader;
+	//m_pAnimatedBillBoardShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	//m_pAnimatedBillBoardShader->BuildObjects(pd3dDevice, pd3dCommandList, pd3dSrvDescriptorHeap);
 
 	m_pMirrorShader = new CMirrorShader;
 	m_pMirrorShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
@@ -225,14 +225,26 @@ ID3D12RootSignature* CScene::GetComputeRootSignature()
 
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nRenderMode)
 {
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
-	pCamera->UpdateShaderVariables(pd3dCommandList);
+	if (nRenderMode & RENDER_INIT)
+	{
+		pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+		pCamera->UpdateShaderVariables(pd3dCommandList);
 
-	CB_BLUR cbBlur;
-	cbBlur.m_xmf4x4OldView = pCamera->GetPrevViewMatrix();
-	cbBlur.m_xmf4x4View = pCamera->GetViewMatrix();
-	m_ubBlurCB->CopyData(0, cbBlur);
-	pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_ubBlurCB->Resource()->GetGPUVirtualAddress());
+		CB_BLUR cbBlur;
+		XMMATRIX xmView = XMLoadFloat4x4(&pCamera->GetViewMatrix());
+		XMMATRIX xmPrevview = XMLoadFloat4x4(&pCamera->GetPrevViewMatrix());
+
+		XMFLOAT4X4 xmf4x4View;
+		XMFLOAT4X4 xmf4x4OldView;
+
+		XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(xmView));
+		XMStoreFloat4x4(&xmf4x4OldView, XMMatrixTranspose(xmPrevview));
+
+		cbBlur = { xmf4x4View, xmf4x4OldView };
+
+		m_ubBlurCB->CopyData(0, cbBlur);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(3, m_ubBlurCB->Resource()->GetGPUVirtualAddress());
+	}
 
 	if(nRenderMode & RENDER_SKYBOX)
 		m_pSkyboxShader->Render(pd3dCommandList, pCamera);
@@ -249,7 +261,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (nRenderMode & RENDER_BILLBOARD)
 	{
 		m_pBillBoardShader->Render(pd3dCommandList);
-		m_pAnimatedBillBoardShader->Render(pd3dCommandList);
+		//m_pAnimatedBillBoardShader->Render(pd3dCommandList);
 	}
 	
 	if(nRenderMode & RENDER_ROOM)
@@ -377,9 +389,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	pd3dRootParameters[6].InitAsDescriptorTable(_countof(descriptorRanges), descriptorRanges);
 
-	
 	pd3dRootParameters[7].InitAsConstants(3, 4, 0, D3D12_SHADER_VISIBILITY_ALL);
-
 
 	auto staticSamplers = GetStaticSamplers();
 

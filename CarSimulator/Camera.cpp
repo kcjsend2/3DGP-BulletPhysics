@@ -154,7 +154,7 @@ void CCamera::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 	XMFLOAT4X4 xmf4x4ViewProj;
 	XMStoreFloat4x4(&xmf4x4ViewProj, XMLoadFloat4x4(&Matrix4x4::Multiply((XMFLOAT4X4&)xmf4x4Projection, (XMFLOAT4X4&)xmf4x4View)));
 
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4View, 0);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Projection, 0);
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 3, &m_xmf3Position, 16);
 }
 

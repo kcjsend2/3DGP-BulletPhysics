@@ -255,7 +255,17 @@ void CGameFramework::BuildDescriptorHeaps()
 void CGameFramework::CreateVelocityMap()
 {
 	m_pVelocityMap = new CTexture(1, RESOURCE_TEXTURE2D, 0, 0, 1);
-	m_pVelocityMap->CreateTexture(m_pd3dDevice.Get(), FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_RENDER_TARGET, NULL, RESOURCE_TEXTURE2D, 0);
+
+	float c[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearValue.Color[0] = 0.0f;
+	clearValue.Color[1] = 0.0f;
+	clearValue.Color[2] = 0.0f;
+	clearValue.Color[3] = 0.0f;
+
+	m_pVelocityMap->CreateTexture(m_pd3dDevice.Get(), FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PRESENT, &clearValue, RESOURCE_TEXTURE2D, 0);
 
 	UINT nUavDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -523,7 +533,6 @@ void CGameFramework::FrameAdvance()
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_pd3dSrvDescriptorHeap.Get() };
 
-
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
@@ -579,6 +588,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->SetGraphicsRootDescriptorTable(6, m_pShadowMap[0]->GetSrv());
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pVelocityMap->GetResource(0), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
@@ -591,13 +602,15 @@ void CGameFramework::FrameAdvance()
 	float pfClearColor[4] = { 0.0f, 0.8f, 0.9f, 1.0f };
 
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
+
+
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 	m_pd3dCommandList->OMSetRenderTargets(2, d3dRenderTargets, FALSE, &d3dDsvCPUDescriptorHandle);
 
 	m_pd3dCommandList->OMSetStencilRef(1);
 
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT);
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT | RENDER_INIT);
 
 	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
 
@@ -610,11 +623,12 @@ void CGameFramework::FrameAdvance()
 
 	if (m_pPlayer)
 	{
-		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera); //
+		m_pPlayer->Render(m_pd3dCommandList.Get(), m_pCamera);
 	}
 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_INSTANCING_OBJECT | RENDER_BILLBOARD | RENDER_TERRAIN | RENDER_ROOM | RENDER_PARTICLE);
 	m_pd3dCommandList->OMSetStencilRef(0);
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pVelocityMap->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COPY_SOURCE));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -636,6 +650,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(1), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pScene->GetTexture()->GetResource(0), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
+
+	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pVelocityMap->GetResource(0), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PRESENT));
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	hResult = m_pd3dCommandList->Close();
