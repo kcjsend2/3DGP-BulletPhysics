@@ -600,9 +600,9 @@ void CGameFramework::FrameAdvance()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRenderTargets[2] = { d3dRtvCPUDescriptorHandle, d3dVelocityMapHandle };
 
 	float pfClearColor[4] = { 0.0f, 0.8f, 0.9f, 1.0f };
-
+	float pfVelocityColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
-
+	m_pd3dCommandList->ClearRenderTargetView(d3dVelocityMapHandle, pfVelocityColor, 0, NULL);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -612,12 +612,12 @@ void CGameFramework::FrameAdvance()
 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_LIGHT | RENDER_INIT);
 
-	float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
+	//float mirrorZ = m_pScene->RenderStencilMirror(m_pd3dCommandList.Get());
 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, RENDER_SKYBOX);
 	if (m_pPlayer)
 	{
-		m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
+		//m_pPlayer->ReflectedRender(m_pd3dCommandList.Get(), mirrorZ);
 	}
 	m_pScene->RenderMirror(m_pd3dCommandList.Get());
 

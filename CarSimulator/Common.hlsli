@@ -21,8 +21,8 @@ cbuffer cbShadowInfo : register(b2)
 
 cbuffer cbMotionBlurInfo : register(b3)
 {
-    matrix gmtxOldView : packoffset(c0);
-    matrix gmtxView : packoffset(c4);
+    matrix gmtxOldView;
+    matrix gmtxView;
 }
 
 cbuffer cbParticleInfo : register(b4)

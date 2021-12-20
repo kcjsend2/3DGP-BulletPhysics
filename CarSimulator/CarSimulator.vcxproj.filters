@@ -141,6 +141,5 @@
     <None Include="LightUtil.hlsli" />
     <None Include="Common.hlsli" />
     <None Include="Default_No_Light.hlsl" />
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

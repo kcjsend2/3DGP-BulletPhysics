@@ -36,7 +36,6 @@
 #include <DXGIDebug.h>
 #include <random>
 
-#include "pix3.h"
 #include "d3dx12.h"
 #include "UploadBuffer.h"
 #include "DDSTextureLoader12.h"

@@ -43,15 +43,15 @@ protected:
 	CInstancingShader* m_pInstancingShader = NULL;
 	CLightsShader* m_pLightShader = NULL;
 	CSkyBoxShader* m_pSkyboxShader = NULL;
-	CTreeBillBoardShader* m_pBillBoardShader = NULL;
+	//CTreeBillBoardShader* m_pBillBoardShader = NULL;
 	//CAnimatedBillBoardShader* m_pAnimatedBillBoardShader = NULL;
-	CMirrorShader* m_pMirrorShader = NULL;
-	CRoomShader* m_pRoomShader = NULL;
+	//CMirrorShader* m_pMirrorShader = NULL;
+	//CRoomShader* m_pRoomShader = NULL;
 	CParticleShader* m_pParticleShader = NULL;
 
 	std::shared_ptr<CTexture> m_pTexture = NULL;
 	CPostProcessingShader* m_pPostProcessingShader = NULL;
-	UploadBuffer<CB_BLUR>* m_ubBlurCB;
+	UploadBuffer<CB_BLUR>* m_ubBlurCB = NULL;
 	std::shared_ptr<CParticleObject> m_pParticleObject = NULL;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
