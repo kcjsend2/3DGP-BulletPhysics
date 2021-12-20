@@ -1892,7 +1892,7 @@ CPostProcessingShader::~CPostProcessingShader()
 
 D3D12_SHADER_BYTECODE CPostProcessingShader::CreateComputeShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"PostProcessing.hlsl", "CSEdgeDetection", "cs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"PostProcessing.hlsl", "CSGausianBlur", "cs_5_1", ppd3dShaderBlob));
 }
 
 void CPostProcessingShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
