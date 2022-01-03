@@ -13,8 +13,8 @@ groupshared float4 gf4GroupSharedCache[32 + 2][30 + 2];
 
 void GausianBlur(int3 n3GroupThreadID : SV_GroupThreadID, int3 n3DispatchThreadID : SV_DispatchThreadID)
 {
-    float3 f3HorizontalEdge = (-0.3f * gf4GroupSharedCache[n3GroupThreadID.x][n3GroupThreadID.y + 1].rgb) + (0.3f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y + 1].rgb) + (-0.3f * gf4GroupSharedCache[n3GroupThreadID.x + 2][n3GroupThreadID.y + 1].rgb);
-    float3 f3VerticalEdge = (-0.3f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y].rgb) + (0.3f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y + 1].rgb) + (-0.3f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y + 2].rgb);
+    float3 f3HorizontalEdge = (0.2f * gf4GroupSharedCache[n3GroupThreadID.x][n3GroupThreadID.y + 1].rgb) + (0.2f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y + 1].rgb) + (0.2f * gf4GroupSharedCache[n3GroupThreadID.x + 2][n3GroupThreadID.y + 1].rgb);
+    float3 f3VerticalEdge = (0.2f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y].rgb) + (0.2f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y + 1].rgb) + (0.2f * gf4GroupSharedCache[n3GroupThreadID.x + 1][n3GroupThreadID.y + 2].rgb);
 
 	gtxtRWOutput[n3DispatchThreadID.xy] = float4(sqrt(f3HorizontalEdge*f3HorizontalEdge + f3VerticalEdge*f3VerticalEdge), 1.0f);
 
